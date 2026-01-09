@@ -1,0 +1,99 @@
+################################
+# OS (macOS / Windows)
+################################
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+*.icloud
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+################################
+# Java
+################################
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+
+################################
+# Maven (Spring Legacy 기본)
+################################
+target/
+
+################################
+# IntelliJ IDEA
+################################
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+################################
+# STS / Eclipse (Spring Legacy 핵심)
+################################
+.project
+.classpath
+.settings/
+
+################################
+# Spring Legacy / WAS
+################################
+# Eclipse / STS build
+bin/
+
+# Tomcat
+logs/
+work/
+temp/
+
+################################
+# JSP / Frontend cache
+################################
+*.cache
+
+################################
+# Environment / DB 설정
+################################
+# local DB & secret
+jdbc.properties
+jdbc-local.properties
+application-local.properties
+application-dev.properties
+*.env
+
+################################
+# Archive (선택)
+################################
+*.zip
+*.tar.gz
+*.rar

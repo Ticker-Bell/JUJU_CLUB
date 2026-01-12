@@ -1,0 +1,78 @@
+    /* 전체 사이드바 컨테이너 */
+.sidebar {
+    width: 229px;
+    height: 914px;
+    background-color: #F7F6FE;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* 메뉴는 위, 정보는 아래로 분리 */
+    padding: 60px 20px 40px 20px;
+    box-sizing: border-box;
+    border-right: 1px solid #eee;
+}
+
+/* 버튼 기본 스타일 제거 */
+.menu-item {
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    text-align: left;
+    color: #8E8E8E; /* 비활성 글자색 */
+    transition: all 0.3s ease;
+}
+
+/* 아이콘을 감싸는 동그라미 (핵심!) */
+.icon-wrap {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%; /* 무조건 원형 */
+    transition: all 0.3s ease;
+    margin-right: 15px;
+}
+
+.icon-wrap img {
+    width: 24px;
+    height: 24px;
+    /* 비활성 상태일 때 아이콘 색상을 흐리게 (필요 시) */
+    filter: grayscale(100%) opacity(0.6);
+}
+
+/* [활성화 상태] 클릭된 메뉴 스타일 */
+.menu-item.active {
+    color: #6C5CE7; /* 텍스트 보라색 */
+}
+
+.menu-item.active .icon-wrap {
+    background-color: #6C5CE7; /* 원형 보라색 배경 */
+}
+
+.menu-item.active .icon-wrap img {
+    filter: brightness(0) invert(1); /* 검정 아이콘을 흰색으로 변경 */
+}
+
+.menu-text {
+    font-size: 17px;
+    font-weight: 600;
+}
+
+/* 하단 정보창 스타일 */
+.footer-info {
+    text-align: center;
+    font-size: 13px;
+    color: #B0B0B0;
+    line-height: 1.4;
+}
+
+.footer-info .copyright {
+    font-weight: bold;
+    color: #777;
+    margin-bottom: 8px;
+}

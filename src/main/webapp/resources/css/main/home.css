@@ -1,0 +1,230 @@
+/* ==========================================================================
+   JUJU CLUB - home.css
+   - 역할: 홈 화면의 "기본 스타일 + 전환/애니메이션 + 레이아웃 보정" 담당
+   - Tailwind 유틸리티로 표현하기 어려운 부분(정교한 전환, 위치, 키프레임)을 이 파일에서 관리
+   ========================================================================== */
+
+/* ✅ 구글폰트(Inter) 로드
+   - Tailwind 기본 폰트 + Apple 느낌을 주기 위해 Inter를 사용
+   - 폰트 변경 시 여기만 수정하면 전체 적용됨 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
+
+/* ✅ 전체 페이지 기본 스타일
+   - body overflow-x hidden: 애니메이션 이동 시 가로 스크롤 생기는 것 방지 */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F5F5F7;
+    color: #1D1D1F;
+    overflow-x: hidden;
+}
+
+/* ✅ 차트 라인 애니메이션(상단 주식 그래프 라인)
+   - stroke-dash* 트릭으로 "선이 그려지는" 애니메이션을 만들기 위해 초기값 설정 */
+.chart-line {
+    stroke-dasharray: 500;
+    stroke-dashoffset: 500;
+}
+
+/* ✅ 공통 베지어 곡선(Apple 스타일)
+   - 여러 transition에서 동일한 곡선을 쓰기 때문에 변수로 관리 */
+:root {
+    --ease-spring: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* ✅ 전환 대상 공통 클래스
+   - 화면 전환(로그인 패널 열기/닫기)에서
+     글자/버튼/설명 영역이 자연스럽게 이동하도록 공통 transition을 부여 */
+.transition-item {
+    transition: opacity 0.8s var(--ease-spring), transform 0.8s var(--ease-spring);
+    opacity: 1;
+    transform: translate(0, 0);
+    will-change: transform, opacity;
+}
+
+/* ✅ 복귀 시 "살짝 더 느리게 따라오는" 느낌
+   - closeLoginPanel에서 원상복구할 때 튕기지 않고 부드럽게 */
+.slow-restore {
+    transition: opacity 1.0s ease-out, transform 1.2s var(--ease-spring) !important;
+}
+
+/* ✅ 좌/우로 빠지는 애니메이션 클래스
+   - openLoginPanel()에서 타이틀 양 옆 텍스트를 각각 반대 방향으로 날림 */
+.exit-right { opacity: 0; transform: translateX(50px); }
+.exit-left  { opacity: 0; transform: translateX(-50px); }
+
+/* ✅ 아래로 사라지는 애니메이션 클래스
+   - 설명/버튼/스크롤아이콘 등이 "아래로 내려가며 사라지는" 효과 */
+.exit-down {
+    opacity: 0 !important;
+    transform: translateY(50px) !important;
+    pointer-events: none;
+}
+
+/* ==========================================================================
+   HERO (메인 히어로 영역)
+   ========================================================================== */
+
+/* ✅ 히어로 패널의 중심 배치 + 좌측 이동
+   - 기본: 화면 정중앙
+   - move-to-side: 로그인 패널 열 때 왼쪽으로 살짝 이동 */
+#hero-main-wrapper {
+    transition: left 0.9s var(--ease-spring), transform 0.9s var(--ease-spring);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 1200px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#hero-main-wrapper.move-to-side {
+    left: 30%;
+    transform: translate(-50%, -50%);
+}
+
+/* ✅ 타이핑 커서
+   - .hidden 으로 커서를 끄고/켜며 타이핑 UI를 자연스럽게 보이게 함 */
+.cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background-color: #5E45EB;
+    vertical-align: middle;
+    margin-left: 4px;
+    margin-bottom: 4px;
+}
+.cursor.hidden { display: none; }
+
+/* ✅ 가운데 강조 단어(아는 만큼/주주 클럽)의 폭 고정용 wrapper
+   - JS에서 가장 긴 텍스트 기준으로 width를 고정해,
+     글자가 바뀌어도 레이아웃이 흔들리지 않게 함 */
+#target-holder {
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ✅ 텍스트 자체는 opacity 전환으로 "부드러운 교체" */
+#target-text {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    transition: opacity 0.4s ease;
+}
+
+/* ==========================================================================
+   LOGIN PANEL (오른쪽 로그인 패널)
+   ========================================================================== */
+
+/* ✅ 로그인 패널 기본 상태
+   - 기본은 숨김(opacity 0 + 오른쪽에 살짝 위치)
+   - active 되면 opacity 1 + 제자리로 이동 */
+#login-section {
+    transition: opacity 0.7s ease, transform 0.8s var(--ease-spring);
+    opacity: 0;
+    transform: translateX(50px);
+    pointer-events: none;
+}
+
+#login-section.active {
+    transition-delay: 0.1s;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   TEXT AREA (메인 타이핑 / 로그인 타이핑)
+   ========================================================================== */
+
+/* ✅ 타이핑 wrapper
+   - hero 텍스트와 login 텍스트 영역이 "같은 위치"에서 교체되도록 absolute 레이어를 사용
+   - min-height로 높이를 고정해, 텍스트가 바뀌어도 버튼이 튀지 않게 함 */
+.typing-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    margin-top: 4.5rem;
+    min-height: 9rem;
+}
+
+#hero-text-area {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+}
+
+/* ✅ 로그인 텍스트는 왼쪽 정렬이 필요해서 별도 스타일
+   - visible에서만 opacity 1로 표시 */
+#login-text-area {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: left;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    opacity: 0;
+}
+#login-text-area.visible { opacity: 1; }
+
+/* ==========================================================================
+   AUTH FORM (로그인/회원가입/성공 화면 교체)
+   ========================================================================== */
+
+/* ✅ auth-form 기본은 숨김
+   - active-form만 보여주고 나머지는 pointer-events none 처리 */
+.auth-form {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* ✅ 현재 활성 폼 */
+.auth-form.active-form {
+    position: relative;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   SECTION REVEAL (스크롤 등장 애니메이션)
+   ========================================================================== */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 600ms ease-out, transform 1000ms var(--ease-spring);
+    will-change: opacity, transform;
+}
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+.reveal[data-delay="1"] { transition-delay: 150ms; }
+.reveal[data-delay="2"] { transition-delay: 300ms; }
+
+/* ✅ 스크롤 이동 시 헤더에 가려지는 문제 방지 */
+#home-sections { scroll-margin-top: 96px; }
+
+/* ✅ 로그인 패널 상태에서 스크롤 잠금
+   - 로그인 화면에서 배경 스크롤 되면 UX가 깨지므로 lock-scroll 클래스로 제어 */
+body.lock-scroll {
+    overflow: hidden !important;
+    height: 100vh;
+    touch-action: none;
+}

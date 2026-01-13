@@ -73,37 +73,25 @@
      [JSP] contextPath 설정 / JS에서 쓸 ctx 주입
      - AJAX 요청 URL (/auth/login.ajax 등)에 필요
      ========================================================= -->
+<%--<c:set var="ctx" value="${pageContext.request.contextPath}" />--%>
+
+<%--<script>--%>
+<%--	/* [GLOBAL] JS에서 사용할 contextPath */--%>
+<%--	window.__CTX__ = "<c:out value='${pageContext.request.contextPath}'/>";--%>
+<%--</script>--%>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
+<c:set var="cpath" value="${pageContext.request.contextPath}" />
 
 <script>
-	/* [GLOBAL] JS에서 사용할 contextPath */
 	window.__CTX__ = "<c:out value='${pageContext.request.contextPath}'/>";
 </script>
-
 
 <!-- =========================================================
      [HEADER 영역] : 상단 고정 네비게이션
      - (좌) 로고
      - (우) 기능소개 버튼 / 로그인 버튼
      ========================================================= -->
-<header class="fixed top-0 w-full p-6 md:p-8 flex justify-between items-center z-50 bg-white/70 backdrop-blur-md border-b border-gray-200/50 transition-all duration-500">
-	<!-- [HEADER-LEFT] 로고/브랜드 -->
-	<div class="text-xl font-black tracking-tighter cursor-pointer hover:opacity-80 transition-opacity text-primary">
-		JUJU CLUB
-	</div>
-
-	<!-- [HEADER-RIGHT] 메뉴 버튼 -->
-	<div class="flex gap-4">
-		<!-- 기능 소개(로그인 패널 닫기 용도로 사용됨) -->
-		<button id="btn-header-features" class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개</button>
-
-		<!-- 로그인 패널 열기 -->
-		<button id="btn-header-login" class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-			로그인
-		</button>
-	</div>
-</header>
-
+<jsp:include page="common/topbar.jsp"/>
 
 <!-- =========================================================
      [HERO 전체 영역] : 첫 화면(메인 히어로)
@@ -111,7 +99,7 @@
      - 오른쪽 로그인 패널 (숨김 상태 -> active 시 표시)
      - 하단 "더 알아보기" 스크롤 아이콘
      ========================================================= -->
-<div class="relative h-screen w-full">
+<div class="relative h-screen w-full overflow-hidden">
 
 	<!-- =======================================================
 	     [HERO - 중앙 메인 래퍼]

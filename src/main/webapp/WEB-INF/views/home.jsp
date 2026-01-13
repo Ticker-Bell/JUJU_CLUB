@@ -12,7 +12,6 @@
 	Hello world!
 </h1>
 
-<%--<P>  The time on the server is ${serverTime}. </P>--%>
-<%@ include file="common/sidebar.jsp"%>
+<P>  The time on the server is ${serverTime}. </P>
 </body>
 </html>

@@ -5,13 +5,9 @@
   Time: 오후 4:28
   To change this template use File | Settings | File Templates.
 --%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>로드맵</title>
-</head>
-<body>
-<%@ include file="../common/sidebar.jsp"%>
-<h1>로드맵</h1>
-</body>
-</html>
+<div>
+    <h1>ranking</h1>
+
+</div>

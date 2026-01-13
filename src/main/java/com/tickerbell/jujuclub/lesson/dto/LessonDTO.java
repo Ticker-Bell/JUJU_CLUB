@@ -8,20 +8,16 @@ import org.apache.ibatis.type.Alias;
 
 public class LessonDTO {
 
-  @Alias("QstChat")
+  @Alias("LessonTitle")
   @Builder
   @Data
   @AllArgsConstructor
   @NoArgsConstructor
-  public static class QstChat{
+  public static class LessonTitle{
 
-    private String lessonId;
+    private String chapterName;
+    private String lessonName;
     private String questionId;
-    private String questionType;
-    private String question_text;
-    private String options;
-    private String answer;
-    private String image;
   }
 
 }

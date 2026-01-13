@@ -7,7 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface LessonMapper {
-  List<LessonDTO.QstChat> selectQstChats(String lessonId);
+
   List<QstChatMsgDTO> selectQstChat(String lessonId);
+  LessonDTO.LessonTitle selectLssnTitle(String lessonId);
 
 }

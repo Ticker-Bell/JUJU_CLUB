@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.lesson.controller;
 
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
 import java.util.List;
@@ -21,9 +22,12 @@ public class LessonController {
   @GetMapping("/lessonInfo")
   public String lessonInfo(@RequestParam String lessonId, Model model) throws Exception {
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+    LessonDTO.LessonTitle title = lessonService.getLessonTitle(lessonId);
 
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
+    model.addAttribute("titles",title);
+
 
     return "/lesson/lessonInfo";
   }

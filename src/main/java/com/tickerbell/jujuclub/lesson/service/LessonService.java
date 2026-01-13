@@ -2,6 +2,7 @@ package com.tickerbell.jujuclub.lesson.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonTitle;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.mapper.LessonMapper;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class LessonService {
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   /**
-   * 레슨 채팅 목록 조회
+   * 레슨 화면  개념형 문제 채팅 조회
    */
   public Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> getLessonChat(String lessonId) throws Exception {
     List<QstChatMsgDTO> jsonList = lessonMapper.selectQstChat(lessonId);
@@ -38,5 +39,11 @@ public class LessonService {
     return chatMap;
   }
 
+  /**
+   * 레슨 화면 타이틀 조회
+   */
+  public LessonTitle getLessonTitle(String lessonId){
+    return lessonMapper.selectLssnTitle(lessonId);
+  }
 
 }

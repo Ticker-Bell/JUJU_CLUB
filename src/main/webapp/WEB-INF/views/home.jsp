@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page session="false" %>
+<%@ page session="true" %>
 <!doctype html>
 <html lang="ko">
 <head>
@@ -177,6 +177,8 @@
 
 <body>
 
+<c:set var="ctx" value="${pageContext.request.contextPath}" />
+
 <header class="fixed top-0 w-full p-6 md:p-8 flex justify-between items-center z-50 bg-white/70 backdrop-blur-md border-b border-gray-200/50 transition-all duration-500">
 	<div class="text-xl font-black tracking-tighter cursor-pointer hover:opacity-80 transition-opacity text-primary">
 		JUJU CLUB
@@ -205,8 +207,8 @@
 						</svg>
 					</div>
 					<span id="target-holder" class="relative z-20">
-                        <span id="target-text" class="text-primary">아는 만큼</span>
-                    </span>
+						<span id="target-text" class="text-primary">아는 만큼</span>
+					</span>
 				</div>
 
 				<span id="title-part-2" class="transition-item inline-block">보인다.</span>
@@ -215,9 +217,9 @@
 			<div class="typing-wrapper">
 				<div id="hero-text-area" class="transition-item">
 					<p id="hero-desc" class="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto flex items-center justify-center">
-                        <span>
-                            <span id="type-content"></span><span id="cursor-main" class="cursor animate-blink"></span>
-                        </span>
+						<span>
+							<span id="type-content"></span><span id="cursor-main" class="cursor animate-blink"></span>
+						</span>
 					</p>
 				</div>
 
@@ -235,10 +237,10 @@
 		</div>
 
 		<div id="hero-btns" class="transition-item pt-10 flex flex-col md:flex-row gap-4 justify-center">
-			<button id="btn-start" class="bg-primary text-white px-12 py-6 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
+			<button id="btn-start" type="button" class="bg-primary text-white px-12 py-6 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
 				주주클럽 시작하기
 			</button>
-			<button class="bg-white text-black px-12 py-6 rounded-full font-bold text-lg hover:bg-gray-50 transition-colors shadow-soft">
+			<button type="button" class="bg-white text-black px-12 py-6 rounded-full font-bold text-lg hover:bg-gray-50 transition-colors shadow-soft">
 				더 알아보기 ↓
 			</button>
 		</div>
@@ -248,64 +250,88 @@
 
 		<div id="auth-card" class="w-full max-w-2xl bg-white p-12 md:p-16 rounded-[48px] shadow-2xl relative border border-gray-100 flex flex-col justify-center min-h-[550px] transition-all duration-500">
 
+			<!-- 로그인 폼 -->
 			<div id="form-login" class="auth-form active-form">
 				<div>
 					<form onsubmit="event.preventDefault();" class="space-y-8 mt-2">
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-3 ml-1">이메일</label>
-							<input type="email" class="w-full px-8 py-6 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400" placeholder="juju@club.com">
+							<input id="loginEmail" name="email" type="email"
+								   class="w-full px-8 py-6 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
+								   placeholder="juju@club.com" autocomplete="username">
 						</div>
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-3 ml-1">비밀번호</label>
-							<input type="password" class="w-full px-8 py-6 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl" placeholder="••••••••">
+							<input id="loginPassword" name="password" type="password"
+								   class="w-full px-8 py-6 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl"
+								   placeholder="••••••••" autocomplete="current-password">
 						</div>
+
 						<div class="flex justify-between items-center text-base px-2">
 							<label class="flex items-center gap-3 cursor-pointer group">
-								<input type="checkbox" class="w-5 h-5 text-primary rounded border-gray-300 focus:ring-primary bg-gray-100">
+								<input id="autoLogin" type="checkbox"
+									   class="w-5 h-5 text-primary rounded border-gray-300 focus:ring-primary bg-gray-100">
 								<span class="text-gray-500 font-medium group-hover:text-primary transition-colors">자동 로그인</span>
 							</label>
 							<a href="#" class="text-primary font-bold hover:underline">비밀번호 찾기</a>
 						</div>
-						<button class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-6">
+
+						<button id="btn-submit-login" type="button"
+								class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-6">
 							로그인하기
 						</button>
 					</form>
+
 					<div class="mt-10 text-center text-base text-gray-400 font-medium">
-						계정이 없으신가요? <button id="btn-go-signup" class="text-primary font-bold hover:underline ml-1">회원가입</button>
+						계정이 없으신가요?
+						<button id="btn-go-signup" type="button" class="text-primary font-bold hover:underline ml-1">회원가입</button>
 					</div>
 				</div>
 			</div>
 
+			<!-- 회원가입 폼 -->
 			<div id="form-signup" class="auth-form">
 				<div>
 					<form onsubmit="event.preventDefault();" class="space-y-6 mt-2">
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">이메일</label>
-							<input type="email" class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400" placeholder="example@email.com">
+							<input id="signupEmail" name="email" type="email"
+								   class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
+								   placeholder="example@email.com" autocomplete="username">
 						</div>
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">닉네임</label>
-							<input type="text" class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400" placeholder="멋진 주주">
+							<input id="signupUsername" name="username" type="text"
+								   class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
+								   placeholder="멋진 주주" autocomplete="nickname">
 						</div>
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">비밀번호</label>
-							<input type="password" class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl" placeholder="••••••••">
+							<input id="signupPassword" name="password" type="password"
+								   class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl"
+								   placeholder="••••••••" autocomplete="new-password">
 						</div>
 
-						<button id="btn-submit-signup" class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-4">
+						<button id="btn-submit-signup" type="button"
+								class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-4">
 							가입 완료
 						</button>
 					</form>
+
 					<div class="mt-8 text-center text-base text-gray-400 font-medium">
-						이미 계정이 있으신가요? <button id="btn-go-login" class="text-primary font-bold hover:underline ml-1">로그인</button>
+						이미 계정이 있으신가요?
+						<button id="btn-go-login" type="button" class="text-primary font-bold hover:underline ml-1">로그인</button>
 					</div>
 				</div>
 			</div>
 
+			<!-- 성공 화면 -->
 			<div id="form-success" class="auth-form items-center justify-center text-center">
 				<div class="mb-6 animate-bounce-short">
 					<div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto">
-						<svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+						<svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+						</svg>
 					</div>
 				</div>
 				<h2 class="text-4xl font-black text-gray-900 mb-4">축하합니다!</h2>
@@ -316,12 +342,16 @@
 	</div>
 
 	<div id="scroll-icon" class="transition-item absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-gray-400">
-		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+		</svg>
 	</div>
 
 </div>
 
 <script>
+	const ctx = '<c:out value="${pageContext.request.contextPath}"/>';
+
 	const btnStart = document.getElementById('btn-start');
 	const heroMainWrapper = document.getElementById('hero-main-wrapper');
 
@@ -336,7 +366,7 @@
 
 	const loginTextArea = document.getElementById('login-text-area');
 	const loginSection = document.getElementById('login-section');
-	const authCard = document.getElementById('auth-card'); // 흰색 카드 요소
+	const authCard = document.getElementById('auth-card');
 
 	const typingWrapper = document.querySelector('.typing-wrapper');
 
@@ -347,6 +377,8 @@
 
 	const btnGoSignup = document.getElementById('btn-go-signup');
 	const btnGoLogin = document.getElementById('btn-go-login');
+
+	const btnSubmitLogin = document.getElementById('btn-submit-login');
 	const btnSubmitSignup = document.getElementById('btn-submit-signup');
 
 	// --- 1. 메인 타이핑 로직 ---
@@ -521,9 +553,90 @@
 	btnGoSignup.addEventListener('click', () => switchForm(true));
 	btnGoLogin.addEventListener('click', () => switchForm(false));
 
-	// --- 6. [Updated] 가입 완료 및 집중된 축하 효과 ---
-	btnSubmitSignup.addEventListener('click', () => {
-		// 회원가입 폼 숨기기
+	// ====== 공통: 인라인 에러 표시 ======
+	function showInlineError(formEl, msg) {
+		let box = formEl.querySelector('.form-error');
+		if (!box) {
+			box = document.createElement('div');
+			box.className = 'form-error mt-4 text-sm font-bold text-red-500';
+			formEl.querySelector('form').appendChild(box);
+		}
+		box.textContent = msg || '처리 중 오류가 발생했습니다.';
+	}
+
+	function clearInlineError(formEl){
+		const box = formEl.querySelector('.form-error');
+		if (box) box.remove();
+	}
+
+	async function postJson(url, data){
+		const r = await fetch(url, {
+			method: 'POST',
+			headers: { 'Content-Type':'application/json', 'Accept':'application/json' },
+			body: JSON.stringify(data)
+		});
+		const text = await r.text();
+		try { return JSON.parse(text); }
+		catch(e){ return { ok:false, message:text || '서버 응답 오류' }; }
+	}
+
+	// --- 6. 로그인 AJAX (틀) ---
+	btnSubmitLogin.addEventListener('click', async () => {
+		clearInlineError(formLogin);
+
+		const email = document.getElementById('loginEmail')?.value?.trim();
+		const password = document.getElementById('loginPassword')?.value;
+
+		if (!email || !password) {
+			showInlineError(formLogin, '이메일/비밀번호를 입력해 주세요.');
+			return;
+		}
+
+		btnSubmitLogin.disabled = true;
+		btnSubmitLogin.classList.add('opacity-60');
+
+		// TODO: 서버에 맞춰 구현 (예: /auth/login.ajax)
+		const res = await postJson(ctx + '/auth/login.ajax', { email, password });
+
+		btnSubmitLogin.disabled = false;
+		btnSubmitLogin.classList.remove('opacity-60');
+
+		if (!res.ok) {
+			showInlineError(formLogin, res.message);
+			return;
+		}
+
+		// 로그인 성공 처리 예시
+		window.location.reload();
+	});
+
+	// --- 7. 회원가입 AJAX + 성공 애니메이션 ---
+	btnSubmitSignup.addEventListener('click', async () => {
+		clearInlineError(formSignup);
+
+		const email = document.getElementById('signupEmail')?.value?.trim();
+		const username = document.getElementById('signupUsername')?.value?.trim();
+		const password = document.getElementById('signupPassword')?.value;
+
+		if (!email || !username || !password) {
+			showInlineError(formSignup, '이메일/닉네임/비밀번호를 모두 입력해 주세요.');
+			return;
+		}
+
+		btnSubmitSignup.disabled = true;
+		btnSubmitSignup.classList.add('opacity-60');
+
+		const res = await postJson(ctx + '/auth/signin.ajax', { email, username, password });
+
+		btnSubmitSignup.disabled = false;
+		btnSubmitSignup.classList.remove('opacity-60');
+
+		if (!res.ok) {
+			showInlineError(formSignup, res.message);
+			return;
+		}
+
+		// ✅ 성공이면 기존 성공 애니메이션 실행
 		formSignup.style.opacity = '0';
 		formSignup.style.transform = 'translateY(10px)';
 		formSignup.style.pointerEvents = 'none';
@@ -532,60 +645,29 @@
 			formSignup.classList.remove('active-form');
 			formSuccess.classList.add('active-form');
 
-			// 축하 메시지 등장
 			setTimeout(() => {
 				formSuccess.style.opacity = '1';
 				formSuccess.style.transform = 'translateY(0)';
 
-				// [New] 집중 폭죽 효과 (Focused Confetti)
-				// 카드의 위치를 계산하여 그 주변에서 발사
 				const rect = authCard.getBoundingClientRect();
-
-				// 화면 전체 기준 좌표 (0~1)로 변환
-				// 카드 왼쪽 끝
 				const x1 = rect.left / window.innerWidth;
-				// 카드 오른쪽 끝
 				const x2 = rect.right / window.innerWidth;
-				// 카드 중간 높이
 				const y = (rect.top + rect.height / 2) / window.innerHeight;
 
-				var duration = 1000; // [수정] 1초로 짧게 설정
+				var duration = 1000;
 				var end = Date.now() + duration;
 
 				(function frame() {
-					// 왼쪽 발사 (카드 왼쪽 가장자리에서 안쪽으로)
-					confetti({
-						particleCount: 5,
-						angle: 60,
-						spread: 55,
-						origin: { x: x1, y: y },
-						colors: ['#5E45EB', '#ECE9FD'],
-						zIndex: 9999
-					});
-					// 오른쪽 발사 (카드 오른쪽 가장자리에서 안쪽으로)
-					confetti({
-						particleCount: 5,
-						angle: 120,
-						spread: 55,
-						origin: { x: x2, y: y },
-						colors: ['#5E45EB', '#ECE9FD'],
-						zIndex: 9999
-					});
-
-					if (Date.now() < end) {
-						requestAnimationFrame(frame);
-					}
+					confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: x1, y: y }, colors: ['#5E45EB', '#ECE9FD'], zIndex: 9999 });
+					confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: x2, y: y }, colors: ['#5E45EB', '#ECE9FD'], zIndex: 9999 });
+					if (Date.now() < end) requestAnimationFrame(frame);
 				}());
-
 			}, 50);
 
-			// 3초 후 로그인으로 자동 복귀
 			setTimeout(() => {
-				// 성공 메시지 퇴장
 				formSuccess.style.opacity = '0';
 				formSuccess.style.transform = 'translateY(10px)';
 
-				// 왼쪽 텍스트 복귀
 				startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
 
 				setTimeout(() => {
@@ -603,9 +685,7 @@
 
 		}, 400);
 	});
-
 </script>
 
 </body>
 </html>
-

@@ -8,10 +8,11 @@
   <settings>
     <setting name="cacheEnabled" value="true"/>
     <setting name="lazyLoadingEnabled" value="true"/>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
 
   <!-- typeAliases -->
   <typeAliases>
-    <typeAlias alias="User" type="com.tickerbell.jujuclub.auth.dto.LoginDTO"/>
+    <package name="com.tickerbell.jujuclub"/>
   </typeAliases>
 </configuration>

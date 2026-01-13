@@ -24,7 +24,7 @@
 
   <!-- Mapper Scanner -->
   <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-    <property name="basePackage" value="com.tickerbell.jujuclub.auth.mapper"/>
+    <property name="basePackage" value="com.tickerbell.jujuclub"/>
     <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
   </bean>
 

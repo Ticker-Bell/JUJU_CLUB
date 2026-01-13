@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.lesson.mapper.LessonMapper">
+  <select id="selectQstChats" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$QstChat">
+    SELECT learning_question_chat.question_seq AS questionSeq
+         , speaker
+         , message_text                        AS messageText
+         , order_no                            AS orderNo
+    FROM learning_question_chat
+           left outer join jujuclubproject.learning_question lq
+                           on lq.question_seq = learning_question_chat.question_seq
+    WHERE lesson_id = #{lessonId}
+    ORDER BY order_no ASC
+
+  </select>
+  <select id="asd" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$QstChat">
+    SELECT *
+    from learning_question
+
+  </select>
+
+  <select id="selectQstChat" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
+    SELECT options
+    FROM learning_question
+    WHERE lesson_id = #{lessonId}
+  </select>
+
+</mapper>

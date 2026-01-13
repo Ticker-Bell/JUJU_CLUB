@@ -3,13 +3,22 @@
 <%@ page session="true" %>
 <!doctype html>
 <html lang="ko">
+
+<!-- =========================================================
+     [HEAD] : 라이브러리 로드 / Tailwind 설정 / 분리 CSS 연결
+     ========================================================= -->
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>JUJU CLUB - Focused Celebration</title>
+
+	<!-- [LIB] Tailwind CSS (CDN) -->
 	<script src="https://cdn.tailwindcss.com"></script>
+
+	<!-- [LIB] Confetti (회원가입 성공 축하 이펙트) -->
 	<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+	<!-- [CONFIG] Tailwind 커스텀 컬러/애니메이션 설정 -->
 	<script>
 		tailwind.config = {
 			theme: {
@@ -25,9 +34,10 @@
 						dark: '#1D1D1F',
 					},
 					animation: {
-						'draw-once': 'drawOnce 2s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+						'draw-once': 'drawOnce 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
 						'blink': 'blink 1s step-end infinite',
 						'bounce-short': 'bounceShort 1s ease-in-out infinite',
+						'float-slow': 'floatSlow 3.2s ease-in-out infinite',
 					},
 					keyframes: {
 						drawOnce: {
@@ -42,6 +52,10 @@
 						bounceShort: {
 							'0%, 100%': { transform: 'translateY(0)' },
 							'50%': { transform: 'translateY(-10px)' },
+						},
+						floatSlow: {
+							'0%, 100%': { transform: 'translateY(0)' },
+							'50%': { transform: 'translateY(-12px)' },
 						}
 					}
 				}
@@ -49,156 +63,76 @@
 		}
 	</script>
 
-	<style>
-		@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap');
-
-		body {
-			font-family: 'Inter', sans-serif;
-			background-color: #F5F5F7;
-			color: #1D1D1F;
-			overflow-x: hidden;
-		}
-
-		.chart-line {
-			stroke-dasharray: 500;
-			stroke-dashoffset: 500;
-		}
-
-		.transition-item {
-			transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-			opacity: 1;
-			transform: translate(0, 0);
-			will-change: transform, opacity;
-		}
-
-		.exit-right { opacity: 0; transform: translateX(60px); }
-		.exit-left { opacity: 0; transform: translateX(-60px); }
-		.exit-down { opacity: 0; transform: translateY(150px); pointer-events: none; }
-
-		#hero-main-wrapper {
-			transition: left 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			width: 100%;
-			max-width: 1200px;
-			z-index: 20;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-		}
-
-		#hero-main-wrapper.move-to-side {
-			left: 30%;
-			transform: translate(-50%, -50%);
-		}
-
-		.cursor {
-			display: inline-block;
-			width: 2px;
-			height: 1.2em;
-			background-color: #5E45EB;
-			vertical-align: middle;
-			margin-left: 4px;
-			margin-bottom: 4px;
-		}
-		.cursor.hidden { display: none; }
-
-		#target-holder {
-			display: inline-block;
-			position: relative;
-			text-align: center;
-			white-space: nowrap;
-		}
-		#target-text {
-			display: inline-block;
-			width: 100%;
-			text-align: center;
-			transition: opacity 0.3s ease;
-		}
-
-		#login-section {
-			transition: opacity 1s ease 0.8s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.8s;
-			opacity: 0;
-			transform: translateX(60px);
-			pointer-events: none;
-		}
-		#login-section.active {
-			opacity: 1;
-			transform: translateX(0);
-			pointer-events: auto;
-		}
-
-		.typing-wrapper {
-			position: relative;
-			width: 100%;
-			display: flex;
-			margin-top: 4.5rem;
-			min-height: 9rem;
-		}
-
-		#hero-text-area {
-			position: absolute;
-			top: 0;
-			width: 100%;
-			text-align: center;
-		}
-
-		#login-text-area {
-			position: absolute;
-			top: 0;
-			width: 100%;
-			text-align: left;
-		}
-
-		.auth-form {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 100%;
-			height: 100%;
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			opacity: 0;
-			transform: translateY(10px);
-			pointer-events: none;
-			transition: opacity 0.4s ease, transform 0.4s ease;
-		}
-		.auth-form.active-form {
-			position: relative;
-			opacity: 1;
-			transform: translateY(0);
-			pointer-events: auto;
-		}
-	</style>
+	<!-- [CSS] 분리된 스타일 파일 -->
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/main/home.css" />
 </head>
 
 <body>
 
+<!-- =========================================================
+     [JSP] contextPath 설정 / JS에서 쓸 ctx 주입
+     - AJAX 요청 URL (/auth/login.ajax 등)에 필요
+     ========================================================= -->
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
+<script>
+	/* [GLOBAL] JS에서 사용할 contextPath */
+	window.__CTX__ = "<c:out value='${pageContext.request.contextPath}'/>";
+</script>
+
+
+<!-- =========================================================
+     [HEADER 영역] : 상단 고정 네비게이션
+     - (좌) 로고
+     - (우) 기능소개 버튼 / 로그인 버튼
+     ========================================================= -->
 <header class="fixed top-0 w-full p-6 md:p-8 flex justify-between items-center z-50 bg-white/70 backdrop-blur-md border-b border-gray-200/50 transition-all duration-500">
+	<!-- [HEADER-LEFT] 로고/브랜드 -->
 	<div class="text-xl font-black tracking-tighter cursor-pointer hover:opacity-80 transition-opacity text-primary">
 		JUJU CLUB
 	</div>
+
+	<!-- [HEADER-RIGHT] 메뉴 버튼 -->
 	<div class="flex gap-4">
-		<button class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개</button>
-		<button class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+		<!-- 기능 소개(로그인 패널 닫기 용도로 사용됨) -->
+		<button id="btn-header-features" class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개</button>
+
+		<!-- 로그인 패널 열기 -->
+		<button id="btn-header-login" class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
 			로그인
 		</button>
 	</div>
 </header>
 
-<div class="relative h-screen w-full overflow-hidden">
 
+<!-- =========================================================
+     [HERO 전체 영역] : 첫 화면(메인 히어로)
+     - 가운데 타이틀/타이핑/CTA 버튼
+     - 오른쪽 로그인 패널 (숨김 상태 -> active 시 표시)
+     - 하단 "더 알아보기" 스크롤 아이콘
+     ========================================================= -->
+<div class="relative h-screen w-full">
+
+	<!-- =======================================================
+	     [HERO - 중앙 메인 래퍼]
+	     - 타이틀(주식 / 아는 만큼 / 보인다)
+	     - 메인 타이핑 설명 문구
+	     - CTA 버튼(주주클럽 시작하기)
+	     ======================================================= -->
 	<div id="hero-main-wrapper">
+
+		<!-- [HERO - 타이틀/타이핑 영역 묶음] -->
 		<div class="flex flex-col items-center">
+
+			<!-- [HERO - 메인 타이틀] -->
 			<h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-tight text-dark flex flex-col md:block items-center justify-center whitespace-nowrap text-center">
+
+				<!-- (좌) "주식" -->
 				<span id="title-part-1" class="transition-item inline-block">주식 </span>
 
-				<div class="relative inline-block mx-2 md:mx-4 lg:mx-6 mt-16 md:mt-0 transition-all duration-1000">
+				<!-- (중앙) "아는 만큼" ↔ "주주 클럽" 변경되는 단어 + 그래프 라인 -->
+				<div class="relative inline-block mx-2 md:mx-4 lg:mx-6 mt-16 md:mt-0 transition-all duration-700">
+					<!-- 타이틀 위 그래프 라인(애니메이션) -->
 					<div class="absolute -top-28 left-0 w-full h-28 flex items-end justify-center pointer-events-none">
 						<svg viewBox="0 0 300 100" class="w-full h-full overflow-visible">
 							<path d="M0,95 L70,40 L120,75 L190,20 L240,40 L300,0"
@@ -206,24 +140,35 @@
 								  class="chart-line animate-draw-once drop-shadow-xl" />
 						</svg>
 					</div>
+
+					<!-- 실제 바뀌는 텍스트(폭 고정 JS 적용 대상) -->
 					<span id="target-holder" class="relative z-20">
-						<span id="target-text" class="text-primary">아는 만큼</span>
-					</span>
+           				<span id="target-text" class="text-primary">아는 만큼</span>
+          			</span>
 				</div>
 
+				<!-- (우) "보인다." -->
 				<span id="title-part-2" class="transition-item inline-block">보인다.</span>
 			</h1>
 
+			<!-- ===================================================
+			     [HERO - 타이핑 문구 영역]
+			     - hero-text-area : 메인(중앙) 타이핑
+			     - login-text-area : 로그인 패널 열렸을 때 좌측 정렬 타이핑
+			     =================================================== -->
 			<div class="typing-wrapper">
+
+				<!-- [HERO - 메인 타이핑 문구] -->
 				<div id="hero-text-area" class="transition-item">
 					<p id="hero-desc" class="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed max-w-2xl mx-auto flex items-center justify-center">
-						<span>
-							<span id="type-content"></span><span id="cursor-main" class="cursor animate-blink"></span>
-						</span>
+            			<span>
+              				<span id="type-content"></span><span id="cursor-main" class="cursor animate-blink"></span>
+            			</span>
 					</p>
 				</div>
 
-				<div id="login-text-area" class="hidden opacity-0 transition-opacity duration-500">
+				<!-- [LOGIN - 사이드 타이핑 문구] (로그인 패널 열리면 보임) -->
+				<div id="login-text-area">
 					<div class="text-xl md:text-2xl text-gray-500 font-medium flex flex-col gap-2 items-start">
 						<div class="block">
 							<span id="login-type-title"></span><span id="cursor-login-title" class="cursor animate-blink"></span>
@@ -233,33 +178,43 @@
 						</div>
 					</div>
 				</div>
+
 			</div>
 		</div>
 
-		<div id="hero-btns" class="transition-item pt-10 flex flex-col md:flex-row gap-4 justify-center">
-			<button id="btn-start" type="button" class="bg-primary text-white px-12 py-6 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
+		<!-- [HERO - CTA 버튼 영역] -->
+		<div id="hero-btns" class="transition-item pt-10 flex justify-center w-full">
+			<button id="btn-start" type="button"
+					class="bg-primary text-white px-12 py-6 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl shadow-primary/30">
 				주주클럽 시작하기
 			</button>
-			<button type="button" class="bg-white text-black px-12 py-6 rounded-full font-bold text-lg hover:bg-gray-50 transition-colors shadow-soft">
-				더 알아보기 ↓
-			</button>
 		</div>
+
 	</div>
 
-	<div id="login-section" class="absolute top-0 right-0 w-full md:w-[60%] h-full flex items-center justify-center p-8 md:p-16 z-10">
 
+	<!-- =======================================================
+	     [LOGIN PANEL 영역] : 오른쪽 로그인/회원가입 카드
+	     - login-section : 패널 컨테이너(숨김 -> active 시 표시)
+	     - auth-card : 카드 UI
+	     - form-login / form-signup / form-success : 폼 3단계 전환
+	     ======================================================= -->
+	<div id="login-section" class="absolute top-0 right-0 w-full md:w-[60%] h-full flex items-center justify-center p-8 md:p-16 z-10">
 		<div id="auth-card" class="w-full max-w-2xl bg-white p-12 md:p-16 rounded-[48px] shadow-2xl relative border border-gray-100 flex flex-col justify-center min-h-[550px] transition-all duration-500">
 
-			<!-- 로그인 폼 -->
+			<!-- [FORM-1] 로그인 폼 -->
 			<div id="form-login" class="auth-form active-form">
 				<div>
 					<form onsubmit="event.preventDefault();" class="space-y-8 mt-2">
+						<!-- 이메일 -->
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-3 ml-1">이메일</label>
 							<input id="loginEmail" name="email" type="email"
 								   class="w-full px-8 py-6 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
 								   placeholder="juju@club.com" autocomplete="username">
 						</div>
+
+						<!-- 비밀번호 -->
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-3 ml-1">비밀번호</label>
 							<input id="loginPassword" name="password" type="password"
@@ -267,6 +222,7 @@
 								   placeholder="••••••••" autocomplete="current-password">
 						</div>
 
+						<!-- 자동로그인 / 비밀번호 찾기 -->
 						<div class="flex justify-between items-center text-base px-2">
 							<label class="flex items-center gap-3 cursor-pointer group">
 								<input id="autoLogin" type="checkbox"
@@ -276,12 +232,14 @@
 							<a href="#" class="text-primary font-bold hover:underline">비밀번호 찾기</a>
 						</div>
 
+						<!-- 로그인 버튼 -->
 						<button id="btn-submit-login" type="button"
 								class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-6">
 							로그인하기
 						</button>
 					</form>
 
+					<!-- 로그인 -> 회원가입 전환 -->
 					<div class="mt-10 text-center text-base text-gray-400 font-medium">
 						계정이 없으신가요?
 						<button id="btn-go-signup" type="button" class="text-primary font-bold hover:underline ml-1">회원가입</button>
@@ -289,22 +247,27 @@
 				</div>
 			</div>
 
-			<!-- 회원가입 폼 -->
+			<!-- [FORM-2] 회원가입 폼 -->
 			<div id="form-signup" class="auth-form">
 				<div>
 					<form onsubmit="event.preventDefault();" class="space-y-6 mt-2">
+						<!-- 이메일 -->
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">이메일</label>
 							<input id="signupEmail" name="email" type="email"
 								   class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
 								   placeholder="example@email.com" autocomplete="username">
 						</div>
+
+						<!-- 닉네임 -->
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">닉네임</label>
 							<input id="signupUsername" name="username" type="text"
 								   class="w-full px-8 py-5 rounded-3xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all outline-none font-medium text-xl placeholder-gray-400"
 								   placeholder="멋진 주주" autocomplete="nickname">
 						</div>
+
+						<!-- 비밀번호 -->
 						<div>
 							<label class="block text-base font-bold text-gray-700 mb-2 ml-1">비밀번호</label>
 							<input id="signupPassword" name="password" type="password"
@@ -312,12 +275,14 @@
 								   placeholder="••••••••" autocomplete="new-password">
 						</div>
 
+						<!-- 가입 버튼 -->
 						<button id="btn-submit-signup" type="button"
 								class="w-full bg-primary text-white font-bold py-6 rounded-3xl hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-1 transition-all duration-300 text-xl md:text-2xl mt-4">
 							가입 완료
 						</button>
 					</form>
 
+					<!-- 회원가입 -> 로그인 전환 -->
 					<div class="mt-8 text-center text-base text-gray-400 font-medium">
 						이미 계정이 있으신가요?
 						<button id="btn-go-login" type="button" class="text-primary font-bold hover:underline ml-1">로그인</button>
@@ -325,7 +290,7 @@
 				</div>
 			</div>
 
-			<!-- 성공 화면 -->
+			<!-- [FORM-3] 가입 성공 화면(축하 + 자동으로 로그인폼 복귀) -->
 			<div id="form-success" class="auth-form items-center justify-center text-center">
 				<div class="mb-6 animate-bounce-short">
 					<div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto">
@@ -341,351 +306,152 @@
 		</div>
 	</div>
 
-	<div id="scroll-icon" class="transition-item absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-gray-400">
-		<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-		</svg>
+
+	<!-- =======================================================
+	     [SCROLL ICON 영역] : "더 알아보기" 버튼
+	     - 클릭 시 #home-sections로 스무스 스크롤
+	     - 스크롤 조금 내려가면 자동으로 사라짐(JS)
+	     ======================================================= -->
+	<div class="absolute bottom-10 inset-x-0 flex justify-center">
+		<button id="scroll-icon"
+				type="button"
+				class="transition-item text-gray-400 hover:text-primary transition-colors flex flex-col items-center gap-2 animate-float-slow">
+			<span class="text-xs font-bold tracking-widest">더 알아보기</span>
+			<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+			</svg>
+		</button>
 	</div>
 
 </div>
 
-<script>
-	const ctx = '<c:out value="${pageContext.request.contextPath}"/>';
 
-	const btnStart = document.getElementById('btn-start');
-	const heroMainWrapper = document.getElementById('hero-main-wrapper');
-
-	const targetHolder = document.getElementById('target-holder');
-	const targetText = document.getElementById('target-text');
-	const titlePart1 = document.getElementById('title-part-1');
-	const titlePart2 = document.getElementById('title-part-2');
-
-	const heroTextArea = document.getElementById('hero-text-area');
-	const heroBtns = document.getElementById('hero-btns');
-	const scrollIcon = document.getElementById('scroll-icon');
-
-	const loginTextArea = document.getElementById('login-text-area');
-	const loginSection = document.getElementById('login-section');
-	const authCard = document.getElementById('auth-card');
-
-	const typingWrapper = document.querySelector('.typing-wrapper');
-
-	// 폼 요소
-	const formLogin = document.getElementById('form-login');
-	const formSignup = document.getElementById('form-signup');
-	const formSuccess = document.getElementById('form-success');
-
-	const btnGoSignup = document.getElementById('btn-go-signup');
-	const btnGoLogin = document.getElementById('btn-go-login');
-
-	const btnSubmitLogin = document.getElementById('btn-submit-login');
-	const btnSubmitSignup = document.getElementById('btn-submit-signup');
-
-	// --- 1. 메인 타이핑 로직 ---
-	const typeContent = document.getElementById('type-content');
-	const textSequence = [
-		{ text: "주식 시장의 언어를 배우고,", type: "text" },
-		{ text: "break", type: "br" },
-		{ text: "리스크 없는 환경에서 당신의 투자를 실험하세요. ", type: "text" },
-		{ text: "break", type: "br" },
-		{ text: "주주클럽", type: "strong" },
-		{ text: "이 함께합니다.", type: "text" }
-	];
-
-	function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
-
-	async function typeWriter(element, sequence, speed = 80) {
-		element.innerHTML = "";
-		for (const item of sequence) {
-			if (item.type === 'text') {
-				for (let char of item.text) {
-					element.insertAdjacentText('beforeend', char);
-					await wait(speed);
-				}
-			} else if (item.type === 'br') {
-				element.insertAdjacentHTML('beforeend', '<br/>');
-				await wait(300);
-			} else if (item.type === 'strong') {
-				const strongTag = document.createElement('strong');
-				strongTag.className = "text-primary";
-				element.appendChild(strongTag);
-				for (let char of item.text) {
-					strongTag.insertAdjacentText('beforeend', char);
-					await wait(speed);
-				}
-			}
-		}
-	}
-
-	// --- 2. 왼쪽 사이드 타이핑 로직 ---
-	let typingState = { id: 0 };
-
-	async function startSideTyping(title, sub) {
-		typingState.id++;
-		const currentId = typingState.id;
-
-		const titleEl = document.getElementById('login-type-title');
-		const subEl = document.getElementById('login-type-sub');
-		const cursorTitle = document.getElementById('cursor-login-title');
-		const cursorSub = document.getElementById('cursor-login-sub');
-
-		titleEl.textContent = "";
-		subEl.textContent = "";
-		cursorTitle.classList.remove('hidden');
-		cursorSub.classList.add('hidden');
-
-		for (let char of title) {
-			if(typingState.id !== currentId) return;
-			titleEl.insertAdjacentText('beforeend', char);
-			await wait(80);
-		}
-
-		if(typingState.id !== currentId) return;
-		await wait(200);
-		cursorTitle.classList.add('hidden');
-		cursorSub.classList.remove('hidden');
-
-		for (let char of sub) {
-			if(typingState.id !== currentId) return;
-			subEl.insertAdjacentText('beforeend', char);
-			await wait(40);
-		}
-	}
-
-	// --- 3. 정렬 및 초기화 ---
-	function lockTargetWidth() {
-		const measurer = document.createElement('span');
-		measurer.style.position = 'absolute';
-		measurer.style.visibility = 'hidden';
-		measurer.style.whiteSpace = 'nowrap';
-		measurer.style.fontSize = getComputedStyle(targetText).fontSize;
-		measurer.style.fontWeight = getComputedStyle(targetText).fontWeight;
-		measurer.style.fontFamily = getComputedStyle(targetText).fontFamily;
-		document.body.appendChild(measurer);
-
-		const candidates = ["아는 만큼", "주주 클럽"];
-		let maxWidth = 0;
-		candidates.forEach(txt => {
-			measurer.textContent = txt;
-			const w = measurer.getBoundingClientRect().width;
-			if (w > maxWidth) maxWidth = w;
-		});
-		document.body.removeChild(measurer);
-		targetHolder.style.width = (Math.ceil(maxWidth) + 4) + "px";
-	}
-
-	function alignLoginText() {
-		const holderRect = targetHolder.getBoundingClientRect();
-		const wrapperRect = typingWrapper.getBoundingClientRect();
-
-		let offset = holderRect.left - wrapperRect.left;
-		const additionalSpacing = 24;
-		offset += additionalSpacing;
-
-		loginTextArea.style.paddingLeft = Math.max(0, offset) + 'px';
-	}
-
-	window.addEventListener('load', () => {
-		lockTargetWidth();
-		alignLoginText();
-		setTimeout(() => typeWriter(typeContent, textSequence), 800);
-	});
-
-	window.addEventListener('resize', () => {
-		lockTargetWidth();
-		alignLoginText();
-	});
-
-	// --- 4. 메인 화면 전환 ---
-	btnStart.addEventListener('click', () => {
-		alignLoginText();
-
-		titlePart1.classList.add('exit-right');
-		titlePart2.classList.add('exit-left');
-		heroTextArea.classList.add('exit-down');
-		heroBtns.classList.add('exit-down');
-		scrollIcon.classList.add('exit-down');
-
-		setTimeout(() => {
-			heroMainWrapper.classList.add('move-to-side');
-
-			targetText.style.opacity = '0';
-			setTimeout(() => {
-				targetText.innerText = "주주 클럽";
-				targetText.style.opacity = '1';
-
-				loginTextArea.classList.remove('hidden');
-				loginTextArea.style.opacity = '1';
-
-				alignLoginText();
-				startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
-			}, 300);
-
-			loginSection.classList.add('active');
-		}, 800);
-	});
-
-	// --- 5. 폼 전환 로직 ---
-	function switchForm(toSignup) {
-		const outgoing = toSignup ? formLogin : formSignup;
-		const incoming = toSignup ? formSignup : formLogin;
-
-		const newTitle = toSignup ? "환영합니다." : "만나서 반갑습니다.";
-		const newSub = toSignup ? "새로운 여정을 시작해보세요." : "성공적인 투자의 여정을 이어가세요.";
-		startSideTyping(newTitle, newSub);
-
-		outgoing.style.opacity = '0';
-		outgoing.style.transform = 'translateY(10px)';
-		outgoing.style.pointerEvents = 'none';
-
-		setTimeout(() => {
-			outgoing.classList.remove('active-form');
-			incoming.classList.add('active-form');
-
-			setTimeout(() => {
-				incoming.style.opacity = '1';
-				incoming.style.transform = 'translateY(0)';
-				incoming.style.pointerEvents = 'auto';
-			}, 50);
-		}, 400);
-	}
-
-	btnGoSignup.addEventListener('click', () => switchForm(true));
-	btnGoLogin.addEventListener('click', () => switchForm(false));
-
-	// ====== 공통: 인라인 에러 표시 ======
-	function showInlineError(formEl, msg) {
-		let box = formEl.querySelector('.form-error');
-		if (!box) {
-			box = document.createElement('div');
-			box.className = 'form-error mt-4 text-sm font-bold text-red-500';
-			formEl.querySelector('form').appendChild(box);
-		}
-		box.textContent = msg || '처리 중 오류가 발생했습니다.';
-	}
-
-	function clearInlineError(formEl){
-		const box = formEl.querySelector('.form-error');
-		if (box) box.remove();
-	}
-
-	async function postJson(url, data){
-		const r = await fetch(url, {
-			method: 'POST',
-			headers: { 'Content-Type':'application/json', 'Accept':'application/json' },
-			body: JSON.stringify(data)
-		});
-		const text = await r.text();
-		try { return JSON.parse(text); }
-		catch(e){ return { ok:false, message:text || '서버 응답 오류' }; }
-	}
-
-	// --- 6. 로그인 AJAX (틀) ---
-	btnSubmitLogin.addEventListener('click', async () => {
-		clearInlineError(formLogin);
-
-		const email = document.getElementById('loginEmail')?.value?.trim();
-		const password = document.getElementById('loginPassword')?.value;
-
-		if (!email || !password) {
-			showInlineError(formLogin, '이메일/비밀번호를 입력해 주세요.');
-			return;
-		}
-
-		btnSubmitLogin.disabled = true;
-		btnSubmitLogin.classList.add('opacity-60');
-
-		// TODO: 서버에 맞춰 구현 (예: /auth/login.ajax)
-		const res = await postJson(ctx + '/auth/login.ajax', { email, password });
-
-		btnSubmitLogin.disabled = false;
-		btnSubmitLogin.classList.remove('opacity-60');
-
-		if (!res.ok) {
-			showInlineError(formLogin, res.message);
-			return;
-		}
-
-		// 로그인 성공 처리 예시
-		window.location.reload();
-	});
-
-	// --- 7. 회원가입 AJAX + 성공 애니메이션 ---
-	btnSubmitSignup.addEventListener('click', async () => {
-		clearInlineError(formSignup);
-
-		const email = document.getElementById('signupEmail')?.value?.trim();
-		const username = document.getElementById('signupUsername')?.value?.trim();
-		const password = document.getElementById('signupPassword')?.value;
-
-		if (!email || !username || !password) {
-			showInlineError(formSignup, '이메일/닉네임/비밀번호를 모두 입력해 주세요.');
-			return;
-		}
-
-		btnSubmitSignup.disabled = true;
-		btnSubmitSignup.classList.add('opacity-60');
-
-		const res = await postJson(ctx + '/auth/signin.ajax', { email, username, password });
-
-		btnSubmitSignup.disabled = false;
-		btnSubmitSignup.classList.remove('opacity-60');
-
-		if (!res.ok) {
-			showInlineError(formSignup, res.message);
-			return;
-		}
-
-		// ✅ 성공이면 기존 성공 애니메이션 실행
-		formSignup.style.opacity = '0';
-		formSignup.style.transform = 'translateY(10px)';
-		formSignup.style.pointerEvents = 'none';
-
-		setTimeout(() => {
-			formSignup.classList.remove('active-form');
-			formSuccess.classList.add('active-form');
-
-			setTimeout(() => {
-				formSuccess.style.opacity = '1';
-				formSuccess.style.transform = 'translateY(0)';
-
-				const rect = authCard.getBoundingClientRect();
-				const x1 = rect.left / window.innerWidth;
-				const x2 = rect.right / window.innerWidth;
-				const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-				var duration = 1000;
-				var end = Date.now() + duration;
-
-				(function frame() {
-					confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: x1, y: y }, colors: ['#5E45EB', '#ECE9FD'], zIndex: 9999 });
-					confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: x2, y: y }, colors: ['#5E45EB', '#ECE9FD'], zIndex: 9999 });
-					if (Date.now() < end) requestAnimationFrame(frame);
-				}());
-			}, 50);
-
-			setTimeout(() => {
-				formSuccess.style.opacity = '0';
-				formSuccess.style.transform = 'translateY(10px)';
-
-				startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
-
-				setTimeout(() => {
-					formSuccess.classList.remove('active-form');
-					formLogin.classList.add('active-form');
-
-					setTimeout(() => {
-						formLogin.style.opacity = '1';
-						formLogin.style.transform = 'translateY(0)';
-						formLogin.style.pointerEvents = 'auto';
-					}, 50);
-				}, 400);
-
-			}, 3000);
-
-		}, 400);
-	});
-</script>
+<!-- =========================================================
+     [HOME SECTIONS 영역] : Step01~Step03 기능 소개 섹션 + Footer
+     - reveal 클래스: IntersectionObserver로 스크롤 등장 애니메이션
+     ========================================================= -->
+<section id="home-sections" class="bg-white">
+
+	<!-- [SECTION-STEP01] 로드맵 학습 -->
+	<div class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-2 gap-14 items-center">
+		<!-- (좌) 텍스트 -->
+		<div class="reveal">
+			<div class="text-sm font-extrabold text-primary/80 mb-3">Step 01</div>
+			<h2 class="text-4xl md:text-5xl font-black tracking-tight text-dark leading-tight">
+				헤매지 않는<br/>
+				체계적인 <span class="text-primary">로드맵 학습</span>
+			</h2>
+			<p class="mt-6 text-lg md:text-xl text-gray-500 font-medium leading-relaxed max-w-xl">
+				주식 용어부터 재무제표 분석까지.<br/>
+				초보자도 따라오기만 하면 전문가가 될 수 있는 검증된 커리큘럼을 제공합니다.
+			</p>
+		</div>
+		<!-- (우) 아이콘 -->
+		<div class="reveal" data-delay="1">
+			<div class="mx-auto w-full max-w-[320px] aspect-square rounded-[44px] bg-[#F3F1FF] flex items-center justify-center p-8">
+				<!-- 아이콘 SVG -->
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#5E45EB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-40 h-40">
+					<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/>
+					<line x1="4" y1="22" x2="4" y2="15"/>
+				</svg>
+			</div>
+		</div>
+	</div>
+
+	<!-- [SECTION-STEP02] 실전 모의투자 -->
+	<div class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-2 gap-14 items-center">
+		<div class="reveal md:order-2">
+			<div class="text-sm font-extrabold text-blue-500/90 mb-3">Step 02</div>
+			<h2 class="text-4xl md:text-5xl font-black tracking-tight text-dark leading-tight">
+				리스크 없이 경험하는<br/>
+				<span class="text-blue-500">실전 모의투자</span>
+			</h2>
+			<p class="mt-6 text-lg md:text-xl text-gray-500 font-medium leading-relaxed max-w-xl">
+				배운 내용을 바로 시장에 적용해보세요.<br/>
+				가상의 자금으로 실시간 데이터를 거래하며 나만의 투자 전략을 완성할 수 있습니다.
+			</p>
+		</div>
+		<div class="reveal md:order-1" data-delay="1">
+			<div class="mx-auto w-full max-w-[320px] aspect-square rounded-[44px] bg-[#EEF3FF] flex items-center justify-center p-8">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-40 h-40">
+					<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+					<polyline points="17 6 23 6 23 12"/>
+				</svg>
+			</div>
+		</div>
+	</div>
+
+	<!-- [SECTION-STEP03] 랭킹 시스템 -->
+	<div class="max-w-6xl mx-auto px-6 md:px-10 py-24 md:py-32 grid md:grid-cols-2 gap-14 items-center">
+		<div class="reveal">
+			<div class="text-sm font-extrabold text-amber-500/90 mb-3">Step 03</div>
+			<h2 class="text-4xl md:text-5xl font-black tracking-tight text-dark leading-tight">
+				수익으로 증명하는<br/>
+				<span class="text-amber-500">랭킹 시스템</span>
+			</h2>
+			<p class="mt-6 text-lg md:text-xl text-gray-500 font-medium leading-relaxed max-w-xl">
+				단순한 학습을 넘어 경쟁하세요.<br/>
+				수익률 랭킹에 이름을 올리고 주주클럽의 명예 투자자가 되어보세요.
+			</p>
+		</div>
+		<div class="reveal" data-delay="1">
+			<div class="mx-auto w-full max-w-[320px] aspect-square rounded-[44px] bg-[#FFF7DD] flex items-center justify-center p-8">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-40 h-40">
+					<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+					<path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+					<path d="M4 22h16"/>
+					<path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+					<path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+					<path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+				</svg>
+			</div>
+		</div>
+	</div>
+
+	<!-- [FOOTER] 사이트 정보/링크 -->
+	<footer class="border-t border-gray-200/60">
+		<div class="max-w-6xl mx-auto px-6 md:px-10 py-16 grid md:grid-cols-4 gap-10 text-sm">
+			<div>
+				<div class="font-black text-primary text-lg">JUJU CLUB</div>
+				<p class="mt-3 text-gray-500 leading-relaxed">
+					투자의 시작을 더 쉽고 안전하게.<br/>주주클럽과 함께 성장하세요.
+				</p>
+			</div>
+			<div>
+				<div class="font-bold text-gray-700 mb-3">서비스</div>
+				<ul class="space-y-2 text-gray-500">
+					<li>기능 소개</li>
+					<li>모의투자</li>
+					<li>랭킹</li>
+				</ul>
+			</div>
+			<div>
+				<div class="font-bold text-gray-700 mb-3">고객지원</div>
+				<ul class="space-y-2 text-gray-500">
+					<li>공지사항</li>
+					<li>문의하기</li>
+				</ul>
+			</div>
+			<div>
+				<div class="font-bold text-gray-700 mb-3">약관 및 정책</div>
+				<ul class="space-y-2 text-gray-500">
+					<li>이용약관</li>
+					<li>개인정보처리방침</li>
+				</ul>
+			</div>
+		</div>
+		<div class="max-w-6xl mx-auto px-6 md:px-10 py-10 text-xs text-gray-400 border-t border-gray-200/60">
+			© 2026 JUJU CLUB. All rights reserved.
+		</div>
+	</footer>
+
+</section>
+
+<!-- =========================================================
+     [JS] 분리된 JS 로드 (맨 마지막에서 defer 로딩)
+     - DOM이 구성된 후 실행되는 구조라 가장 안전
+     ========================================================= -->
+<script defer src="${pageContext.request.contextPath}/resources/js/main/home.js"></script>
 
 </body>
 </html>

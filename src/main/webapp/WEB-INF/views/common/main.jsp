@@ -12,6 +12,9 @@
 </head>
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
 <div class="flex flex-1 h-full pt-20 overflow-hidden relative">
+  <!-- topbar -->
+  <%@ include file="topbar.jsp"%>
+
   <!-- sidebar -->
   <%@ include file="sidebar.jsp"%>
 

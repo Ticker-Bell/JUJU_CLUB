@@ -5,9 +5,16 @@
   Time: 오후 2:42
   To change this template use File | Settings | File Templates.
 --%>
+<%-- 1. 라이브러리 선언은 유지 (에러 방지) --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ include file="common.jsp" %>
+
+<%-- 2. common.jsp include를 제거하는 대신, 필요한 변수만 안전하게 선언 --%>
+<c:if test="${empty cpath}">
+    <c:set var="cpath" value="${pageContext.request.contextPath}" />
+</c:if>
+
 <!-- Top Bar -->
 <div class="w-full h-20 flex flex-shrink-0 fixed top-0 z-50">
     <!-- logo -->
@@ -26,9 +33,9 @@
         <!-- 로그인 전 -->
         <c:if test="${empty user}">
             <div class="flex gap-4">
-                <button class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개
+                <button id="btn-header-features" class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개
                 </button>
-                <button class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                <button id="btn-header-login" class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
                     로그인
                 </button>
             </div>

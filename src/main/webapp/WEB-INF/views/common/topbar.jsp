@@ -22,7 +22,7 @@
 
     <!-- top bar navigation -->
     <header class="flex-1 bg-primary/10 flex items-center justify-end px-10 gap-6">
-        <%-- 로그인 처리 로직 추가 후 수정 필요  --%>
+        <%-- TODO: 로그인 처리 로직 추가 후 수정 필요  --%>
         <!-- 로그인 전 -->
         <c:if test="${empty user}">
             <div class="flex gap-4">

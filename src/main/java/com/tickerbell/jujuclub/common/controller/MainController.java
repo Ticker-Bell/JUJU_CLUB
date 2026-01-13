@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @RequestMapping("/main")
 @Controller
-public class SidebarController {
+public class MainController {
     private final UserInfoService userInfoService;
 
-    public SidebarController(UserInfoService userInfoService) {
+    public MainController(UserInfoService userInfoService) {
         this.userInfoService = userInfoService;
     }
 

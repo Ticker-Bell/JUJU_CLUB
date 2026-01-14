@@ -11,4 +11,6 @@ public interface LessonMapper {
   List<QstChatMsgDTO> selectQstChat(String lessonId);
   LessonDTO.LessonTitle selectLssnTitle(String lessonId);
 
+  List<LessonDTO.LessonQst> selectQSt(String lessonId);
+
 }

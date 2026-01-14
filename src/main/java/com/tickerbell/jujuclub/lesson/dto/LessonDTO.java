@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.lesson.dto;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,19 @@ public class LessonDTO {
     private String chapterName;
     private String lessonName;
     private String questionId;
+  }
+  @Alias("LessonQst")
+  @Builder
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class LessonQst{
+
+    private String questionText;
+    private String options;
+    private String answer;
+
+    private List<String> optionList;
   }
 
 }

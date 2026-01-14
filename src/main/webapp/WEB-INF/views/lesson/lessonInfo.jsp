@@ -15,7 +15,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-
 <%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col">

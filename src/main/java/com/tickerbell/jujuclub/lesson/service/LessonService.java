@@ -1,10 +1,15 @@
 package com.tickerbell.jujuclub.lesson.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonQst;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonTitle;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.mapper.LessonMapper;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public class LessonService {
           jsonDto.getOptions(),
           new TypeReference<List<QstChatMsgDTO.QstChatMsgJsonDTO>>() {}
       );
+
       chatMap.put("options" + idx, messages);
       idx++;
     }
@@ -45,5 +51,43 @@ public class LessonService {
   public LessonTitle getLessonTitle(String lessonId){
     return lessonMapper.selectLssnTitle(lessonId);
   }
+
+
+  /**
+   * 레슨 문항 조회
+   */
+  public List<LessonDTO.LessonQst> getLssnQst(String lessonId) throws IOException {
+
+    List<LessonQst> lessonQsts = lessonMapper.selectQSt(lessonId);
+    List<LessonDTO.LessonQst> result = new ArrayList<>();
+
+    for (LessonQst lessonQst : lessonQsts) {
+
+      // options 파싱
+      JsonNode optionsNode = objectMapper.readTree(lessonQst.getOptions());
+      JsonNode choicesNode = optionsNode.get("choices");
+
+      List<String> options =
+          objectMapper.readValue(
+              choicesNode.traverse(),
+              new TypeReference<List<String>>() {}
+          );
+
+      // answer 파싱 (String)
+      JsonNode answerNode = objectMapper.readTree(lessonQst.getAnswer());
+      String answer = answerNode.get("correct").get(0).asText();
+
+      LessonDTO.LessonQst qst = new LessonDTO.LessonQst();
+      qst.setQuestionText(lessonQst.getQuestionText());
+      qst.setOptionList(options);
+      qst.setAnswer(answer);
+
+      result.add(qst);
+    }
+
+    return result;
+  }
+
+
 
 }

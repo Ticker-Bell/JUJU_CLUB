@@ -8,6 +8,7 @@
     SELECT OPTIONS
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
+    AND question_id = 'Q001'
   </select>
 
   <select id="selectLssnTitle" parameterType="String"
@@ -19,6 +20,19 @@
     LEFT OUTER JOIN LEARNING_CHAPTER LC ON LL.CHAPTER_ID = LC.CHAPTER_ID
     LEFT OUTER JOIN LEARNING_QUESTION LQ ON LL.LESSON_ID = LQ.LESSON_ID
     WHERE LL.LESSON_ID = #{lessonId}
+    LIMIT 1;
   </select>
+
+  <select id="selectQSt" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
+    select question_text
+         , options
+         , answer
+    from learning_question
+    where lesson_id = #{lessonId}
+    and question_id !='Q001'
+  </select>
+
+
 
 </mapper>

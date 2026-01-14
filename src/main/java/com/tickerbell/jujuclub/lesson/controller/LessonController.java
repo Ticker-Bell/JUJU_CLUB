@@ -24,12 +24,14 @@ public class LessonController {
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
     LessonDTO.LessonTitle title = lessonService.getLessonTitle(lessonId);
 
+    List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles",title);
+    model.addAttribute("qst",lessonQst);
 
 
-    return "/lesson/lessonMain";
+    return "/lesson/qst2";
   }
 
 

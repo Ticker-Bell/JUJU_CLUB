@@ -8,15 +8,11 @@
   <settings>
     <setting name="cacheEnabled" value="true"/>
     <setting name="lazyLoadingEnabled" value="true"/>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
 
   <!-- typeAliases -->
   <typeAliases>
-    <typeAlias alias="User" type="com.tickerbell.jujuclub.auth.dto.LoginDTO"/>
-    <typeAlias alias="HoldinglistItemDTO" type="com.tickerbell.jujuclub.stock.dto.HoldinglistItemDTO"/>
-    <typeAlias alias="MockPortfolioDTO" type="com.tickerbell.jujuclub.stock.dto.MockPortfolioDTO"/>
-    <typeAlias alias="PortfolioAllocationItemDTO" type="com.tickerbell.jujuclub.stock.dto.PortfolioAllocationItemDTO"/>
-    <typeAlias alias="UserInvestSummeryDTO" type="com.tickerbell.jujuclub.stock.dto.UserInvestSummeryDTO"/>
-    <typeAlias alias="WatchlistItemDTO" type="com.tickerbell.jujuclub.stock.dto.WatchlistItemDTO"/>
+    <package name="com.tickerbell.jujuclub"/>
   </typeAliases>
 </configuration>

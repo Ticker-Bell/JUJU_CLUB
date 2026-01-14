@@ -14,11 +14,4 @@ public class StockMyController {
         return "stock/my"; //my.jsp
     }
 
-//    @GetMapping("/watchlist")
-//    public ResponseEntity<List<WatchlistItemDTO>> getWatchlist() {
-//        int userSeq = 1; //로그인시 수정
-//        List<WatchlistItemDTO> items = watchlistService.getWatchlistItems(userSeq);
-//        return ResponseEntity.ok(items);
-//    }
-
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.lesson.mapper.LessonMapper">
+
+  <select id="selectQstChat" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
+    SELECT OPTIONS
+    FROM LEARNING_QUESTION
+    WHERE LESSON_ID = #{lessonId}
+  </select>
+
+  <select id="selectLssnTitle" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonTitle">
+    SELECT CHAPTER_NAME
+         ,LL.LESSON_NAME
+         ,SUBSTRING(QUESTION_ID,4) AS QUESTIONID
+    FROM LEARNING_LESSON LL
+    LEFT OUTER JOIN LEARNING_CHAPTER LC ON LL.CHAPTER_ID = LC.CHAPTER_ID
+    LEFT OUTER JOIN LEARNING_QUESTION LQ ON LL.LESSON_ID = LQ.LESSON_ID
+    WHERE LL.LESSON_ID = #{lessonId}
+  </select>
+
+</mapper>

@@ -1,9 +1,12 @@
 package com.tickerbell.jujuclub.utils;
 
-import com.tickerbell.jujuclub.stockChart.dto.StockChartDTO;
+import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartDTO;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+
+@Component
 public class StockChartParser {
     private static final int FIELD_COUNT = 46; //체결 데이터 한 건당 필드 수
     private StockChartFormatter stockChartFormatter;

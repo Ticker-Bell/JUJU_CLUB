@@ -8,11 +8,11 @@ public class StockChartFormatter {
     }
 
     public  static String formatTime(String time){
-        //체결시간 포맷팅(09:11)
+        //체결시간 포맷팅(09:11:36)
         if(time == null || time.length() !=6){
             return "N/A";
         }
-        return time.substring(0,2)+":"+time.substring(2,4);
+        return time.substring(0,2)+":"+time.substring(2,4)+":"+time.substring(4,6);
     }
 
     public static String formatdayOverDayWithSign(String sign, int change, double rate) {

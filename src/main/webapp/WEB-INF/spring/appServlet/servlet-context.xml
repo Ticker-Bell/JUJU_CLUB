@@ -22,7 +22,7 @@
 	</beans:bean>
 	
 	<context:component-scan base-package="com.tickerbell.jujuclub" />
-	
-	
-	
+	<!-- kis.properties 읽어주기 -->
+	<context:property-placeholder location="classpath:kis.properties"/>
+
 </beans:beans>

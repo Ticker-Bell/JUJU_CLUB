@@ -6,7 +6,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
   <!-- 1. Properties 파일 불러오기 -->
-  <context:property-placeholder location="classpath:db.properties"/>
+  <context:property-placeholder location="classpath:db.properties, classpath:kis.properties"/>
   <!-- DataSource -->
   <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
     <property name="driverClassName" value="${db.driver}"/>
@@ -24,7 +24,8 @@
 
   <!-- Mapper Scanner -->
   <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-    <property name="basePackage" value="com.tickerbell.jujuclub.auth.mapper"/>
+    <property name="basePackage" value="com.tickerbell.jujuclub.auth.mapper, com.tickerbell.jujuclub.stock.mapper"/>
+
     <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
   </bean>
 

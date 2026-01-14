@@ -1,8 +1,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--공통 헤더--%>
 
-
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
 <!doctype html>
 <html lang="ko">
 <head>
@@ -12,77 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <link rel="stylesheet" as="style" crossorigin
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
-
     <style>
-      body {
-        font-family: 'Pretendard', sans-serif;
-        background: #fff;
-        color: #191919;
-        letter-spacing: -0.015em;
-      }
-
-      .num-font {
-        font-feature-settings: "tnum";
-        letter-spacing: 0;
-        font-weight: 600;
-      }
-
-      /* sidebar nav */
-      .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 10px 16px 10px 12px;
-        border-radius: 99px;
-        transition: all .2s ease;
-        color: #9CA3AF;
-        width: 100%;
-        cursor: pointer;
-      }
-
-      .nav-icon-box {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: all .3s cubic-bezier(.34, 1.56, .64, 1);
-      }
-
-      .nav-item:hover {
-        background-color: rgba(255, 255, 255, .8);
-        color: #191919;
-      }
-
-      .nav-item:hover .nav-icon-box {
-        background-color: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
-        transform: scale(1.05);
-      }
-
-      .nav-item.active {
-        color: #191919;
-        font-weight: 800;
-      }
-
-      .nav-item.active .nav-icon-box {
-        background-color: #5E45EB;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(94, 69, 235, .4);
-        transform: scale(1.05);
-      }
-
-      /* web-card */
-      .web-card {
-        background: #fff;
-        border-radius: 16px;
-        border: 1px solid #E5E7EB;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
-        overflow: hidden;
-      }
 
       /* chat bubbles */
       .bubble-wrap {
@@ -180,46 +111,6 @@
           opacity: 1;
         }
       }
-
-      /* ✅ 전체 문제 진행도: 5개 동그라미 */
-      .q-dots {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .q-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        background: rgba(209, 213, 219, 0.95);
-        border: none;
-        box-shadow: none;
-        transition: transform .2s ease, background-color .2s ease, box-shadow .2s ease;
-      }
-
-      .q-dot.active {
-        width: 14px;
-        height: 14px;
-        background: rgba(94, 69, 235, 0.95);
-        box-shadow: 0 0 0 6px rgba(94, 69, 235, 0.12), 0 10px 18px rgba(94, 69, 235, 0.16);
-        transform: translateY(-1px);
-      }
-
-      /* scroll */
-      ::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background: #E5E7EB;
-        border-radius: 10px;
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background: #D1D5DB;
-      }
     </style>
 
     <script>
@@ -237,14 +128,7 @@
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
 
 <div class="w-full h-20 flex flex-shrink-0 fixed top-0 z-50">
-    <div class="w-[220px] bg-primary/15 flex items-center pl-6 border-r border-transparent transition-all duration-300">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary/30 text-lg">
-                J
-            </div>
-            <span class="text-lg font-extrabold text-text tracking-tight">JUJU CLUB</span>
-        </div>
-    </div>
+    <%@ include file="/WEB-INF/views/lesson/common/lesson.jsp" %>
 
     <header class="flex-1 bg-primary/10 flex items-center justify-end px-10 gap-6">
         <div class="flex items-center gap-6">
@@ -283,67 +167,13 @@
 </div>
 
 <div class="flex flex-1 h-full pt-20 overflow-hidden relative">
-
-    <aside class="w-[220px] bg-primary/5 flex flex-col flex-shrink-0 z-40 py-8 pl-4 border-r border-transparent h-full overflow-y-auto transition-all duration-300">
-        <nav class="flex flex-col justify-center gap-5 w-full pr-4 my-auto">
-            <a href="roadmap.html" class="nav-item group">
-                <div class="nav-icon-box"><i data-lucide="map" class="w-5 h-5 stroke-[2]"></i></div>
-                <span class="text-sm font-bold mt-0.5">학습 로드맵</span>
-            </a>
-            <a href="mypage.html" class="nav-item group">
-                <div class="nav-icon-box"><i data-lucide="user" class="w-5 h-5 stroke-[2]"></i>
-                </div>
-                <span class="text-sm font-bold mt-0.5">마이페이지</span>
-            </a>
-            <a href="trading.html" class="nav-item group">
-                <div class="nav-icon-box"><i data-lucide="bar-chart-2"
-                                             class="w-5 h-5 stroke-[2]"></i></div>
-                <span class="text-sm font-bold mt-0.5">모의투자</span>
-            </a>
-            <a href="rank.html" class="nav-item group">
-                <div class="nav-icon-box"><i data-lucide="trophy" class="w-5 h-5 stroke-[2]"></i>
-                </div>
-                <span class="text-sm font-bold mt-0.5">랭킹</span>
-            </a>
-            <a href="#" class="nav-item group">
-                <div class="nav-icon-box"><i data-lucide="message-circle"
-                                             class="w-5 h-5 stroke-[2]"></i></div>
-                <span class="text-sm font-bold mt-0.5">커뮤니티</span>
-            </a>
-        </nav>
-
-        <footer class="mt-auto pr-4 pt-6 pb-2">
-            <div class="text-center text-[10px] font-extrabold text-gray-400 leading-relaxed">
-                <div class="text-gray-500">© 2026 JUJU CLUB</div>
-                <div class="mt-1">모의투자 서비스 · 학습 로드맵</div>
-                <div class="mt-1">문의: support@jujuclub.example</div>
-            </div>
-        </footer>
-    </aside>
+    <%--sidebar 공통헤더--%>
+    <%@ include file="/WEB-INF/views/common/sidebar.jsp" %>
 
     <main class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
         <div class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">
 
-            <div class="mb-6 px-1 flex items-end relative min-h-[50px]">
-                <div>
-                    <div class="text-[11px] font-extrabold text-gray-400 flex items-center gap-2 mb-1">
-                        <span class="w-2 h-2 rounded-full bg-primary"></span>
-                        Education 1 · 주식의 개념
-                    </div>
-                    <div class="text-lg font-extrabold text-gray-900">
-                        대화로 배우는 “주식이란 무엇인가?”
-                    </div>
-                </div>
-
-                <div id="qDots" class="q-dots absolute left-1/2 -translate-x-1/2 bottom-2"
-                     aria-label="문제 진행도">
-                    <span class="q-dot active" data-q="1" title="1번 문제"></span>
-                    <span class="q-dot" data-q="2" title="2번 문제"></span>
-                    <span class="q-dot" data-q="3" title="3번 문제"></span>
-                    <span class="q-dot" data-q="4" title="4번 문제"></span>
-                    <span class="q-dot" data-q="5" title="5번 문제"></span>
-                </div>
-            </div>
+            <%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
 
             <section class="web-card flex-1 min-h-0 flex flex-col">
                 <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -448,6 +278,7 @@
     console.log(script);
 
 
+
     // ====== UI refs ======
     const chatList = document.getElementById("chatList");
     const chatScroll = document.getElementById("chatScroll");
@@ -455,7 +286,7 @@
     const nextBtn = document.getElementById("nextBtn");
     const skipBtn = document.getElementById("skipBtn");
     const resetBtn = document.getElementById("resetBtn");
-
+    console.log(chatList)
     let idx = 0;
 
     function mdBoldToHTML(s) {

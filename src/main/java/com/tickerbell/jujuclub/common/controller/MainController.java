@@ -33,6 +33,8 @@ public class MainController {
         }
 
         model.addAttribute("user", userInfo);
+
+        model.addAttribute("targetPage", "/WEB-INF/views/roadMap/roadMapMain.jsp");
         return "common/main";
     }
 

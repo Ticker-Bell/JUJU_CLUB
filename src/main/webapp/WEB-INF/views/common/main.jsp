@@ -30,7 +30,7 @@
                     <jsp:include page="${targetPage}" />
                 </c:when>
                 <c:otherwise>
-                    <h1>환영합니다! 메뉴를 선택해주세요.</h1>
+                    <jsp:include page="../roadMap/roadMapMain.jsp" />
                 </c:otherwise>
             </c:choose>
 

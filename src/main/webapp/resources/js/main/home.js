@@ -446,6 +446,7 @@
     async function postJson(url, data) {
         const r = await fetch(url, {
             method: "POST",
+            credentials: 'same-origin',
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify(data),
         });
@@ -488,8 +489,13 @@
             return;
         }
 
-        // ✅ 로그인 성공 시: 세션 반영을 위해 새로고침
-        window.location.reload();
+        /**
+         *
+         * 로그인 성공 시:
+         * 서버에서 보내준 redirectUrl을 사용
+         *
+         */
+            window.location.href = res.redirectUrl;
     }
 
     async function handleSignup() {

@@ -3,6 +3,8 @@ package com.tickerbell.jujuclub.lesson.controller;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,20 +18,20 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LessonController {
 
-    private final LessonService lessonService;
+  private final LessonService lessonService;
 
-    @GetMapping("/lessonInfo")
-    public String lessonInfo(@RequestParam String lessonId, Model model) throws Exception {
-        Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
-        LessonDTO.LessonTitle title = lessonService.getLessonTitle(lessonId);
+  @GetMapping("/lessonInfo")
+  public String lessonInfo(@RequestParam String lessonId, Model model) throws Exception {
+    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+    LessonDTO.LessonTitle title = lessonService.getLessonTitle(lessonId);
 
-        model.addAttribute("chat", chatMap);
-        model.addAttribute("colNames", chatMap.keySet());
-        model.addAttribute("titles", title);
+    model.addAttribute("chat", chatMap);
+    model.addAttribute("colNames", chatMap.keySet());
+    model.addAttribute("titles",title);
 
 
-        return "/lesson/lessonInfo";
-    }
+    return "/lesson/lessonMain";
+  }
 
     @PostMapping("/lessonInfo")
     public String test(Model model,

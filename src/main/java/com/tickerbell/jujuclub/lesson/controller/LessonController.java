@@ -29,7 +29,7 @@ public class LessonController {
     model.addAttribute("titles",title);
 
 
-    return "/lesson/lessonInfo";
+    return "/lesson/lessonMain";
   }
 
 

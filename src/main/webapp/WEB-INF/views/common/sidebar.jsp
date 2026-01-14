@@ -16,8 +16,8 @@
 
     <%-- 로드맵  --%>
     <nav class="flex flex-col justify-center gap-5 w-full pr-4 my-auto">
-        <a href="${cpath}/main/roadMapMain.do" class="nav-item group"
-            hx-get="${cpath}/main/roadMapMain.do"
+        <a href="${cpath}/roadMap/main.do" class="nav-item group"
+            hx-get="${cpath}/roadMap/main.do"
             hx-target="#main"
             hx-swap="innerHTML"
             hx-push-url="true">

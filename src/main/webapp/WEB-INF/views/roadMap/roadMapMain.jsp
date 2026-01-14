@@ -7,6 +7,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div>
-    <h1>roadMap</h1>
+    <h1>로드맵</h1>
 
 </div>

@@ -6,7 +6,14 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--<%@ include file="../common/common.jsp"%>--%>
 <div>
     <h1>로드맵</h1>
-
+    <button type="button"
+            class="bg-blue-500 text-white p-2 rounded"
+            hx-post="${cpath}/lesson/lessonInfo"
+            hx-vals='{"lessonId": "10", "category": "java"}'
+            hx-target="#main"
+            hx-swap="innerHTML"
+            hx-push-url="true"> 이동버튼 </button>
 </div>

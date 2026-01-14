@@ -8,9 +8,10 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/lesson")
 @Controller
@@ -34,5 +35,25 @@ public class LessonController {
     return "/lesson/qst2";
   }
 
+    @PostMapping("/lessonInfo")
+    public String test(Model model,
+                       @RequestHeader(value="HX-Request", defaultValue="false") boolean isHtmx,
+                       @RequestParam("lessonId") String lessonId,   // 보낸 데이터 받기
+                       @RequestParam("category") String category) {
+
+        model.addAttribute("lessonId", lessonId);
+        model.addAttribute("category", category);
+
+        // 응답 처리 (HTMX 패턴 유지)
+        if (isHtmx) {
+            // test.jsp 내 <div> 태그 내용 반환
+            return "lesson/test";
+        } else {
+            // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
+            // Redirect를 하거나 에러 페이지를 띄움
+            return "redirect:/main";
+        }
+
+    }
 
 }

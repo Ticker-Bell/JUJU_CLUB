@@ -1,0 +1,77 @@
+package com.tickerbell.jujuclub.auth.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import com.tickerbell.jujuclub.auth.dto.SignupDTO;
+import com.tickerbell.jujuclub.auth.service.SignupService;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+@RequestMapping("/auth")
+public class SignupController {
+
+    private final SignupService signupService;
+
+    public SignupController(SignupService signupService) {
+        this.signupService = signupService;
+    }
+
+    @PostMapping(
+            value = "/signin.ajax",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+
+    @ResponseBody
+    public Map<String, Object> signupAjax(@RequestBody SignupAjaxRequest request) {
+
+        Map<String, Object> map = new HashMap<>();
+
+        try {
+            SignupDTO dto = new SignupDTO();
+
+            dto.setUserId(request.getEmail());
+            dto.setUserName(request.getUsername());
+            dto.setUserPw(request.getPassword());
+
+            signupService.signup(dto);
+
+            map.put("ok", true);
+            map.put("message", "회원가입이 완료되었습니다.");
+            return map;
+
+        } catch (IllegalArgumentException e) {
+            map.put("ok", false);
+            map.put("message", e.getMessage());
+            return map;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("ok", false);
+            map.put("message", "처리 중 오류가 발생했습니다.");
+            return map;
+        }
+    }
+
+    public static class SignupAjaxRequest {
+        private String email;
+        private String username;
+        private String password;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
+}

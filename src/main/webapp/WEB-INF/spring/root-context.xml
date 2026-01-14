@@ -10,4 +10,6 @@
 	<import resource="root-contextDB.xml"/>
 
     <context:component-scan base-package="com.tickerbell.jujuclub.stockdata"/>
+	<!-- BCryptPasswordEncoder 빈 등록 -->
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 </beans>

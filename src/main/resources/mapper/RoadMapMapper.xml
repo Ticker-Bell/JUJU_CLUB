@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 모든 레벨/챕터/레슨 조회 -->
+<mapper namespace="com.tickerbell.jujuclub.roadMap.mapper.RoadMapMapper">
+    <select id="learningList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelChapterLessonDTO">
+        SELECT
+            lv.level_seq AS levelId,
+            lv.level_name AS levelName,
+            ch.chapter_id AS chapterId,
+            ch.chapter_name AS chapterName,
+            ch.test_reward AS testReward,
+            ch.test_pay AS testPay,
+            ls.lesson_id AS lessonId,
+            ls.lesson_name AS lessonName,
+            ls.lesson_type AS lessonType
+        FROM learning_level AS lv
+                 JOIN learning_chapter AS ch ON lv.level_seq = ch.level_seq
+                 JOIN learning_lesson AS ls ON ch.chapter_id = ls.chapter_id
+        WHERE lv.level_seq = #{level_seq} and ch.chapter_id = #{chapter_id}
+    </select>
+
+    <select id="levelList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelDTO">
+        select level_seq AS levelId,
+               level_name AS levelName
+        from learning_level
+    </select>
+
+    <select id="chapterList" resultType="com.tickerbell.jujuclub.roadMap.dto.ChapterDTO">
+        select lv.level_seq AS levelId,
+               ch.chapter_id AS chapterId,
+               ch.chapter_name AS chapterName,
+               ch.test_reward AS testReward,
+               ch.test_pay AS testPay
+        from learning_level as lv left join learning_chapter as ch
+        on lv.level_seq = ch.level_seq
+        where lv.level_seq = #{level_seq}
+    </select>
+    <select id="lessonList" resultType="com.tickerbell.jujuclub.roadMap.dto.RoadMapLessonDTO">
+        select ch.chapter_id AS chapterId,
+               ls.lesson_id AS lessonId,
+               ls.lesson_name AS lessonName,
+               ls.lesson_type AS lessonType
+        from learning_chapter as ch left join learning_lesson as ls
+                                            on ch.chapter_id = ls.chapter_id
+        where ch.chapter_id = #{chapter_id}
+    </select>
+    <select id="userLessonList" resultType="com.tickerbell.jujuclub.roadMap.dto.UserLessonDTO">
+        select result_seq as resultId,
+               lesson_id as lessonId,
+               user_seq as userId,
+               started_at as startDate,
+               finished_at as endDate
+        from user_question_result
+        where user_seq = #{user_seq}
+    </select>
+</mapper>

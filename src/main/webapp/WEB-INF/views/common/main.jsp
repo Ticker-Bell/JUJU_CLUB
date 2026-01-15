@@ -21,8 +21,10 @@
 
     <%--선택형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+    <title>Main</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
 <!-- topbar -->
 <jsp:include page="topbar.jsp"/>
@@ -40,15 +42,6 @@
 <%--        </div>--%>
     </main>
 </div>
-
-<%--htmx 사용할때는 동적으로 처리하는거라 화면 교체후에 다시 생성해야 한다고하네요--%>
-<script>
-  document.body.addEventListener('htmx:afterSwap', (evt) => {
-    if (evt.detail.target.id === 'main' && window.lucide) {
-      lucide.createIcons(evt.detail.target); // main 안에 있는 SVG만 다시 생성
-    }
-  });
-</script>
 
 <script src="${cpath}/resources/js/main/main.js"></script>
 

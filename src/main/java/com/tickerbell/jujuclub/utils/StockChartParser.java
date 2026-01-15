@@ -1,19 +1,28 @@
 package com.tickerbell.jujuclub.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartDTO;
+import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-
+@Slf4j
 @Component
 public class StockChartParser {
     private static final int FIELD_COUNT = 46; //체결 데이터 한 건당 필드 수
-    private StockChartFormatter stockChartFormatter;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    //api에서 받은 데이터 가공
     public List<StockChartDTO> parseStockChart(String rawData) {
+        //웹소켓 데이터 가공
         List<StockChartDTO> stockChartDTOList = new ArrayList<>();
+
+        if (rawData.startsWith("{") || rawData.startsWith("[")) {
+            log.info("설정/성공 메시지 수신 (파싱 생략): {}", rawData);
+        }
 
         String[] parts = rawData.split("\\|");
         String[] allFieldData = parts[3].split("\\^");
@@ -34,11 +43,46 @@ public class StockChartParser {
         return stockChartDTOList;
     }
 
+    public List<StockChartRestDTO> parseStockRestData(String response) {
+        List<StockChartRestDTO> stockChartRestList;
+        try {
+            String trimmedJson = response.trim();
+            JsonNode jsonNode = objectMapper.readTree(trimmedJson);
+
+            String rtCd = jsonNode.path("rt_cd").asText();
+            if (!"0".equals(rtCd)) {
+                return Collections.emptyList();
+            }
+            JsonNode outputNode = jsonNode.get("output");
+
+            stockChartRestList = objectMapper.convertValue(
+                    outputNode,
+                    new TypeReference<List<StockChartRestDTO>>() {
+                    }
+            );
+            stockChartRestList.sort(Comparator.comparing(StockChartRestDTO::getTradeDate));
+            stockChartRestList.forEach(StockChartParser::applyRestFormatting);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return stockChartRestList;
+    }
+
 
     private static void applyFormatting(StockChartDTO stockChartDTO) {
         stockChartDTO.setDisplayPrice(StockChartFormatter.formatPrice(stockChartDTO.getCurrentPrice()));
         stockChartDTO.setDisplayTime(StockChartFormatter.formatTime(stockChartDTO.getTradeTime()));
         stockChartDTO.setDisplayChange(StockChartFormatter.formatdayOverDayWithSign(stockChartDTO.getDayOverDaySign(), stockChartDTO.getDayOverDayChange(), stockChartDTO.getDayOverDayRate()));
+        stockChartDTO.setDisplayRate(StockChartFormatter.formatdayOverDayRate(stockChartDTO.getDayOverDayRate()));
 
     }
+
+
+    private static void applyRestFormatting(StockChartRestDTO stockChartRestDTO) {
+        //rest 데이터 포맷팅
+        stockChartRestDTO.setDisplayPrice(StockChartFormatter.formatPrice(stockChartRestDTO.getCurrentPrice()));
+        stockChartRestDTO.setDisplayDate(StockChartFormatter.formatDate(stockChartRestDTO.getTradeDate()));
+    }
+
+
 }

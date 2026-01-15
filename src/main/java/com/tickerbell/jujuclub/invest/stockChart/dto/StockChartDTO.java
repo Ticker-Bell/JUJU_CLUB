@@ -1,11 +1,9 @@
 package com.tickerbell.jujuclub.invest.stockChart.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,4 +19,5 @@ public class StockChartDTO {
     private String displayPrice; //포맷팅한 현재가
     private String displayTime; //포맷팅한 체결시간
     private String displayChange; //포맷팅한 전일 대비 관련 데이터
+    private String displayRate; //포맷팅한 전일 대비율
 }

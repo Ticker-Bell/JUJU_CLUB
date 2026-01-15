@@ -32,19 +32,12 @@
     <jsp:include page="sidebar.jsp"/>
 
     <!-- Main -->
-    <main class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
-        <div id="main" class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">
+    <main id="main" class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
+<%--        <div id="main" class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">--%>
 
-            <c:choose>
-                <c:when test="${not empty targetPage}">
-                    <jsp:include page="${targetPage}"/>
-                </c:when>
-                <c:otherwise>
-                    <jsp:include page="../roadMap/roadMapMain.jsp"/>
-                </c:otherwise>
-            </c:choose>
+            <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
 
-        </div>
+<%--        </div>--%>
     </main>
 </div>
 

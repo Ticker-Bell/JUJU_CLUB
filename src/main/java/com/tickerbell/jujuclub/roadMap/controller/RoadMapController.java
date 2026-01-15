@@ -1,17 +1,14 @@
 package com.tickerbell.jujuclub.roadMap.controller;
 
-import com.tickerbell.jujuclub.roadMap.dto.ChapterDTO;
-import com.tickerbell.jujuclub.roadMap.dto.LevelDTO;
-import com.tickerbell.jujuclub.roadMap.dto.RoadMapLessonDTO;
-import com.tickerbell.jujuclub.roadMap.dto.UserLessonDTO;
+import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -24,7 +21,7 @@ public class RoadMapController {
     }
 
     @GetMapping("/main.do")
-    public String roadMap(Model model, @RequestHeader(value="HX-Request", required = false) boolean isHtmx, HttpSession httpSession) {
+    public String getRoadMap(Model model) {
 
         List<LevelDTO> levelList = roadMapService.levelList();
         List<ChapterDTO> chptList = roadMapService.chapterList(1);
@@ -36,14 +33,21 @@ public class RoadMapController {
         lessonList.forEach(System.out::println);
         userLessonList.forEach(System.out::println);
 
-        if (isHtmx) {
-            // 사이드바 클릭 시 처리
-            return "roadMap/roadMapMain";
-        } else {
-            // 주소창 입력 및 새로고침 처리
-            model.addAttribute("targetPage", "/WEB-INF/views/roadMap/roadMapMain.jsp");
-            return "common/main";
-        }
+        model.addAttribute("levelList",levelList);
+        model.addAttribute("chptList",chptList);
+        model.addAttribute("lessonList",lessonList);
+        model.addAttribute("userLessonList",userLessonList.stream().findFirst());
+
+        return "roadMap/roadMapMain";
+    }
+
+    @PostMapping("/main.do")
+    public String postRoadMap(Model model,
+                              @RequestParam("levelId") Integer levelId,
+                              @RequestParam("chapterId") String chapterId) {
+
+        List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelId, chapterId);
+        return null;
     }
 
 }

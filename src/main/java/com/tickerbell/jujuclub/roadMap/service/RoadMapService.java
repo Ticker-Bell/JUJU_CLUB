@@ -34,11 +34,9 @@ public class RoadMapService {
         return roadMapMapper.userLessonList(userId);
     }
 
-
-
     // level id or chapter id로 조회시, 레벨/챕터에 해당하는 레슨 데이터 보여줘야함
-    public List<LevelChapterLessonDTO> getLearningList(Integer levelId, String chapterId) {
-        return roadMapMapper.learningList(levelId, chapterId);
+    public List<LevelChapterLessonDTO> selectLearningList(Integer levelId, String chapterId) {
+        return roadMapMapper.selectLearningList(levelId, chapterId);
     }
 
 

@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 모든 레벨/챕터/레슨 조회 -->
 <mapper namespace="com.tickerbell.jujuclub.roadMap.mapper.RoadMapMapper">
-    <select id="learningList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelChapterLessonDTO">
+    <select id="selectLearningList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelChapterLessonDTO">
         SELECT
             lv.level_seq AS levelId,
             lv.level_name AS levelName,
@@ -47,11 +47,16 @@
     </select>
     <select id="userLessonList" resultType="com.tickerbell.jujuclub.roadMap.dto.UserLessonDTO">
         select result_seq as resultId,
-               lesson_id as lessonId,
-               user_seq as userId,
-               started_at as startDate,
-               finished_at as endDate
-        from user_question_result
+               lv.level_seq AS levelId,
+               ch.chapter_id AS chapterId,
+               us.lesson_id as lessonId,
+               us.user_seq as userId,
+               us.started_at as startDate,
+               us.finished_at as endDate
+        from user_question_result AS us
+                 JOIN learning_lesson AS ls ON us.lesson_id = ls.lesson_id
+                 JOIN learning_chapter AS ch ON ch.chapter_id = ls.chapter_id
+                 JOIN learning_level as lv ON lv.level_seq = ch.level_seq
         where user_seq = #{user_seq}
     </select>
 </mapper>

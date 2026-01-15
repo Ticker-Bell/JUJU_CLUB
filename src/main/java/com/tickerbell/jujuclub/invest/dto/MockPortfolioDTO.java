@@ -1,5 +1,4 @@
-package com.tickerbell.jujuclub.stock.dto;
-
+package com.tickerbell.jujuclub.invest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ public class MockPortfolioDTO {
 
     private int portfolioSeq;
     private int userSeq;
-    private Integer stockSeq;
+    private int stockSeq;
     private int quantity;
     private int avgPrice;
     private LocalDateTime updatedAt;

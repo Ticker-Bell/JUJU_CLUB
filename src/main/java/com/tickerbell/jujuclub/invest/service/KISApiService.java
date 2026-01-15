@@ -1,6 +1,6 @@
-package com.tickerbell.jujuclub.stock.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.stock.dto.KISDataDTO;
+import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -85,11 +85,13 @@ public class KISApiService {
     }
 
     //현재가 조회 : 토큰 준비, KIS API 호출(토큰 + 종목코드), 응답에서 추출
+    //등락률
+    //등락부호
     public KISDataDTO getPriceData(String stockCode) {
         try {
             //토큰가져오기
             String token = getAccessToken();
-            //URL만들기
+            //URL만들기(REST 주식현재가 시세[v1_국내주식-008] 사용)
             String urlStr = BASE_URL
                     + "/uapi/domestic-stock/v1/quotations/inquire-price"
                     + "?FID_COND_MRKT_DIV_CODE=J"
@@ -116,19 +118,19 @@ public class KISApiService {
                 response.append(line);
             }
             br.close();
-            //현재가 추출
+            //데이터 추출, 파싱
             String json = response.toString();
-            //데이터 파싱
+
             int priceStart = json.indexOf("\"stck_prpr\":\"") + 13; //주식현재가:stck-prpr
             int priceEnd = json.indexOf("\"", priceStart);
             String priceStr = json.substring(priceStart, priceEnd);
             int currentPrice = Integer.parseInt(priceStr);
 
-            int rateStart = json.indexOf("\"prdy_ctrt\":\"") + 13; //등락률
+            int rateStart = json.indexOf("\"prdy_ctrt\":\"") + 13; //등락률:prdy_ctrt
             int rateEnd = json.indexOf("\"", rateStart);
             String priceRate = json.substring(rateStart, rateEnd);
 
-            int signStart = json.indexOf("\"prdy_vrss_sign\":\"") + 18; //등락 부호
+            int signStart = json.indexOf("\"prdy_vrss_sign\":\"") + 18; //등락 부호:prdy_vrss_sign
             int signEnd = json.indexOf("\"", signStart);
             String priceSign = json.substring(signStart, signEnd);
 

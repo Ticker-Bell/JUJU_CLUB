@@ -1,6 +1,6 @@
-package com.tickerbell.jujuclub.stock.mapper;
+package com.tickerbell.jujuclub.invest.mapper;
 
-import com.tickerbell.jujuclub.stock.dto.WatchlistItemDTO;
+import com.tickerbell.jujuclub.invest.dto.WatchlistItemDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -8,8 +8,5 @@ import java.util.List;
 
 @Mapper
 public interface WatchlistMapper {
-
-    // 메소드 선언(SQL이름표), 파라미터(입력값)타입, 리턴(결과)타입, @Param이름
     List<WatchlistItemDTO> selectWatchlistItems(@Param("user_seq") int userSeq);
-
 }

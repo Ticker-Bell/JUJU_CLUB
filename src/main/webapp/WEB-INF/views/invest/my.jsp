@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>마이 포트폴리오</title>
+    <title>모의투자 - 마이 탭 페이지</title>
     <style>
         * {
             margin: 0;
@@ -292,7 +292,7 @@
 <div class="container">
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
-        <a href="#" class="active">마이</a>
+        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>
         <a href="#">투자</a>
     </nav>
 
@@ -302,7 +302,7 @@
         <div class="summary-card highlight">
             <div class="label">총 평가자산</div>
             <div class="value">
-                <fmt:formatNumber value="${portfolio.totalAsset}" pattern="#,###"/>
+                <fmt:formatNumber value="${userAsset.totalAsset}" pattern="#,###"/>
                 <span class="unit">원</span>
             </div>
         </div>
@@ -311,7 +311,7 @@
         <div class="summary-card">
             <div class="label">보유 현금</div>
             <div class="value">
-                <fmt:formatNumber value="${portfolio.cashBalance}" pattern="#,###"/>
+                <fmt:formatNumber value="${userAsset.cashBalance}" pattern="#,###"/>
                 <span class="unit">원</span>
             </div>
         </div>
@@ -320,7 +320,7 @@
         <div class="summary-card">
             <div class="label">투자금</div>
             <div class="value">
-                <fmt:formatNumber value="${portfolio.investedAmount}" pattern="#,###"/>
+                <fmt:formatNumber value="${userAsset.totalStockValue}" pattern="#,###"/>
                 <span class="unit">원</span>
             </div>
         </div>
@@ -328,9 +328,9 @@
         <!-- 총 수익률 -->
         <div class="summary-card">
             <div class="label">총 수익률</div>
-            <div class="value ${portfolio.totalReturnRate >= 0 ? 'positive' : 'negative'}">
-                <c:if test="${portfolio.totalReturnRate >= 0}">+</c:if>
-                <fmt:formatNumber value="${portfolio.totalReturnRate}" pattern="#,##0.0"/>%
+            <div class="value ${userAsset.totalReturnPct >= 0 ? 'positive' : 'negative'}">
+                <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if>
+                <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.0"/>%
             </div>
         </div>
     </div>
@@ -342,10 +342,10 @@
             <!-- 관심 종목 리스트 -->
             <div class="card">
                 <h3 class="card-title">관심 종목 리스트</h3>
-
                 <c:choose>
                     <c:when test="${not empty watchlist}">
                         <c:forEach var="stock" items="${watchlist}">
+                            <fmt:parseNumber var="changePct" value="${stock.changePct}" type="number" />
                             <div class="watchlist-item">
                                 <div class="stock-info">
                                     <div class="stock-name">${stock.stockName}</div>
@@ -355,9 +355,9 @@
                                     <div class="price">
                                         <fmt:formatNumber value="${stock.currentPrice}" pattern="#,###"/>
                                     </div>
-                                    <div class="change ${stock.changeRate >= 0 ? 'positive' : 'negative'}">
-                                        <c:if test="${stock.changeRate >= 0}">+</c:if>
-                                        <fmt:formatNumber value="${stock.changeRate}" pattern="#,##0.0"/>%
+                                    <div class="change ${changePct >= 0 ? 'positive' : 'negative'}">
+                                        <c:if test="${changePct >= 0}">+</c:if>
+                                        <fmt:formatNumber value="${changePct}" pattern="#,##0.0"/>%
                                     </div>
                                 </div>
                             </div>
@@ -365,7 +365,7 @@
                     </c:when>
                     <c:otherwise>
                         <div class="empty-state">
-                            관심 종목이 없습니다.
+                            관심 종목이 없습니다🥲
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -377,7 +377,18 @@
 
                 <!-- Chart.js 캔버스 -->
                 <div class="chart-container">
-                    <canvas id="holdingsChart"></canvas>
+                    <c:choose>
+                        <c:when test="${empty holdings}">
+                            <div class="empty-chart-message">
+                                <div class="icon">📈</div>
+                                <div class="message">보유 종목이 없습니다</div>
+                                <div class="sub-message">주식을 매수하면 차트가 표시됩니다</div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <canvas id="holdingsChart"></canvas>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
 
                 <!-- 차트 범례 (동적 생성용) -->
@@ -386,8 +397,8 @@
                     <c:forEach var="item" items="${chartData}">
                         <div class="legend-item">
                             <div class="legend-color" style="background-color: ${item.color};"></div>
-                            <span>${item.label}</span>
-                            <span><fmt:formatNumber value="${item.percentage}" pattern="#,##0"/>%</span>
+                            <span>${item.stockName}</span>
+                            <span><fmt:formatNumber value="${item.weightPct}" pattern="#,##0"/>%</span>
                         </div>
                     </c:forEach>
                 </div>
@@ -426,9 +437,9 @@
                                 <td class="text-right">
                                     <fmt:formatNumber value="${holding.currentPrice}" pattern="#,###"/>
                                 </td>
-                                <td class="text-right profit ${holding.profitLoss >= 0 ? 'positive' : 'negative'}">
-                                    <c:if test="${holding.profitLoss >= 0}">+</c:if>
-                                    <fmt:formatNumber value="${holding.profitLoss}" pattern="#,###"/>
+                                <td class="text-right profit ${holding.pnl >= 0 ? 'positive' : 'negative'}">
+                                    <c:if test="${holding.pnl >= 0}">+</c:if>
+                                    <fmt:formatNumber value="${holding.pnl}" pattern="#,###"/>
                                 </td>
                             </tr>
                         </c:forEach>
@@ -437,7 +448,7 @@
                 </c:when>
                 <c:otherwise>
                     <div class="empty-state">
-                        보유 종목이 없습니다.
+                        보유 종목이 없습니다🥲
                     </div>
                 </c:otherwise>
             </c:choose>
@@ -447,47 +458,14 @@
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<script src="${pageContext.request.contextPath}/resources/js/invest/portfolioDonutChart.js"></script>
 <script>
-    // 서버에서 전달받은 차트 데이터를 JavaScript 변수로 변환
-    // Controller에서 JSON 형태로 chartDataJson을 전달해주세요
+    //서버에서 전달받은 차트 데이터 : StockMyController에서 전달하는 JSON(chartDataJson)
     const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
 
-    // Chart.js 도넛 차트 초기화
+    //Chart.js 도넛 차트 초기화
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('holdingsChart');
-
-        if (ctx && chartDataFromServer.length > 0) {
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: chartDataFromServer.map(item => item.label),
-                    datasets: [{
-                        data: chartDataFromServer.map(item => item.percentage),
-                        backgroundColor: chartDataFromServer.map(item => item.color),
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: {
-                        legend: {
-                            display: false // 커스텀 범례 사용
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + '%';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
+        DonutChart.renderOrUpdateDonut('holdingsChart', chartDataFromServer);//canvas id
     });
 </script>
 </body>

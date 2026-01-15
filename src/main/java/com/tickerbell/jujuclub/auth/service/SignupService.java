@@ -30,9 +30,10 @@ public class SignupService {
             throw new IllegalArgumentException("비밀번호를 입력해주세요.");
 
         // 2) 중복 체크
-        if (signupMapper.existsByUserId(dto.getUserId()) > 0)
+        // (새로 만든 메서드를 재사용하면 코드가 더 깔끔해집니다)
+        if (isEmailDuplicate(dto.getUserId()))
             throw new IllegalArgumentException("이미 사용중인 이메일 입니다.");
-        if (signupMapper.existsByUserName(dto.getUserName()) > 0)
+        if (isNicknameDuplicate(dto.getUserName()))
             throw new IllegalArgumentException("이미 사용중인 닉네임입니다.");
 
         // 3) BCrypt 해싱 (핵심)
@@ -40,5 +41,17 @@ public class SignupService {
 
         // 4) 저장
         signupMapper.insertUser(dto);
+    }
+
+    // ============================================================
+    // [수정된 부분] 중복 확인 메서드는 signup() 메서드 밖으로 빼야 합니다.
+    // ============================================================
+
+    public boolean isEmailDuplicate(String email) {
+        return signupMapper.existsByUserId(email) > 0;
+    }
+
+    public boolean isNicknameDuplicate(String nickname) {
+        return signupMapper.existsByUserName(nickname) > 0;
     }
 }

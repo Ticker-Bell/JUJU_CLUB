@@ -22,7 +22,7 @@
     <!-- 회원가입 -->
     <insert id="insertUser" parameterType="com.tickerbell.jujuclub.auth.dto.SignupDTO">
         INSERT INTO USERS (user_id, user_pw, user_name, user_level, created_at)
-        VALUES (#{userId}, #{userPw}, #{userName}, 1, NOW())
+        VALUES (#{userId}, #{userPw}, #{userName}, null, NOW())
     </insert>
 
 </mapper>

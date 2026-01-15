@@ -76,11 +76,13 @@ public class LessonService {
       // answer 파싱 (String)
       JsonNode answerNode = objectMapper.readTree(lessonQst.getAnswer());
       String answer = answerNode.get("correct").get(0).asText();
+      String explanation = answerNode.get("explanation").asText();
 
       LessonDTO.LessonQst qst = new LessonDTO.LessonQst();
       qst.setQuestionText(lessonQst.getQuestionText());
       qst.setOptionList(options);
       qst.setAnswer(answer);
+      qst.setExplanation(explanation);
 
       result.add(qst);
     }

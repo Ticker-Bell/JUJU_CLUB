@@ -30,6 +30,7 @@ public class LessonDTO {
     private String questionText;
     private String options;
     private String answer;
+    private String explanation;
 
     private List<String> optionList;
   }

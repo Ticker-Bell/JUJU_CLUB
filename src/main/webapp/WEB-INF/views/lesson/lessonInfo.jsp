@@ -21,17 +21,27 @@
             </div>
             <div>
                 <div class="text-sm font-extrabold text-gray-900">주식 기초 채팅</div>
-                <div class="text-[11px] font-semibold text-gray-400">버튼을 눌러 다음 메시지를
-                    받아보세요
+                <div class="text-[11px] font-semibold text-gray-400">
+                    버튼을 눌러 다음 메시지를 받아보세요
                 </div>
             </div>
         </div>
 
-        <button id="resetBtn"
-                class="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-extrabold text-xs hover:bg-gray-50 transition flex items-center gap-2">
-            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-            다시보기
-        </button>
+        <!-- 오른쪽 버튼 영역 -->
+        <div class="flex items-center gap-2">
+            <!-- 빠르게 보기 (이동됨) -->
+            <button id="skipBtn"
+                    class="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-extrabold text-xs hover:bg-gray-50 transition">
+                빠르게 보기
+            </button>
+
+            <!-- 다시보기 -->
+            <button id="resetBtn"
+                    class="px-3 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-extrabold text-xs hover:bg-gray-50 transition flex items-center gap-2">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                다시보기
+            </button>
+        </div>
     </div>
 
     <div id="chatScroll" class="flex-1 min-h-0 overflow-y-auto px-6 py-5 bg-white">
@@ -40,8 +50,9 @@
         <div id="typingRow" class="mt-4 hidden">
             <div class="bubble-wrap">
                 <div class="typing">
-                    <span class="dot"></span><span class="dot"></span><span
-                        class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
                 </div>
             </div>
         </div>
@@ -61,10 +72,6 @@
                     다음
                 </button>
 
-                <button id="skipBtn"
-                        class="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-extrabold text-sm hover:bg-gray-50 transition">
-                    빠르게 보기
-                </button>
             </div>
         </div>
     </div>
@@ -99,6 +106,10 @@
     const resetBtn = document.getElementById("resetBtn");
     let idx = 0;
 
+    function scrollToBottom(){
+      chatScroll.scrollTop = chatScroll.scrollHeight;
+    }
+
     function addMessage(msg) {
       const row = document.createElement("div");
       const isRight = msg.side === "right";
@@ -131,6 +142,15 @@
     function step() {
       if (idx >= script.length) {
         alert("개념 문제 완료! 다음문제로 이동");
+
+        htmx.ajax('POST', '${cpath}/lesson/qst', {
+          target: '#main',
+          values: {
+            lessonId: 'lesson_stock_01',
+            questionId: 'Q002'
+          }
+        });
+
         return;
       }
       addMessage(script[idx]);

@@ -82,20 +82,19 @@
         <div class="p-8 text-center">
             <div id="modalIcon"
                  class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg transition-transform">
-                🎉
+
             </div>
 
             <h3 id="modalTitle" class="text-2xl font-extrabold text-gray-900 mb-2">
-                정답입니다!
+
             </h3>
 
             <p id="modalDesc" class="text-gray-600 font-medium leading-relaxed mb-6">
-                주식은 회사의 자본금을 쪼갠 것으로,<br>주식을 가지면 회사의 주인이 되는 것입니다.
             </p>
 
             <button id="modalActionBtn"
                     class="w-full py-3.5 rounded-xl bg-primary text-white font-extrabold shadow-lg shadow-primary/30 hover:brightness-105 transition-all">
-                다음 문제로
+
             </button>
         </div>
 
@@ -108,6 +107,8 @@
 
   let selectedIdx = null;
   const CORRECT_IDX = ${qst[0].answer};
+  const EXPLANATION = `${fn:escapeXml(qst[0].explanation)}`;
+
 
   function selectOption(el, idx) {
     // 기존 선택 해제
@@ -141,7 +142,7 @@
       icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-green-100 text-green-600";
       title.textContent = "정답입니다!";
       title.className = "text-2xl font-extrabold text-green-600 mb-2";
-      desc.innerHTML = `맞아요! <span class="font-bold text-gray-900">주식은 회사의 소유권</span>을 의미합니다.<br>채권(A)이나 예금(C)과는 다른 개념이죠.`;
+      desc.innerHTML = EXPLANATION;
       bar.className = "h-2 w-full bg-green-500";
       btn.textContent = "다음 문제로";
 
@@ -182,6 +183,7 @@
   function closeModal() {
     document.getElementById('resultModal').classList.add('hidden');
   }
+
 </script>
 
 </html>

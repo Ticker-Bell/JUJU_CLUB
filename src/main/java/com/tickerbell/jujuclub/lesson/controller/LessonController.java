@@ -46,4 +46,31 @@ public class LessonController {
     }
 
   }
+
+  @PostMapping("/qst")
+  public String getQstInfo(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String lessonId,@RequestParam String questionId,
+      Model model) throws Exception {
+
+    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+
+    List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
+
+    List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
+
+    model.addAttribute("chat", chatMap);
+    model.addAttribute("colNames", chatMap.keySet());
+    model.addAttribute("titles", title);
+    model.addAttribute("qst", lessonQst);
+
+    if (isHtmx) {
+      return "/lesson/qst2";
+    } else {
+      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
+      // Redirect를 하거나 에러 페이지를 띄움
+      return "redirect:/main";
+    }
+
+  }
 }

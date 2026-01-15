@@ -7,22 +7,15 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--<%@ include file="../common/common.jsp"%>--%>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<link rel="stylesheet" as="style" crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
 <div>
-    <h1>로드맵</h1>
-    <form action="roadMap/main.do" method="post">
-        <label for="level">단계</label><select name="levelId" id="levelId">
-            <c:forEach items="${levelList}" var="level">
-                <option value="${level.levelId}">${level.levelName}</option>
-            </c:forEach>
-        </select>
-        <label for="level">챕터</label><select name="chapterId" id="chapterId">
-        <c:forEach items="${chptList}" var="chapter">
-            <option value="${chapter.chapterId}">${chapter.chapterName}</option>
-        </c:forEach>
-    </select>
-    <input type="submit" value="이동">
-    </form>
+    <section class="roadmap-stage flex-1 min-h-0 relative">
+
+    <%@ include file="dropDown.jsp"%>
 
     <button type="button"
             class="bg-blue-500 text-white p-2 rounded"
@@ -31,4 +24,7 @@
             hx-target="#main"
             hx-swap="innerHTML"
             hx-push-url="true"> 이동버튼 </button>
+    </section>
+
 </div>
+

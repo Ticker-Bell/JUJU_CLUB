@@ -12,6 +12,7 @@
 <head>
     <title>Main</title>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
 <!-- topbar -->

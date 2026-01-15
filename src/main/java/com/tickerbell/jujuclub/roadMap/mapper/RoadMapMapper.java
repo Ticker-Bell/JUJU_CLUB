@@ -19,7 +19,8 @@ public interface RoadMapMapper {
 
     // user id로 user의 현재 레슨 진행도 조회
     List<UserLessonDTO> userLessonList(@Param("user_seq") Integer userId);
-
+    // level chapter id로 조회
+    List<LevelChapterLessonDTO> levelChptSelectAllList(@Param("level_seq") Integer levelId, @Param("chapter_id") String chapterId);
     // level id or chapter id로 조회
     List<LevelChapterLessonDTO> selectLearningList(@Param("level_seq") Integer levelId, @Param("chapter_id") String chapterId);
 

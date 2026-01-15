@@ -31,10 +31,10 @@ public class RoadMapController {
         levelList.forEach(System.out::println);
         chptList.forEach(System.out::println);
         lessonList.forEach(System.out::println);
-        userLessonList.forEach(System.out::println);
+        System.out.println(userLessonList.stream().findFirst());
 
         model.addAttribute("levelList",levelList);
-        model.addAttribute("chptList",chptList);
+        model.addAttribute("chptList",chptList); // 레벨 선택하면 챕터리스트 조회
         model.addAttribute("lessonList",lessonList);
         model.addAttribute("userLessonList",userLessonList.stream().findFirst());
 

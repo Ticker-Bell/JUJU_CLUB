@@ -20,6 +20,19 @@
         WHERE lv.level_seq = #{level_seq} and ch.chapter_id = #{chapter_id}
     </select>
 
+    <select id="levelChptSelectAllList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelChapterLessonDTO">
+        SELECT
+            lv.level_seq AS levelId,
+            lv.level_name AS levelName,
+            ch.chapter_id AS chapterId,
+            ch.chapter_name AS chapterName,
+            ch.test_reward AS testReward,
+            ch.test_pay AS testPay
+        FROM learning_level AS lv
+                 JOIN learning_chapter AS ch ON lv.level_seq = ch.level_seq
+        WHERE lv.level_seq = #{level_seq} and ch.chapter_id = #{chapter_id}
+    </select>
+
     <select id="levelList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelDTO">
         select level_seq AS levelId,
                level_name AS levelName
@@ -58,5 +71,6 @@
                  JOIN learning_chapter AS ch ON ch.chapter_id = ls.chapter_id
                  JOIN learning_level as lv ON lv.level_seq = ch.level_seq
         where user_seq = #{user_seq}
+        order by levelId desc, chapterId desc, lessonId desc
     </select>
 </mapper>

@@ -22,7 +22,21 @@
 	</beans:bean>
 	
 	<context:component-scan base-package="com.tickerbell.jujuclub" />
-	
-	
+
+	<!-- HtmxHandler -->
+	<interceptors>
+		<interceptor>
+			<mapping path="/**"/>
+
+			<exclude-mapping path="/resources/**"/>
+			<exclude-mapping path="/css/**"/>
+			<exclude-mapping path="/js/**"/>
+			<exclude-mapping path="/img/**"/>
+			<exclude-mapping path="/favicon.ico"/>
+			<!-- 추후 홈, 로그인, 온보딩 페이지 및 기타 페이지 등록 -->
+			<!-- <exclude-mapping path="/login/**"/>-->
+			<beans:bean class="com.tickerbell.jujuclub.common.controller.HtmxLayoutInterceptor"/>
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpSession;
+
 @RequestMapping("/main")
 @Controller
 public class MainController {
@@ -19,7 +21,7 @@ public class MainController {
 
     // main화면으로 이동
     @GetMapping()
-    public String showMain(Model model) {
+    public String showMain(Model model, HttpSession session) {
         String testId = "hi";
         System.out.println("=== 조회 시작 ID: " + testId + " ===");
 
@@ -32,7 +34,10 @@ public class MainController {
             System.out.println("조회 실패: DB에 해당 ID가 없거나 JOIN 결과가 없음");
         }
 
-        model.addAttribute("user", userInfo);
+        session.setAttribute("user", userInfo);
+//        UserInfoDTO users = (UserInfoDTO) session.getAttribute("userSeq");
+//
+//        model.addAttribute("user", users);
 
         model.addAttribute("targetPage", "/WEB-INF/views/roadMap/roadMapMain.jsp");
         return "common/main";

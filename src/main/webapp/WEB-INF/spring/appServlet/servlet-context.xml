@@ -33,6 +33,7 @@
 			<exclude-mapping path="/js/**"/>
 			<exclude-mapping path="/img/**"/>
 			<exclude-mapping path="/favicon.ico"/>
+			<exclude-mapping path="/"/>
 			<!-- 추후 홈, 로그인, 온보딩 페이지 및 기타 페이지 등록 -->
 			<!-- <exclude-mapping path="/login/**"/>-->
 			<beans:bean class="com.tickerbell.jujuclub.common.controller.HtmxLayoutInterceptor"/>

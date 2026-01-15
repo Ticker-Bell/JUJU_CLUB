@@ -1,6 +1,5 @@
 package com.tickerbell.jujuclub.auth.dto;
 
-
 import lombok.*;
 
 import java.util.Date;
@@ -11,9 +10,10 @@ import java.util.Date;
 @AllArgsConstructor
 public class SigninDTO {
 
+  private int userSeq;
   private String userId;
   private String userPw;
   private String userName;
   private Date createdAt;
-  private int userLevel;
+  private Integer userLevel;
 }

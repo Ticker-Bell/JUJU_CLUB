@@ -8,10 +8,7 @@ import com.tickerbell.jujuclub.auth.service.SignupService;
 
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/auth")
@@ -58,6 +55,38 @@ public class SignupController {
             map.put("message", "처리 중 오류가 발생했습니다.");
             return map;
         }
+    }
+
+    // 1. 이메일 중복 확인 API
+    @GetMapping("/check-email")
+    @ResponseBody
+    public Map<String, Object> checkEmail(@RequestParam String email) {
+        Map<String, Object> map = new HashMap<>();
+
+        if (signupService.isEmailDuplicate(email)) {
+            map.put("ok", false);
+            map.put("message", "이미 사용중인 이메일 입니다."); // 백엔드에서 메시지 결정
+        } else {
+            map.put("ok", true);
+            map.put("message", "사용 가능한 이메일입니다.");
+        }
+        return map;
+    }
+
+    // 2. 닉네임 중복 확인 API
+    @GetMapping("/check-nickname")
+    @ResponseBody
+    public Map<String, Object> checkNickname(@RequestParam String nickname) {
+        Map<String, Object> map = new HashMap<>();
+
+        if (signupService.isNicknameDuplicate(nickname)) {
+            map.put("ok", false);
+            map.put("message", "이미 사용중인 닉네임 입니다."); // 백엔드에서 메시지 결정
+        } else {
+            map.put("ok", true);
+            map.put("message", "사용 가능한 닉네임입니다.");
+        }
+        return map;
     }
 
     public static class SignupAjaxRequest {

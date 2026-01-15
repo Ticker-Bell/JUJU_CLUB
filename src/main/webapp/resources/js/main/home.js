@@ -1,665 +1,526 @@
 /* ==========================================================================
-   JUJU CLUB - home.js
-   - 역할: 홈 화면의 모든 인터랙션/애니메이션/폼 전환/통신 담당
-   - 목적: "기능별로 분리된 함수" + "주석으로 의도/흐름"을 명확히 해 유지보수하기 쉽게
+   JUJU CLUB - home.js (Final V11: Auto Focus on Email)
    ========================================================================== */
 
-(() => {
-    /* ------------------------------------------------------------------------
-       0) 전역/환경값
-       ------------------------------------------------------------------------ */
-
-    // ✅ JSP에서 window.__CTX__로 주입한 contextPath
-    // - 예) /myapp
-    // - API 호출, 정적 리소스 경로, 라우팅에 사용
+document.addEventListener("DOMContentLoaded", () => {
     const ctx = window.__CTX__ || "";
-
-    // ✅ 새로고침 시 스크롤 위치 복원 방지 (항상 맨 위에서 시작)
-    // - 로그인 패널 애니메이션이 "맨 위 기준"으로 설계되어 있어
-    //   이전 스크롤 위치가 복원되면 UX가 어긋날 수 있음
     if (history.scrollRestoration) history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
 
-    /* ------------------------------------------------------------------------
-       1) DOM 요소 캐싱
-       - querySelector/getElementById 호출을 흩뿌리지 않고
-         상단에 모아두면 유지보수/리팩토링이 쉬움
-       ------------------------------------------------------------------------ */
-
+    /* Elements */
     const $ = (id) => document.getElementById(id);
-
-    // Hero / Title
     const btnStart = $("btn-start");
     const heroMainWrapper = $("hero-main-wrapper");
-    const targetHolder = $("target-holder");
-    const targetText = $("target-text");
-    const titlePart1 = $("title-part-1");
-    const titlePart2 = $("title-part-2");
-
-    // Header buttons
+    const targetHolder = $("target-holder"), targetText = $("target-text");
+    const titlePart1 = $("title-part-1"), titlePart2 = $("title-part-2"), chartLine = document.querySelector(".chart-line");
     const btnHeaderLogin = $("btn-header-login");
-    const btnHeaderFeatures = $("btn-header-features");
-
-    // Hero text/buttons
-    const heroTextArea = $("hero-text-area");
-    const heroBtns = $("hero-btns");
-    const scrollIcon = $("scroll-icon");
-
-    // Login area
-    const loginTextArea = $("login-text-area");
-    const loginSection = $("login-section");
-    const authCard = $("auth-card");
+    const heroTextArea = $("hero-text-area"), heroBtns = $("hero-btns"), scrollIcon = $("scroll-icon");
+    const loginTextArea = $("login-text-area"), loginSection = $("login-section"), authCard = $("auth-card");
     const typingWrapper = document.querySelector(".typing-wrapper");
+    const formLogin = $("form-login"), formSignup = $("form-signup"), formSuccess = $("form-success");
+    const formSurvey = $("form-survey"), formAccountSuccess = $("form-account-success"), formFinalReady = $("form-final-ready");
 
-    // Forms
-    const formLogin = $("form-login");
-    const formSignup = $("form-signup");
-    const formSuccess = $("form-success");
+    const btnSubmitSurvey = $("btn-submit-survey"), btnGoMain = $("btn-go-main");
+    const btnGoSignup = $("btn-go-signup"), btnGoLogin = $("btn-go-login");
+    const btnSubmitLogin = $("btn-submit-login"), btnSubmitSignup = $("btn-submit-signup");
+    const btnBackLogin = $("btn-back-home-login"), btnBackSignup = $("btn-back-home-signup");
 
-    // Form switches
-    const btnGoSignup = $("btn-go-signup");
-    const btnGoLogin = $("btn-go-login");
+    const btnToFinal = $("btn-to-final");
+    const btnStartLearning = $("btn-start-learning");
 
-    // Submit buttons
-    const btnSubmitLogin = $("btn-submit-login");
-    const btnSubmitSignup = $("btn-submit-signup");
-
-    // Main typing
+    const cursorMain = $("cursor-main"), cursorLoginTitle = $("cursor-login-title"), cursorLoginSub = $("cursor-login-sub");
     const typeContent = $("type-content");
 
-    /* ------------------------------------------------------------------------
-       2) 타이머/애니메이션 제어 유틸
-       - 화면 전환 중 연속 클릭/빠른 전환이 발생하면
-         setTimeout이 겹쳐 애니메이션이 꼬일 수 있음
-       - 그래서 "등록한 timeout을 모두 추적하고"
-         전환 시작 시 전부 클리어하는 방식으로 안정성 확보
-       ------------------------------------------------------------------------ */
-
+    /* Utils */
     let timeouts = [];
+    function setCleanTimeout(cb, delay) { const id = setTimeout(cb, delay); timeouts.push(id); return id; }
+    function clearAllTimeouts() { timeouts.forEach(id => clearTimeout(id)); timeouts = []; }
+    const wait = (ms) => new Promise(res => setTimeout(res, ms));
 
-    function setCleanTimeout(cb, delay) {
-        const id = setTimeout(cb, delay);
-        timeouts.push(id);
-        return id;
-    }
-
-    function clearAllTimeouts() {
-        timeouts.forEach((id) => clearTimeout(id));
-        timeouts = [];
-    }
-
-    // ✅ async 타이핑에서 await로 쓰는 sleep
-    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    /* ------------------------------------------------------------------------
-       3) 메인 타이핑(히어로 문장)
-       - textSequence의 구성대로 타이핑 출력
-       - strong/줄바꿈까지 지원
-       - mainTypingState.id를 통해 "이전 타이핑 작업 취소" 가능하게 함
-       ------------------------------------------------------------------------ */
-
-    const textSequence = [
-        { text: "주식 시장의 언어를 배우고,", type: "text" },
-        { type: "br" },
-        { text: "리스크 없는 환경에서 당신의 투자를 실험하세요. ", type: "text" },
-        { type: "br" },
-        { text: "주주클럽", type: "strong" },
-        { text: "이 함께합니다.", type: "text" },
-    ];
-
-    let mainTypingState = { id: 0 };
-
-    async function startMainTyping() {
-        mainTypingState.id++;
-        const currentId = mainTypingState.id;
-
-        typeContent.innerHTML = "";
-
-        const cursorMain = $("cursor-main");
-        if (cursorMain) cursorMain.classList.remove("hidden");
-
-        for (const item of textSequence) {
-            if (mainTypingState.id !== currentId) return;
-
-            if (item.type === "text") {
-                for (const char of item.text) {
-                    if (mainTypingState.id !== currentId) return;
-                    typeContent.insertAdjacentText("beforeend", char);
-                    await wait(45);
-                }
+    /* Reset */
+    function resetForm(formEl) {
+        if (!formEl) return;
+        const inputs = formEl.querySelectorAll("input");
+        inputs.forEach(el => {
+            if(el.type === 'radio') el.checked = false;
+            else {
+                el.value = "";
+                el.classList.remove("border-red-500", "ring-red-200", "ring-2", "border-blue-500", "ring-blue-200", "shake");
+                el.classList.add("focus:ring-primary/20", "focus:border-primary");
             }
-
-            if (item.type === "br") {
-                typeContent.insertAdjacentHTML("beforeend", "<br/>");
-                await wait(200);
-            }
-
-            if (item.type === "strong") {
-                const strongTag = document.createElement("strong");
-                strongTag.className = "text-primary";
-                typeContent.appendChild(strongTag);
-
-                for (const char of item.text) {
-                    if (mainTypingState.id !== currentId) return;
-                    strongTag.insertAdjacentText("beforeend", char);
-                    await wait(45);
-                }
-            }
-        }
-    }
-
-    /* ------------------------------------------------------------------------
-       4) 사이드 타이핑(로그인 패널의 2줄 문장)
-       - openLoginPanel() 또는 switchForm()에서 호출
-       - 타이핑 도중 문장이 바뀌면 이전 타이핑을 취소해야 하므로
-         typingState.id로 취소 가능한 구조
-       ------------------------------------------------------------------------ */
-
-    let typingState = { id: 0 };
-
-    async function startSideTyping(title, sub) {
-        typingState.id++;
-        const currentId = typingState.id;
-
-        const titleEl = $("login-type-title");
-        const subEl = $("login-type-sub");
-        const cursorTitle = $("cursor-login-title");
-        const cursorSub = $("cursor-login-sub");
-
-        titleEl.textContent = "";
-        subEl.textContent = "";
-
-        cursorTitle.classList.remove("hidden");
-        cursorSub.classList.add("hidden");
-
-        for (const char of title) {
-            if (typingState.id !== currentId) return;
-            titleEl.insertAdjacentText("beforeend", char);
-            await wait(45);
-        }
-
-        if (typingState.id !== currentId) return;
-        await wait(200);
-
-        cursorTitle.classList.add("hidden");
-        cursorSub.classList.remove("hidden");
-
-        for (const char of sub) {
-            if (typingState.id !== currentId) return;
-            subEl.insertAdjacentText("beforeend", char);
-            await wait(45);
-        }
-    }
-
-    /* ------------------------------------------------------------------------
-       5) 레이아웃 안정화(타이틀 가운데 텍스트 폭 고정)
-       - "아는 만큼" ↔ "주주 클럽" 텍스트 변경 시
-         가운데 단어 폭이 달라지면 타이틀 전체가 흔들릴 수 있음
-       - 가장 긴 단어 기준으로 width를 고정해 흔들림 제거
-       ------------------------------------------------------------------------ */
-
-    function lockTargetWidth() {
-        const measurer = document.createElement("span");
-        measurer.style.position = "absolute";
-        measurer.style.visibility = "hidden";
-        measurer.style.whiteSpace = "nowrap";
-        measurer.style.fontSize = getComputedStyle(targetText).fontSize;
-        measurer.style.fontWeight = getComputedStyle(targetText).fontWeight;
-        measurer.style.fontFamily = getComputedStyle(targetText).fontFamily;
-
-        document.body.appendChild(measurer);
-
-        const candidates = ["아는 만큼", "주주 클럽"];
-        let maxWidth = 0;
-
-        candidates.forEach((txt) => {
-            measurer.textContent = txt;
-            const w = measurer.getBoundingClientRect().width;
-            if (w > maxWidth) maxWidth = w;
         });
-
-        document.body.removeChild(measurer);
-
-        targetHolder.style.width = `${Math.ceil(maxWidth) + 4}px`;
+        const checkboxes = formEl.querySelectorAll("input[type='checkbox']");
+        checkboxes.forEach(cb => cb.checked = false);
+        const msgs = formEl.querySelectorAll("p[id^='msg-']");
+        msgs.forEach(p => { p.innerText = ""; p.classList.add("hidden"); p.classList.remove("text-red-600", "text-blue-500"); });
+        clearInlineError(formEl);
+        if (formEl.id === "form-signup") disableSignupButton();
     }
 
-    /* ------------------------------------------------------------------------
-       6) 로그인 타이핑 영역의 "시작 위치" 정렬
-       - 로그인 문장은 left-aligned가 요구됨
-       - 그런데 화면 중앙 기준으로 시작하면 어색하니
-         가운데 단어(target-holder) 위치 기준으로 padding-left를 계산해
-         "자연스럽게 이어지는" 인상을 주도록 맞춘다.
-       ------------------------------------------------------------------------ */
-
-    function alignLoginText() {
-        const holderRect = targetHolder.getBoundingClientRect();
-        const wrapperRect = typingWrapper.getBoundingClientRect();
-
-        // holder의 좌측이 wrapper 기준에서 얼마나 떨어져 있는지 계산
-        let offset = holderRect.left - wrapperRect.left;
-
-        // 미세한 감각 보정(원본 유지)
-        offset += 24;
-
-        loginTextArea.style.paddingLeft = `${Math.max(0, offset)}px`;
-    }
-
-    /* ------------------------------------------------------------------------
-       7) 스크롤 잠금/해제
-       - 로그인 패널 활성화 시 배경 스크롤이 되면
-         포커스가 깨지고, 전환 애니메이션 기준점(상단)이 흔들릴 수 있음
-       ------------------------------------------------------------------------ */
-
-    function lockScroll() {
-        document.body.classList.add("lock-scroll");
-    }
-    function unlockScroll() {
-        document.body.classList.remove("lock-scroll");
-    }
-
-    /* ------------------------------------------------------------------------
-       8) 로그인 패널 열기/닫기 (핵심 UX)
-       - 요구사항: "로그인창 먼저 사라지고 → 글자 이동" 등 단계적 제어
-       - openLoginPanel() : 히어로 요소를 사라지게 하고, 패널을 활성화
-       - closeLoginPanel(): 패널을 비활성화하고, 히어로를 원복
-       ------------------------------------------------------------------------ */
-
-    const snappyBezier = "cubic-bezier(0.19, 1, 0.22, 1)";
-    let scrollPoller = null;
-
-    function openLoginPanel() {
-        clearAllTimeouts();
-        if (scrollPoller) cancelAnimationFrame(scrollPoller);
-
-        // (1) 먼저 히어로 영역 요소들을 퇴장시키기 (즉시 반응)
-        titlePart1.classList.add("exit-right");
-        titlePart2.classList.add("exit-left");
-        heroTextArea.classList.add("exit-down");
-        heroBtns.classList.add("exit-down");
-        if (scrollIcon) scrollIcon.classList.add("exit-down");
-
-        heroMainWrapper.classList.remove("slow-restore");
-
-        // (2) 로그인 패널 애니메이션 본체
-        const runPanelAnimation = () => {
-            lockScroll();
-            heroMainWrapper.classList.add("move-to-side");
-
-            // 가운데 단어 교체(아는 만큼 -> 주주 클럽)
-            targetText.style.transition = `all 0.4s ${snappyBezier}`;
-            targetText.style.opacity = "0";
-            targetText.style.transform = "translateY(-20px) scale(0.95) blur(4px)";
-
-            setCleanTimeout(() => {
-                targetText.innerText = "주주 클럽";
-                targetText.style.opacity = "1";
-                targetText.style.transform = "translateY(0) scale(1) blur(0)";
-
-                // 로그인 타이핑 영역 표시
-                loginTextArea.classList.remove("exit-down");
-                loginTextArea.classList.add("visible");
-
-                // 위치 맞추고 타이핑 시작
-                alignLoginText();
-                startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
-            }, 250);
-
-            // 패널 표시
-            loginSection.classList.add("active");
-        };
-
-        // (3) 스크롤이 내려가 있는 상태라면
-        //     "상단으로 부드럽게 이동한 뒤" 패널을 열어야 자연스럽다.
-        if (window.scrollY > 5) {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-
-            const checkScrollPosition = () => {
-                if (window.scrollY <= 5) {
-                    setCleanTimeout(runPanelAnimation, 50);
-                } else {
-                    scrollPoller = requestAnimationFrame(checkScrollPosition);
-                }
-            };
-            scrollPoller = requestAnimationFrame(checkScrollPosition);
-        } else {
-            // 맨 위에서 시작하면 약간의 템포를 주고 시작
-            setCleanTimeout(runPanelAnimation, 600);
-        }
-    }
-
-    function closeLoginPanel() {
-        if (!loginSection.classList.contains("active")) return;
-
-        clearAllTimeouts();
-
-        // (1) 로그인 패널부터 먼저 숨기기
-        loginSection.classList.remove("active");
-        loginTextArea.classList.remove("visible");
-        loginTextArea.classList.add("exit-down");
-
-        // (2) 히어로 패널 원복 + 가운데 단어 원복(주주 클럽 -> 아는 만큼)
-        setCleanTimeout(() => {
-            heroMainWrapper.classList.remove("move-to-side");
-
-            targetText.style.transition = `all 0.4s ${snappyBezier}`;
-            targetText.style.opacity = "0";
-            targetText.style.transform = "translateY(-20px) scale(0.95) blur(4px)";
-
-            setCleanTimeout(() => {
-                targetText.innerText = "아는 만큼";
-                targetText.style.opacity = "1";
-                targetText.style.transform = "translateY(0) scale(1) blur(0)";
-            }, 250);
-        }, 400);
-
-        // (3) 텍스트/버튼/스크롤아이콘을 천천히 원복
-        setCleanTimeout(() => {
-            const elementsToRestore = [titlePart1, titlePart2, heroBtns, scrollIcon];
-
-            elementsToRestore.forEach((el) => {
-                if (!el) return;
-                el.classList.add("slow-restore");
-                el.classList.remove("exit-down", "exit-left", "exit-right");
-            });
-
-            // heroTextArea도 원복
-            if (heroTextArea) {
-                heroTextArea.classList.add("slow-restore");
-                heroTextArea.classList.remove("exit-down");
-                heroTextArea.style.opacity = "";
-                heroTextArea.style.transform = "";
-            }
-
-            // 메인 타이핑 다시 시작
-            typeContent.innerHTML = "";
-            startMainTyping();
-
-            unlockScroll();
-
-            // slow-restore 클래스를 일정 시간 후 제거(다음 전환에 영향 없게)
-            setCleanTimeout(() => {
-                elementsToRestore.forEach((el) => el && el.classList.remove("slow-restore"));
-                heroTextArea && heroTextArea.classList.remove("slow-restore");
-            }, 1400);
-        }, 900);
-    }
-
-    /* ------------------------------------------------------------------------
-       9) 폼 전환 (로그인 <-> 회원가입)
-       - 화면 전환은 auth-form의 active-form 클래스로 관리
-       - 전환 시 타이핑 문구도 함께 교체해 "상태 변화"를 더 명확히 전달
-       ------------------------------------------------------------------------ */
-
-    function switchForm(toSignup) {
-        const outgoing = toSignup ? formLogin : formSignup;
-        const incoming = toSignup ? formSignup : formLogin;
-
-        const newTitle = toSignup ? "환영합니다." : "만나서 반갑습니다.";
-        const newSub = toSignup ? "새로운 여정을 시작해보세요." : "성공적인 투자의 여정을 이어가세요.";
-        startSideTyping(newTitle, newSub);
-
-        // outgoing을 먼저 fade-out
-        outgoing.style.opacity = "0";
-        outgoing.style.transform = "translateY(10px)";
-        outgoing.style.pointerEvents = "none";
-
-        setCleanTimeout(() => {
-            outgoing.classList.remove("active-form");
-            incoming.classList.add("active-form");
-
-            // incoming을 다시 fade-in
-            setCleanTimeout(() => {
-                incoming.style.opacity = "1";
-                incoming.style.transform = "translateY(0)";
-                incoming.style.pointerEvents = "auto";
-            }, 50);
-        }, 400);
-    }
-
-    /* ------------------------------------------------------------------------
-       10) 폼 에러 표시 유틸
-       - 서버 응답 오류/유효성 오류를 "폼 내부"에 인라인으로 표시
-       - 기존 UI 스타일을 해치지 않도록 minimal한 DOM 추가 방식 사용
-       ------------------------------------------------------------------------ */
-
+    /* Error Display */
     function showInlineError(formEl, msg) {
-        let box = formEl.querySelector(".form-error");
-        if (!box) {
-            box = document.createElement("div");
-            box.className = "form-error mt-4 text-sm font-bold text-red-500";
-            formEl.querySelector("form").appendChild(box);
+        if (formEl.id === "form-login") {
+            const errorP = $("msg-login-error");
+            if (errorP) {
+                errorP.innerText = msg || "정보를 확인해주세요.";
+                errorP.classList.remove("hidden");
+                errorP.classList.add("text-red-600");
+                $("loginEmail").classList.add("shake");
+                $("loginPassword").classList.add("shake");
+                setTimeout(() => { $("loginEmail").classList.remove("shake"); $("loginPassword").classList.remove("shake"); }, 500);
+            }
+        } else {
+            let box = formEl.querySelector(".form-error");
+            if (!box) { box = document.createElement("div"); box.className="form-error mt-4 text-sm font-bold text-red-600 absolute bottom-20 w-full text-center"; formEl.querySelector("form").appendChild(box); }
+            box.textContent = msg || "오류 발생";
         }
-        box.textContent = msg || "처리 중 오류가 발생했습니다.";
     }
-
     function clearInlineError(formEl) {
-        const box = formEl.querySelector(".form-error");
-        if (box) box.remove();
+        if (formEl.id === "form-login") {
+            const errorP = $("msg-login-error");
+            if(errorP) { errorP.classList.add("hidden"); errorP.innerText = ""; }
+            ["loginEmail", "loginPassword"].forEach(id => {
+                const el = $(id); if(el) el.classList.remove("border-red-500", "ring-2", "ring-red-200");
+            });
+        }
+        const box = formEl.querySelector(".form-error"); if(box) box.remove();
     }
 
-    /* ------------------------------------------------------------------------
-       11) API 호출 유틸(fetch)
-       - 서버가 JSON을 주는 경우/아닌 경우에 대비
-       - 응답이 JSON이 아니면 message로 text를 내려받아 표시
-       ------------------------------------------------------------------------ */
-
-    async function postJson(url, data) {
-        const r = await fetch(url, {
-            method: "POST",
-            credentials: 'same-origin',
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify(data),
-        });
-
-        const text = await r.text();
-
-        try {
-            return JSON.parse(text);
-        } catch (e) {
-            return { ok: false, message: text || "서버 응답 오류" };
-        }
+    /* Signup State */
+    function updateSignupButtonState() {
+        const eM = $("msg-email-error"), nM = $("msg-nickname-error"), pM = $("msg-password-error");
+        const ok = (el) => el && !el.classList.contains("hidden") && el.classList.contains("text-blue-500");
+        if (ok(eM) && ok(nM) && ok(pM)) enableSignupButton(); else disableSignupButton();
     }
-
-    /* ------------------------------------------------------------------------
-       12) 로그인/회원가입 submit 이벤트
-       - 입력값 검증 -> 버튼 disabled -> 서버 호출 -> 실패면 인라인 에러 -> 성공 처리
-       ------------------------------------------------------------------------ */
-
-    async function handleLogin() {
-        clearInlineError(formLogin);
-
-        const email = $("loginEmail")?.value?.trim();
-        const password = $("loginPassword")?.value;
-
-        if (!email || !password) {
-            showInlineError(formLogin, "이메일/비밀번호를 입력해 주세요.");
-            return;
-        }
-
-        btnSubmitLogin.disabled = true;
-        btnSubmitLogin.classList.add("opacity-60");
-
-        const res = await postJson(ctx + "/auth/login.ajax", { email, password });
-
-        btnSubmitLogin.disabled = false;
-        btnSubmitLogin.classList.remove("opacity-60");
-
-        if (!res.ok) {
-            showInlineError(formLogin, res.message);
-            return;
-        }
-
-        /**
-         *
-         * 로그인 성공 시:
-         * 서버에서 보내준 redirectUrl을 사용
-         *
-         */
-            window.location.href = res.redirectUrl;
-    }
-
-    async function handleSignup() {
-        clearInlineError(formSignup);
-
-        const email = $("signupEmail")?.value?.trim();
-        const username = $("signupUsername")?.value?.trim();
-        const password = $("signupPassword")?.value;
-
-        if (!email || !username || !password) {
-            showInlineError(formSignup, "이메일/닉네임/비밀번호를 모두 입력해 주세요.");
-            return;
-        }
-
-        btnSubmitSignup.disabled = true;
-        btnSubmitSignup.classList.add("opacity-60");
-
-        const res = await postJson(ctx + "/auth/signin.ajax", { email, username, password });
-
+    function enableSignupButton() {
+        if(!btnSubmitSignup) return;
         btnSubmitSignup.disabled = false;
-        btnSubmitSignup.classList.remove("opacity-60");
+        btnSubmitSignup.classList.remove("bg-gray-300", "text-gray-500", "cursor-not-allowed");
+        btnSubmitSignup.classList.add("bg-primary", "text-white", "hover:bg-primary/90", "hover:shadow-xl", "hover:-translate-y-1");
+    }
+    function disableSignupButton() {
+        if(!btnSubmitSignup) return;
+        btnSubmitSignup.disabled = true;
+        btnSubmitSignup.classList.remove("bg-primary", "text-white", "hover:bg-primary/90", "hover:shadow-xl", "hover:-translate-y-1");
+        btnSubmitSignup.classList.add("bg-gray-300", "text-gray-500", "cursor-not-allowed");
+    }
 
-        if (!res.ok) {
-            showInlineError(formSignup, res.message);
+    /* Validation Bindings */
+    function bindPasswordValidation() {
+        const pwInput = $("signupPassword");
+        const pwMsg = $("msg-password-error");
+        if (!pwInput || !pwMsg) return;
+
+        pwInput.addEventListener("keyup", () => {
+            const val = pwInput.value;
+            const regex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*?_~]).{8,16}$/;
+            if (!val) {
+                pwMsg.classList.add("hidden");
+                pwInput.classList.remove("border-red-500", "ring-red-200", "border-blue-500", "ring-blue-200");
+                updateSignupButtonState(); return;
+            }
+            pwMsg.classList.remove("hidden");
+            if (regex.test(val)) {
+                pwMsg.innerText = "사용가능한 비밀번호 입니다";
+                pwMsg.classList.remove("text-red-500", "text-red-600");
+                pwMsg.classList.add("text-blue-500");
+                pwInput.classList.remove("border-red-500", "ring-red-200");
+                pwInput.classList.add("border-blue-500", "ring-2", "ring-blue-200");
+            } else {
+                pwMsg.innerText = "8~16자 영문, 숫자, 특수문자를 혼합해주세요.";
+                pwMsg.classList.remove("text-blue-500", "text-red-600");
+                pwMsg.classList.add("text-red-500");
+                pwInput.classList.add("border-red-500", "ring-2", "ring-red-200");
+                pwInput.classList.remove("border-blue-500", "ring-blue-200");
+            }
+            updateSignupButtonState();
+        });
+    }
+
+    function bindEmailValidation() {
+        const emailInput = $("signupEmail");
+        const emailMsg = $("msg-email-error");
+        if (!emailInput || !emailMsg) return;
+
+        emailInput.addEventListener("keyup", () => {
+            const val = emailInput.value.trim();
+            const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+            if (!val) {
+                emailMsg.classList.add("hidden");
+                emailInput.classList.remove("border-red-500", "ring-red-200", "border-blue-500", "ring-blue-200");
+                updateSignupButtonState();
+                return;
+            }
+
+            if (!regex.test(val)) {
+                emailMsg.innerText = "올바른 이메일 형식이 아닙니다.";
+                emailMsg.classList.remove("hidden", "text-blue-500");
+                emailMsg.classList.add("text-red-500");
+                emailInput.classList.add("border-red-500", "ring-2", "ring-red-200");
+                emailInput.classList.remove("border-blue-500", "ring-blue-200");
+            } else {
+                emailMsg.classList.add("hidden");
+                emailInput.classList.remove("border-red-500", "ring-red-200");
+            }
+            updateSignupButtonState();
+        });
+    }
+
+    function checkDuplicate(url, inputId, msgId) {
+        const inputEl = $(inputId); const msgEl = $(msgId);
+        if(!inputEl || !msgEl) return;
+
+        inputEl.addEventListener("blur", () => {
+            const val = inputEl.value.trim();
+            inputEl.classList.remove("shake");
+
+            if(!val) {
+                msgEl.classList.add("hidden");
+                inputEl.classList.remove("border-red-500", "ring-red-200", "border-blue-500", "ring-blue-200");
+                updateSignupButtonState(); return;
+            }
+
+            if(inputId === "signupEmail") {
+                const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if(!regex.test(val)) return;
+            }
+
+            fetch(ctx + url + encodeURIComponent(val))
+                .then(r => r.json())
+                .then(d => {
+                    msgEl.innerText = d.message; msgEl.classList.remove("hidden");
+                    if(d.ok) {
+                        msgEl.classList.remove("text-red-500"); msgEl.classList.add("text-blue-500");
+                        inputEl.classList.remove("border-red-500", "ring-red-200"); inputEl.classList.add("border-blue-500", "ring-2", "ring-blue-200");
+                    } else {
+                        msgEl.classList.remove("text-blue-500"); msgEl.classList.add("text-red-500");
+                        inputEl.classList.add("border-red-500", "ring-2", "ring-red-200", "shake");
+                        inputEl.classList.remove("focus:ring-primary/20", "focus:border-primary");
+                        setTimeout(() => inputEl.classList.remove("shake"), 500);
+                    }
+                    updateSignupButtonState();
+                }).catch(e => console.error(e));
+        });
+    }
+
+    /* Signup */
+    async function handleSignup() {
+        if(btnSubmitSignup.disabled) return;
+        const em = $("signupEmail")?.value?.trim(), nm = $("signupUsername")?.value?.trim(), pw = $("signupPassword")?.value;
+        let hasError = false;
+        if (!$("msg-email-error").classList.contains("text-blue-500")) { $("signupEmail").classList.add("shake"); hasError = true; }
+        if (!$("msg-nickname-error").classList.contains("text-blue-500")) { $("signupUsername").classList.add("shake"); hasError = true; }
+        if (!$("msg-password-error").classList.contains("text-blue-500")) { $("signupPassword").classList.add("shake"); hasError = true; }
+        if (hasError) {
+            setTimeout(() => { $("signupEmail").classList.remove("shake"); $("signupUsername").classList.remove("shake"); $("signupPassword").classList.remove("shake"); }, 500);
             return;
         }
+        btnSubmitSignup.disabled = true;
+        const res = await postJson(ctx + "/auth/signin.ajax", {email:em, username:nm, password:pw});
+        if(!res.ok) { showInlineError(formSignup, res.message); updateSignupButtonState(); return; }
 
-        // ✅ 회원가입 성공 UX:
-        // 1) signup 폼 fade-out
-        // 2) success 화면 fade-in
-        // 3) confetti + 잠시 보여준 뒤 다시 로그인 폼으로 복귀
-        formSignup.style.opacity = "0";
-        formSignup.style.transform = "translateY(10px)";
-        formSignup.style.pointerEvents = "none";
-
+        formSignup.style.opacity="0"; formSignup.style.transform="translateY(10px)"; formSignup.style.pointerEvents="none";
         setCleanTimeout(() => {
-            formSignup.classList.remove("active-form");
-            formSuccess.classList.add("active-form");
-
+            formSignup.classList.remove("active-form"); formSuccess.classList.add("active-form");
             setCleanTimeout(() => {
-                formSuccess.style.opacity = "1";
-                formSuccess.style.transform = "translateY(0)";
-
-                // confetti 분사 위치 계산(카드 양쪽에서 쏘는 느낌)
-                const rect = authCard.getBoundingClientRect();
-                const x1 = rect.left / window.innerWidth;
-                const x2 = rect.right / window.innerWidth;
-                const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-                const duration = 1000;
-                const end = Date.now() + duration;
-
-                (function frame() {
-                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: x1, y }, colors: ["#5E45EB", "#ECE9FD"], zIndex: 9999 });
-                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: x2, y }, colors: ["#5E45EB", "#ECE9FD"], zIndex: 9999 });
-                    if (Date.now() < end) requestAnimationFrame(frame);
-                })();
+                formSuccess.style.opacity="1"; formSuccess.style.transform="translateY(0)";
+                const r = authCard.getBoundingClientRect();
+                const x1 = r.left/window.innerWidth, x2 = r.right/window.innerWidth, y = (r.top+r.height/2)/window.innerHeight;
+                const cf = {spread:70, ticks:100, gravity:1.2, decay:0.94, startVelocity:30, colors:["#5E45EB","#ECE9FD"], zIndex:9999};
+                confetti({...cf, particleCount:50, angle:60, origin:{x:x1, y:y}}); confetti({...cf, particleCount:50, angle:120, origin:{x:x2, y:y}});
             }, 50);
-
             setCleanTimeout(() => {
-                // 성공 화면을 잠시 보여준 뒤 로그인 폼으로 복귀
-                formSuccess.style.opacity = "0";
-                formSuccess.style.transform = "translateY(10px)";
-
+                formSuccess.style.opacity="0"; formSuccess.style.transform="translateY(10px)";
                 startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
-
                 setCleanTimeout(() => {
-                    formSuccess.classList.remove("active-form");
-                    formLogin.classList.add("active-form");
-
-                    setCleanTimeout(() => {
-                        formLogin.style.opacity = "1";
-                        formLogin.style.transform = "translateY(0)";
-                        formLogin.style.pointerEvents = "auto";
-                    }, 50);
+                    formSuccess.classList.remove("active-form"); formLogin.classList.add("active-form");
+                    setCleanTimeout(()=>{ formLogin.style.opacity="1"; formLogin.style.transform="translateY(0)"; formLogin.style.pointerEvents="auto"; }, 50);
                 }, 400);
             }, 2500);
         }, 400);
     }
 
-    /* ------------------------------------------------------------------------
-       13) 스크롤 아이콘 동작 + 스크롤시 아이콘 숨김
-       - "더 알아보기" 클릭 -> 아래 섹션으로 smooth scroll
-       - 스크롤이 조금만 내려가면 아이콘은 자연스럽게 사라짐
-       ------------------------------------------------------------------------ */
-
-    function bindScrollIcon() {
-        if (!scrollIcon) return;
-
-        scrollIcon.addEventListener("click", () => {
-            const target = document.getElementById("home-sections");
-            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-
-        let arrowHidden = false;
-        window.addEventListener(
-            "scroll",
-            () => {
-                if (arrowHidden) return;
-                if (window.scrollY > 20) {
-                    arrowHidden = true;
-                    scrollIcon.classList.add("exit-down");
-                }
-            },
-            { passive: true }
-        );
+    async function postJson(url, d) {
+        try { const r = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(d)});
+            const t = await r.text(); try { return JSON.parse(t); } catch(e) { return {ok:false, message:t}; }
+        } catch(e) { return {ok:false, message:"통신 오류"}; }
     }
 
-    /* ------------------------------------------------------------------------
-       14) 섹션 reveal(IntersectionObserver)
-       - 스크롤로 내려갈 때 Step01/02/03가 부드럽게 등장
-       - 한번 보이면 observe 해제(성능)
-       ------------------------------------------------------------------------ */
+    /* Login */
+    async function handleLogin() {
+        const em = $("loginEmail")?.value?.trim(), pw = $("loginPassword")?.value;
+        if(!em || !pw) { showInlineError(formLogin, "이메일과 비밀번호를 입력해주세요."); return; }
 
-    function initReveal() {
-        const revealEls = document.querySelectorAll(".reveal");
+        btnSubmitLogin.disabled=true; btnSubmitLogin.classList.add("opacity-60");
+        const res = await postJson(ctx+"/auth/login.ajax", {email:em, password:pw});
+        btnSubmitLogin.disabled=false; btnSubmitLogin.classList.remove("opacity-60");
 
-        const io = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("is-visible");
-                        io.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.22, rootMargin: "0px 0px -35% 0px" }
-        );
+        if(!res.ok) {
+            showInlineError(formLogin, res.message);
+            return;
+        }
 
-        revealEls.forEach((el) => io.observe(el));
+        if(btnHeaderLogin && res.userName) {
+            const nameSpan = document.createElement("div");
+            nameSpan.className = "text-base font-extrabold text-gray-800 mr-6 self-center transition-item flex items-center";
+            nameSpan.innerHTML = `<span class="text-primary mr-1">${res.userName}</span>님`;
+            const parent = btnHeaderLogin.parentElement;
+            parent.classList.add("flex", "items-center");
+            if(parent.querySelector("div.text-base")) parent.querySelector("div.text-base").remove();
+            parent.insertBefore(nameSpan, btnHeaderLogin);
+
+            btnHeaderLogin.innerText = "로그아웃";
+            btnHeaderLogin.removeEventListener("click", openLoginPanel);
+            btnHeaderLogin.addEventListener("click", () => {
+                window.location.href = ctx + "/auth/logout";
+            });
+        }
+
+        if (res.nextAction === "main") {
+            window.location.href = res.redirectUrl;
+        } else {
+            openSurvey();
+        }
     }
 
-    /* ------------------------------------------------------------------------
-       15) 이벤트 바인딩 & 초기화
-       ------------------------------------------------------------------------ */
+    /* Open Login Panel with Auto Focus */
+    function openLoginPanel() {
+        clearAllTimeouts(); if (scrollPoller) cancelAnimationFrame(scrollPoller);
 
-    function bindEvents() {
-        btnStart?.addEventListener("click", openLoginPanel);
-        btnHeaderLogin?.addEventListener("click", openLoginPanel);
-        btnHeaderFeatures?.addEventListener("click", closeLoginPanel);
+        if (formSignup) { formSignup.classList.remove("active-form"); formSignup.style.opacity="0"; formSignup.style.transform="translateY(10px)"; formSignup.style.pointerEvents="none"; }
+        if (formLogin) { formLogin.classList.add("active-form"); formLogin.style.opacity="1"; formLogin.style.transform="translateY(0)"; formLogin.style.pointerEvents="auto"; }
+        resetForm(formLogin); resetForm(formSignup);
 
-        btnGoSignup?.addEventListener("click", () => switchForm(true));
-        btnGoLogin?.addEventListener("click", () => switchForm(false));
+        titlePart1.classList.add("exit-right"); titlePart2.classList.add("exit-left"); if(chartLine) chartLine.style.opacity="0";
+        heroTextArea.classList.add("exit-down"); heroBtns.classList.add("exit-down"); if(scrollIcon) scrollIcon.classList.add("exit-down");
+        heroMainWrapper.classList.remove("slow-restore");
 
-        btnSubmitLogin?.addEventListener("click", handleLogin);
-        btnSubmitSignup?.addEventListener("click", handleSignup);
+        const run = () => {
+            lockScroll(); heroMainWrapper.classList.add("move-to-side");
+            targetText.style.transition=`all 0.4s cubic-bezier(0.19, 1, 0.22, 1)`; targetText.style.opacity="0"; targetText.style.transform="translateY(-20px) scale(0.95) blur(4px)";
+            setCleanTimeout(() => {
+                targetText.innerText="주주 클럽"; targetText.style.opacity="1"; targetText.style.transform="translateY(0) scale(1) blur(0)";
+                loginTextArea.classList.remove("exit-down"); loginTextArea.classList.add("visible"); alignLoginText();
+                startSideTyping("만나서 반갑습니다.", "성공적인 투자의 여정을 이어가세요.");
+
+                // [추가] 로그인 폼 이메일 필드 포커싱
+                const loginInput = $("loginEmail");
+                if(loginInput) setTimeout(() => loginInput.focus(), 100);
+
+            }, 250);
+            loginSection.classList.add("active");
+        };
+        if(window.scrollY > 5) { window.scrollTo({top:0, behavior:"smooth"}); const check = () => { if(window.scrollY<=5) setCleanTimeout(run, 50); else scrollPoller=requestAnimationFrame(check); }; scrollPoller=requestAnimationFrame(check); } else setCleanTimeout(run, 600);
     }
 
-    window.addEventListener("load", () => {
-        window.scrollTo(0, 0);
-        lockTargetWidth();
-        alignLoginText();
+    function closeLoginPanel() {
+        if (!loginSection.classList.contains("active")) return; clearAllTimeouts();
+        loginSection.classList.remove("active"); loginTextArea.classList.remove("visible"); loginTextArea.classList.add("exit-down");
+        setCleanTimeout(() => {
+            heroMainWrapper.classList.remove("move-to-side"); targetText.style.transition=`all 0.4s cubic-bezier(0.19, 1, 0.22, 1)`;
+            targetText.style.opacity="0"; targetText.style.transform="translateY(-20px) scale(0.95) blur(4px)";
+            setCleanTimeout(() => { targetText.innerText="아는 만큼"; targetText.style.opacity="1"; targetText.style.transform="translateY(0) scale(1) blur(0)"; }, 250);
+        }, 400);
+        setCleanTimeout(() => {
+            [titlePart1, titlePart2, heroBtns, scrollIcon].forEach(el => el && (el.classList.add("slow-restore"), el.classList.remove("exit-down", "exit-left", "exit-right")));
+            if(chartLine) chartLine.style.opacity="1";
+            if(heroTextArea) { heroTextArea.classList.add("slow-restore"); heroTextArea.classList.remove("exit-down"); heroTextArea.style.opacity=""; heroTextArea.style.transform=""; }
+            typeContent.innerHTML=""; startMainTyping(); unlockScroll();
+            setCleanTimeout(() => {
+                resetForm(formLogin); resetForm(formSignup);
+                if(formSignup) { formSignup.classList.remove("active-form"); formSignup.style.opacity="0"; formSignup.style.transform="translateY(10px)"; formSignup.style.pointerEvents="none"; }
+                if(formLogin) { formLogin.classList.add("active-form"); formLogin.style.opacity="1"; formLogin.style.transform="translateY(0)"; formLogin.style.pointerEvents="auto"; }
+            }, 1400);
+        }, 900);
+    }
 
-        // 메인 타이핑 시작 (원본 타이밍 유지)
-        setTimeout(startMainTyping, 600);
-    });
+    /* Switch Form with Focus */
+    function switchForm(toSignup) {
+        const outF = toSignup ? formLogin : formSignup; const inF = toSignup ? formSignup : formLogin;
+        startSideTyping(toSignup ? "환영합니다." : "만나서 반갑습니다.", toSignup ? "새로운 여정을 시작해보세요." : "성공적인 투자의 여정을 이어가세요.");
+        outF.style.opacity="0"; outF.style.transform="translateY(10px)"; outF.style.pointerEvents="none";
+        setCleanTimeout(() => {
+            outF.classList.remove("active-form"); resetForm(outF);
+            inF.classList.add("active-form"); resetForm(inF);
+            setCleanTimeout(() => {
+                inF.style.opacity="1"; inF.style.transform="translateY(0)"; inF.style.pointerEvents="auto";
 
-    window.addEventListener("resize", () => {
-        lockTargetWidth();
-        alignLoginText();
-    });
+                // [추가] 폼 전환 시 해당 이메일 필드 포커싱
+                const targetId = toSignup ? "signupEmail" : "loginEmail";
+                const targetInput = $(targetId);
+                if(targetInput) setTimeout(() => targetInput.focus(), 50);
 
-    // 즉시 초기화 실행
-    bindEvents();
-    bindScrollIcon();
-    initReveal();
-})();
+            }, 50);
+        }, 400);
+    }
+
+    function openSurvey() {
+        clearAllTimeouts();
+        heroMainWrapper.classList.add("hero-hide-complete");
+        loginTextArea.style.opacity = "0"; loginTextArea.style.transform = "translateY(-20px)";
+        formLogin.style.opacity = "0"; formLogin.style.transform = "translateY(10px)"; formLogin.style.pointerEvents = "none";
+
+        setCleanTimeout(() => {
+            loginSection.classList.add("center-stage");
+            setCleanTimeout(() => {
+                loginSection.classList.remove("center-stage"); loginSection.classList.add("section-expanded"); authCard.classList.add("card-expanded");
+                setCleanTimeout(() => {
+                    formLogin.classList.remove("active-form"); formSurvey.classList.add("active-form");
+                    startSideTyping("투자 성향 파악", "성공적인 투자를 위한 첫 걸음입니다.");
+                    formSurvey.style.opacity = "1"; formSurvey.style.transform = "translateY(0)"; formSurvey.style.pointerEvents = "auto";
+                }, 200);
+            }, 300);
+        }, 500);
+    }
+
+    /* Survey Logic */
+    async function handleSurveySubmit() {
+        let totalScore = 0;
+        let answeredCount = 0;
+        for(let i=1; i<=6; i++) {
+            const radio = document.querySelector(`input[name="q${i}"]:checked`);
+            if(radio) { totalScore += parseInt(radio.value); answeredCount++; }
+        }
+        if(answeredCount < 6) { alert("모든 문항에 답해주세요."); return; }
+
+        let levelInt = 1;
+        let levelText = "LV.1 입문 투자자";
+        if (totalScore <= 14) { levelInt = 1; levelText = "LV.1 입문 투자자"; }
+        else if (totalScore <= 22) { levelInt = 2; levelText = "LV.2 중급 투자자"; }
+        else { levelInt = 3; levelText = "LV.3 실전 투자자"; }
+
+        btnSubmitSurvey.disabled=true;
+        btnSubmitSurvey.classList.add("opacity-60");
+        const originalBtnText = btnSubmitSurvey.innerText;
+        btnSubmitSurvey.innerText = "결과 분석 및 계좌 개설 중...";
+
+        try {
+            const [levelRes, accountRes] = await Promise.all([
+                postJson(ctx + "/auth/updateLevel.ajax", { level: levelInt }),
+                postJson(ctx + "/account/create.ajax", {})
+            ]);
+
+            if (!levelRes.ok || !accountRes.ok) {
+                const msg = !levelRes.ok ? levelRes.message : accountRes.message;
+                alert("오류 발생: " + msg);
+                throw new Error(msg);
+            }
+
+            const levelBadge = document.getElementById("user-level-badge");
+            if(levelBadge) levelBadge.innerText = levelText;
+
+            if (accountRes.accountNo) {
+                const rawNo = String(accountRes.accountNo);
+                const formattedNo = rawNo.replace(/(\d{6})(\d{2})(\d{6})/, '$1-$2-$3');
+                const accountDisplay = document.getElementById("display-account-no");
+                if(accountDisplay) accountDisplay.innerText = formattedNo;
+            }
+
+            const balanceDisplay = document.getElementById("display-balance");
+            if(balanceDisplay) balanceDisplay.innerText = "1,000,000 원";
+
+            await wait(1000);
+
+            formSurvey.style.opacity="0"; formSurvey.style.transform="translateY(10px)"; formSurvey.style.pointerEvents="none";
+            setCleanTimeout(() => {
+                formSurvey.classList.remove("active-form"); formAccountSuccess.classList.add("active-form");
+                setCleanTimeout(() => {
+                    formAccountSuccess.style.opacity="1";
+                    formAccountSuccess.style.transform="translateY(0)";
+                    confetti({particleCount:150, spread:80, origin:{y:0.6}});
+                }, 50);
+            }, 400);
+
+        } catch (e) {
+            console.error(e);
+            btnSubmitSurvey.disabled = false;
+            btnSubmitSurvey.classList.remove("opacity-60");
+            btnSubmitSurvey.innerText = originalBtnText;
+        }
+    }
+
+    function goToFinalStep() {
+        formAccountSuccess.style.opacity = "0";
+        formAccountSuccess.style.transform = "translateY(10px)";
+        formAccountSuccess.style.pointerEvents = "none";
+
+        setCleanTimeout(() => {
+            formAccountSuccess.classList.remove("active-form");
+            formFinalReady.classList.add("active-form");
+
+            setCleanTimeout(() => {
+                formFinalReady.style.opacity = "1";
+                formFinalReady.style.transform = "translateY(0)";
+                formFinalReady.style.pointerEvents = "auto";
+            }, 50);
+        }, 400);
+    }
+
+    let mainTypingState = {id: 0}, typingState = {id: 0};
+    async function startMainTyping() {
+        mainTypingState.id++; const cid = mainTypingState.id; typeContent.innerHTML = ""; if (cursorMain) cursorMain.classList.remove("hidden");
+        const seq = [{text: "주식 시장의 언어를 배우고,", type: "text"}, {type: "br"}, {text: "리스크 없는 환경에서 당신의 투자를 실험하세요. ", type: "text"}, {type: "br"}, {text: "주주클럽", type: "strong"}, {text: "이 함께합니다.", type: "text"}];
+        for (const i of seq) {
+            if (mainTypingState.id !== cid) return;
+            if (i.type === "text") for (const c of i.text) { if (mainTypingState.id !== cid) return; typeContent.insertAdjacentText("beforeend", c); await wait(45); }
+            if (i.type === "br") { typeContent.insertAdjacentHTML("beforeend", "<br/>"); await wait(200); }
+            if (i.type === "strong") { const s = document.createElement("strong"); s.className = "text-primary"; typeContent.appendChild(s); for (const c of i.text) { if (mainTypingState.id !== cid) return; s.insertAdjacentText("beforeend", c); await wait(45); } }
+        }
+        if (mainTypingState.id === cid && cursorMain) { await wait(500); cursorMain.classList.add("hidden"); }
+    }
+    async function startSideTyping(title, sub) {
+        typingState.id++; const cid = typingState.id;
+        $("login-type-title").textContent = ""; $("login-type-sub").textContent = "";
+        if(cursorLoginTitle) cursorLoginTitle.classList.remove("hidden"); if(cursorLoginSub) cursorLoginSub.classList.add("hidden");
+        for (const c of title) { if (typingState.id !== cid) return; $("login-type-title").insertAdjacentText("beforeend", c); await wait(45); }
+        if (typingState.id !== cid) return; await wait(200);
+        if(cursorLoginTitle) cursorLoginTitle.classList.add("hidden"); if(cursorLoginSub) cursorLoginSub.classList.remove("hidden");
+        for (const c of sub) { if (typingState.id !== cid) return; $("login-type-sub").insertAdjacentText("beforeend", c); await wait(45); }
+        if (typingState.id === cid && cursorLoginSub) { await wait(500); cursorLoginSub.classList.add("hidden"); }
+    }
+
+    function lockTargetWidth() {
+        const m = document.createElement("span"); m.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-size:"+getComputedStyle(targetText).fontSize+";font-weight:"+getComputedStyle(targetText).fontWeight;
+        document.body.appendChild(m); let maxW = 0; ["아는 만큼", "주주 클럽"].forEach(t => { m.textContent = t; const w = m.getBoundingClientRect().width; if(w > maxW) maxW = w; });
+        document.body.removeChild(m); targetHolder.style.width = Math.ceil(maxW)+4+"px";
+    }
+    function alignLoginText() {
+        loginTextArea.style.paddingLeft = Math.max(0, targetHolder.getBoundingClientRect().left - typingWrapper.getBoundingClientRect().left + 24) + "px";
+    }
+    function lockScroll() { document.body.classList.add("lock-scroll"); }
+    function unlockScroll() { document.body.classList.remove("lock-scroll"); }
+
+    const snappyBezier = "cubic-bezier(0.19, 1, 0.22, 1)";
+    let scrollPoller = null;
+
+    window.addEventListener("load", () => { window.scrollTo(0,0); lockTargetWidth(); alignLoginText(); setTimeout(startMainTyping, 600); });
+    window.addEventListener("resize", () => { lockTargetWidth(); alignLoginText(); });
+
+    if(btnStart) btnStart.addEventListener("click", openLoginPanel);
+    if(btnHeaderLogin) btnHeaderLogin.addEventListener("click", openLoginPanel);
+    if(btnBackLogin) btnBackLogin.addEventListener("click", closeLoginPanel);
+    if(btnBackSignup) btnBackSignup.addEventListener("click", closeLoginPanel);
+    if(btnGoSignup) btnGoSignup.addEventListener("click", () => switchForm(true));
+    if(btnGoLogin) btnGoLogin.addEventListener("click", () => switchForm(false));
+    if(btnSubmitLogin) btnSubmitLogin.addEventListener("click", handleLogin);
+    if(btnSubmitSignup) btnSubmitSignup.addEventListener("click", handleSignup);
+    if(btnSubmitSurvey) btnSubmitSurvey.addEventListener("click", handleSurveySubmit);
+    if(btnGoMain) btnGoMain.addEventListener("click", () => window.location.href=ctx+"/main");
+    if(btnToFinal) btnToFinal.addEventListener("click", goToFinalStep);
+    if(btnStartLearning) btnStartLearning.addEventListener("click", () => window.location.href=ctx+"/main");
+
+    ['loginEmail', 'loginPassword'].forEach(id => { const el=$(id); if(el) el.addEventListener("keyup", e=>{if(e.key==="Enter") handleLogin();}); });
+    ['signupEmail', 'signupUsername', 'signupPassword'].forEach(id => { const el=$(id); if(el) el.addEventListener("keyup", e=>{if(e.key==="Enter") handleSignup();}); });
+
+    checkDuplicate("/auth/check-email?email=", "signupEmail", "msg-email-error");
+    checkDuplicate("/auth/check-nickname?nickname=", "signupUsername", "msg-nickname-error");
+    bindPasswordValidation();
+    bindEmailValidation();
+
+    if(scrollIcon) {
+        scrollIcon.addEventListener("click",()=>{const t=$("home-sections"); if(t)t.scrollIntoView({behavior:"smooth",block:"start"});});
+        let h=false; window.addEventListener("scroll",()=>{if(h)return; if(window.scrollY>20){h=true; scrollIcon.classList.add("exit-down");}},{passive:true});
+    }
+    const els=document.querySelectorAll(".reveal"); const io=new IntersectionObserver(e=>{e.forEach(i=>{if(i.isIntersecting){i.target.classList.add("is-visible");io.unobserve(i.target);}});},{threshold:0.22, rootMargin:"0px 0px -35% 0px"}); els.forEach(e=>io.observe(e));
+});

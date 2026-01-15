@@ -29,40 +29,39 @@
 
     <!-- top bar navigation -->
     <header class="flex-1 bg-primary/10 flex items-center justify-end px-10 gap-6">
+        <%-- TODO: 로그인 처리 로직 추가 후 수정 필요  --%>
         <!-- 로그인 전 -->
-        <c:if test="${empty sessionScope.user}">
+        <c:if test="${empty user}">
             <div class="flex gap-4">
-                <button id="btn-header-features" class="hidden md:block text-sm font-bold text-gray-500 hover:text-black transition-colors">기능 소개
-                </button>
                 <button id="btn-header-login" class="bg-primary text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
                     로그인
                 </button>
             </div>
         </c:if>
         <!-- 로그인 후 -->
-        <c:if test="${not empty sessionScope.user}">
+        <c:if test="${not empty user}">
             <div class="flex items-center gap-6">
                 <div class="text-right">
                     <div class="text-[10px] font-extrabold text-gray-500">총 자산</div>
                     <div class="text-sm font-extrabold num-font text-gray-900">
-                        ₩ <fmt:formatNumber value="${sessionScope.user.cashBalance}" type="number" />
+                        ₩ <fmt:formatNumber value="${user.cashBalance}" type="number" />
                     </div>
                 </div>
                 <div class="flex items-center">
         <span id="userLevelBadge"
               class="px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-extrabold border border-primary/20">
           <c:choose>
-              <c:when test="${sessionScope.user.userLevel == 1}">
+              <c:when test="${user.userLevel == 1}">
                   <%-- 초급: 기본 테마 --%>
                   <c:set var="levelClass" value="bg-primary/10 text-primary border-primary/20"/>
                   초급
               </c:when>
-              <c:when test="${sessionScope.user.userLevel == 2}">
+              <c:when test="${user.userLevel == 2}">
                   <%-- 중급: 녹색 계열 (예시) --%>
                   <c:set var="levelClass" value="bg-green-100 text-green-600 border-green-200"/>
                   중급
               </c:when>
-              <c:when test="${sessionScope.user.userLevel == 3}">
+              <c:when test="${user.userLevel == 3}">
                   <%-- 고급: 주황/금색 계열 (예시) --%>
                   <c:set var="levelClass" value="bg-orange-100 text-orange-600 border-orange-200"/>
                   고급
@@ -77,7 +76,7 @@
                 </div>
 
                 <div class="text-right">
-                    <span class="block text-sm font-extrabold text-text">${sessionScope.user.userName} 님</span>
+                    <span class="block text-sm font-extrabold text-text">${user.userName} 님</span>
                 </div>
             </div>
 

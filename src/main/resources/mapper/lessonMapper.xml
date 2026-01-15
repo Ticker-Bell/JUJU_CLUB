@@ -15,12 +15,11 @@
     resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonTitle">
     SELECT CHAPTER_NAME
          ,LL.LESSON_NAME
-         ,SUBSTRING(QUESTION_ID,4) AS QUESTIONID
+         ,SUBSTRING(QUESTION_ID,4) AS questionId
     FROM LEARNING_LESSON LL
     LEFT OUTER JOIN LEARNING_CHAPTER LC ON LL.CHAPTER_ID = LC.CHAPTER_ID
     LEFT OUTER JOIN LEARNING_QUESTION LQ ON LL.LESSON_ID = LQ.LESSON_ID
     WHERE LL.LESSON_ID = #{lessonId}
-    LIMIT 1;
   </select>
 
   <select id="selectQSt" parameterType="String"

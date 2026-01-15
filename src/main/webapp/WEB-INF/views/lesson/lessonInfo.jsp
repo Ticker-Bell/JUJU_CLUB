@@ -1,16 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--공통 헤더--%>
 
-<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
-<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
 <!doctype html>
 <html lang="ko">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>JUJU CLUB - Education 1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -75,22 +71,108 @@
 </section>
 
 <script>
-  const script = [];
-  // 여러 options 컬럼 반복
-  <c:forEach var="colName" items="${colNames}">
-  <c:set var="chatList" value="${chat[colName]}" />
+  (function() {
+    if (!document.getElementById("chatList")) return; // htmx 로딩 후 DOM 확인
 
-  <c:forEach var="msg" items="${chatList}" varStatus="s">
-  script.push({
-    side: '${msg.sender}',  // 일단 DB sender 그대로
-    name: '${msg.sender}',  // JS에서 변경
-    text: '<c:out value="${msg.text}" />'
-  });
-  </c:forEach>
-  </c:forEach>
+    const script = [];
+    <c:forEach var="colName" items="${colNames}">
+    <c:set var="chatList" value="${chat[colName]}" />
+    <c:forEach var="msg" items="${chatList}" varStatus="s">
+    script.push({
+      side: '${msg.sender}',
+      name: '${msg.sender}',
+      text: '<c:out value="${msg.text}" />'
+    });
+    </c:forEach>
+    </c:forEach>
+
+    // JS side/name UI 처리
+    script.forEach(msg => {
+      const isUser = msg.side.trim() === 'user';
+      msg.side = isUser ? 'right' : 'left';
+      msg.name = isUser ? '홍길동' : '멘토';
+    });
+
+    const chatList = document.getElementById("chatList");
+    const nextBtn = document.getElementById("nextBtn");
+    const skipBtn = document.getElementById("skipBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    let idx = 0;
+
+    function addMessage(msg) {
+      const row = document.createElement("div");
+      const isRight = msg.side === "right";
+      row.className = "flex w-full";
+      row.style.justifyContent = isRight ? "flex-end" : "flex-start";
+
+      const wrap = document.createElement("div");
+      wrap.className = "flex flex-col";
+      wrap.style.alignItems = isRight ? "flex-end" : "flex-start";
+
+      const meta = document.createElement("div");
+      meta.className = `meta ${isRight ? "right" : ""}`;
+      meta.textContent = msg.name + ' · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+      const bubbleWrap = document.createElement("div");
+      bubbleWrap.className = "bubble-wrap";
+
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${isRight ? "right" : "left"}`;
+      bubble.innerHTML = msg.text;
+
+      bubbleWrap.appendChild(bubble);
+      wrap.appendChild(meta);
+      wrap.appendChild(bubbleWrap);
+      row.appendChild(wrap);
+      chatList.appendChild(row);
+      chatList.scrollTop = chatList.scrollHeight;
+    }
+
+    function step() {
+      if (idx >= script.length) {
+        alert("개념 문제 완료! 다음문제로 이동");
+        return;
+      }
+      addMessage(script[idx]);
+      idx++;
+      const done = idx >= script.length;
+      nextBtn.innerHTML = done
+          ? `<i data-lucide="check" class="w-4 h-4"></i> 완료`
+          : `<i data-lucide="send" class="w-4 h-4"></i> 다음`;
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function reset(){
+      idx = 0;
+      chatList.innerHTML = "";
+      typingRow.classList.add("hidden");
+      nextBtn.innerHTML = `<i data-lucide="send" class="w-4 h-4"></i> 다음`;
+      if (window.lucide) lucide.createIcons();
+      scrollToBottom();
+    }
+
+    function skipAll(){
+      typingRow.classList.add("hidden");
+      while(idx < script.length){
+        addMessage(script[idx]);
+        idx++;
+      }
+      nextBtn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> 완료`;
+      if (window.lucide) lucide.createIcons();
+      scrollToBottom();
+    }
+
+    nextBtn.addEventListener("click", step);
+    skipBtn.addEventListener("click", skipAll);
+    resetBtn.addEventListener("click", reset);
+
+    // 첫 메시지 자동
+    step();
+  })();
 </script>
 
-<script src="${cpath}/resources/js/lesson/lessonchat.js"></script>
+
 
 
 </html>

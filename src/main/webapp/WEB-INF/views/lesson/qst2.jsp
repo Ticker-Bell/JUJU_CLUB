@@ -1,11 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%--공통헤더--%>
-<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
 <!doctype html>
 <html lang="ko">
 <head>
+
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>JUJU CLUB - Education 2</title>
@@ -13,60 +12,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
 
     <link rel="stylesheet" as="style" crossorigin
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
-    <style>
-      /* Quiz Button Styles */
-      .quiz-option {
-        width: 100%;
-        text-align: left;
-        padding: 20px 24px;
-        border-radius: 16px;
-        border: 1px solid #E5E7EB;
-        background-color: #FFFFFF;
-        transition: all 0.2s ease;
-        position: relative;
-        font-weight: 600;
-        color: #4B5563;
-      }
-
-      .quiz-option:hover {
-        background-color: #F9FAFB;
-        border-color: #D1D5DB;
-      }
-
-      .quiz-option.selected {
-        background-color: #F5F3FF; /* primary light */
-        border-color: #5E45EB;
-        color: #5E45EB;
-        font-weight: 800;
-        box-shadow: 0 0 0 1px #5E45EB;
-      }
-
-
-      /* Modal Animation */
-      .modal-bg {
-        background-color: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
-      }
-
-      .modal-content {
-        animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes modalUp {
-        from {
-          opacity: 0;
-          transform: scale(0.95) translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1) translateY(0);
-        }
-      }
-    </style>
 
     <script>
       tailwind.config = {
@@ -80,52 +30,46 @@
     </script>
 </head>
 
-<%--lfex flex-1 빼면 구조 망가짐--%>
-<div class="flex flex-1 h-full pt-20 overflow-hidden relative">
-    <main class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
-        <div class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">
 
-            <%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
 
-            <section
-                    class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
+<section
+        class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
 
-                <div class="w-full max-w-3xl flex flex-col gap-8">
-                    <div class="text-center">
+    <div class="w-full max-w-3xl flex flex-col gap-8">
+        <div class="text-center">
         <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-extrabold mb-4">
             Question 2
         </span>
-                        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
-                            ${qst[0].questionText}
-                        </h2>
-                    </div>
+            <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
+                ${qst[0].questionText}
+            </h2>
+        </div>
 
-                    <div class="grid grid-cols-1 gap-3 w-full" id="quizOptions">
-                        <c:forEach var="opt" items="${qst[0].optionList}" varStatus="status">
-                            <button class="quiz-option"
-                                    onclick="selectOption(this, ${status.index + 1})">
+        <div class="grid grid-cols-1 gap-3 w-full" id="quizOptions">
+            <c:forEach var="opt" items="${qst[0].optionList}" varStatus="status">
+                <button class="quiz-option"
+                        onclick="selectOption(this, ${status.index + 1})">
                 <span class="mr-2 text-gray-400 font-extrabold">
                     ${fn:substring("ABCDEFGHIJKLMNOPQRSTUVWXYZ", status.index, status.index + 1)}.
                 </span>
-                                    ${opt}
-                            </button>
-                        </c:forEach>
-                    </div>
-                </div>
-
-
-                <div class="absolute bottom-0 left-0 w-full p-6 border-t border-gray-100 bg-white flex justify-end">
-                    <button id="checkBtn" onclick="checkAnswer()" disabled
-                            class="px-6 py-3 rounded-xl bg-gray-200 text-gray-400 font-extrabold text-sm transition-all flex items-center gap-2 cursor-not-allowed">
-                        <span>정답 확인</span>
-                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                    </button>
-                </div>
-
-            </section>
+                        ${opt}
+                </button>
+            </c:forEach>
         </div>
-    </main>
-</div>
+    </div>
+
+
+    <div class="absolute bottom-0 left-0 w-full p-6 border-t border-gray-100 bg-white flex justify-end">
+        <button id="checkBtn" onclick="checkAnswer()" disabled
+                class="px-6 py-3 rounded-xl bg-gray-200 text-gray-400 font-extrabold text-sm transition-all flex items-center gap-2 cursor-not-allowed">
+            <span>정답 확인</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+</section>
+
 
 <div id="resultModal"
      class="fixed inset-0 z-[100] modal-bg hidden flex items-center justify-center p-4">

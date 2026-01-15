@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface LessonMapper {
 
   List<QstChatMsgDTO> selectQstChat(String lessonId);
-  LessonDTO.LessonTitle selectLssnTitle(String lessonId);
+  List<LessonDTO.LessonTitle> selectLssnTitle(String lessonId);
 
   List<LessonDTO.LessonQst> selectQSt(String lessonId);
 

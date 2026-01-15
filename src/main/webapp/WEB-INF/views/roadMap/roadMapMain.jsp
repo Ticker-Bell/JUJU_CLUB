@@ -12,7 +12,7 @@
     <button type="button"
             class="bg-blue-500 text-white p-2 rounded"
             hx-post="${cpath}/lesson/lessonInfo"
-            hx-vals='{"lessonId": "10", "category": "java"}'
+            hx-vals='{"lessonId": "lesson_stock_01"}'
             hx-target="#main"
             hx-swap="innerHTML"
             hx-push-url="true"> 이동버튼 </button>

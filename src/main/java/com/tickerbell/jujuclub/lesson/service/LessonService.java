@@ -48,7 +48,7 @@ public class LessonService {
   /**
    * 레슨 화면 타이틀 조회
    */
-  public LessonTitle getLessonTitle(String lessonId){
+  public List<LessonTitle> getLessonTitle(String lessonId){
     return lessonMapper.selectLssnTitle(lessonId);
   }
 

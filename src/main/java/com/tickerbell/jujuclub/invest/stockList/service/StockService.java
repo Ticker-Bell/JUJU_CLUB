@@ -15,5 +15,5 @@ public class StockService {
 
     public StockDTO findBySeq(Integer seq) {return stockMapper.findBySeq(seq);}
 
-    public List<StockDTO> findStockCodeListFromUserWatchList(Integer UserSeq) {return stockMapper.findStockCodeListFromUserWatchList(UserSeq);}
+    public List<StockDTO> findStockListFromUserWatchList(Integer UserSeq) {return stockMapper.findStockListFromUserWatchList(UserSeq);}
 }

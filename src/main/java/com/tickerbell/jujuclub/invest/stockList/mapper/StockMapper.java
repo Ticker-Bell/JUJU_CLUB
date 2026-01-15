@@ -9,5 +9,5 @@ import java.util.List;
 public interface StockMapper {
     StockDTO findBySeq(Integer seq);
 
-    List<StockDTO> findStockCodeListFromUserWatchList(Integer UserSeq);
+    List<StockDTO> findStockListFromUserWatchList(Integer UserSeq);
 }

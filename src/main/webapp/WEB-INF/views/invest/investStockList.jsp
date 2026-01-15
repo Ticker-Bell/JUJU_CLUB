@@ -182,9 +182,10 @@
 
     <div class="stock-list-container">
         <div class="stock-scroll-area" id="stockList">
-            <c:forEach items="${stockDTOList}" var="stock" varStatus="status">
+            <c:forEach items="${stockDTOList}" var="stock">
                 <div class="stock-item">
                     <div class="text-col">
+                        <span class="rank">${stock.rank}</span>
                         <span class="txt-name">${stock.stockName}</span>
                         <span class="txt-code num-font">${stock.stockCode}</span>
                     </div>
@@ -193,50 +194,97 @@
                         <span class="txt-rate color-red num-font">+0.00%</span>
                     </div>
                 </div>
-
             </c:forEach>
-            <div class="stock-item selected">
-                <div class="text-col">
-                    <span class="txt-name">삼성전자</span>
-                    <span class="txt-code num-font">005930</span>
-                </div>
-                <div class="text-col items-end">
-                    <span class="txt-price color-red num-font">000000</span>
-                    <span class="txt-rate color-red num-font">+0.00%</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function switchLeftTab(idx) {
-        const slider = document.getElementById('left-tab-slider');
+    // 탭 클릭 시 실행
+    function switchLeftTab(idx, sortType) {
+        // UI 변경
+        updateTabUI(idx);
 
-        // 요소가 실제로 존재하는지 체크 (안전장치)
+        // 데이터 요청(AJAX) - 클릭했을 때만 서버에 요청해서 화면 갈아끼움
+        fetchStockList(sortType);
+    }
+
+    // 탭 UI만 변경하는 함수
+    function updateTabUI(idx){
+        const slider = document.getElementById('left-tab-slider');
         if(!slider) return;
 
-        for (let i = 0; i < 5; i++) {
+        for (let i=0; i<5; i++){
             const el = document.getElementById('left-tab-' + i);
             if (el) el.classList.remove('active');
         }
         const activeBtn = document.getElementById('left-tab-' + idx);
-        if (activeBtn) {
+        if(activeBtn){
             activeBtn.classList.add('active');
             slider.style.width = activeBtn.offsetWidth + 'px';
             slider.style.left = activeBtn.offsetLeft + 'px';
         }
     }
 
-    // 2. 초기화 함수
+    //AJAX 데이터 요청 및 렌더링
+    function fetchStockList(sortType){
+        const url = '/main/stock/list?sortType=' + sortType;
+
+        fetch(url)
+            .then(res => res.json())
+            .then(data => renderStockList(data))
+            .catch(err => console.error(err));
+    }
+
+    //JS로 리스트 다시 그리기
+    function renderStockList(data){
+        const container = document.getElementById('stockList');
+
+        if (!data || data.length === 0){
+            container.innerHTML = '<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>';
+            return;
+        }
+
+        let html = '';
+
+        data.forEach(item => {
+            // const rateVal = parseFloat(item.rate);
+            //
+            let colorClass = 'color-gray';
+            // let sign = '';
+
+            // if (rateVal > 0) { colorClass = 'color-red'; sign = '+'; }
+            // else if (rateVal < 0) { colorClass = 'color-blue'; }
+
+            // 천단위 콤마 등 포맷팅
+            // const priceStr = parseInt(item.price).toLocaleString();
+
+            html += `
+                <div class="stock-item">
+                    <div class="text-col">
+                        <span class="txt-name">\${item.stockName}</span>
+                        <span class="txt-code num-font">\${item.stockCode}</span>
+                    </div>
+                    <div class="text-col items-end">
+                        <span class="txt-price \${colorClass} num-font">00000</span>
+                        <span class="txt-rate \${colorClass} num-font">0.00%</span>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // 초기화 함수
     function initStockComponent(){
         // 아이콘 생성(이미 로드된 상태라도 강제로 다시 그림)
         if(window.lucide){
             lucide.createIcons();
         }
 
-        // 0번 탭 활성화
-        switchLeftTab(0);
+        // 초기화 시에는 fetch를 호출하지 않고 UI만 0번(관심종목)에 맞춤
+        // 데이터는 이미 JSP가 그렸기 때문
+        updateTabUI(0);
     }
 
     // 만약 이 파일이 단독으로 실행된 경우 (새로고침 직후)

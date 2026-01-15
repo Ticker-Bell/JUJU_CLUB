@@ -10,7 +10,7 @@
     </select>
 
     <!-- 유저 관심 종목 테이블과 조인해서 유저가 즐겨찾기한 종목들의 코드 조회 -->
-    <select id="findStockCodeListFromUserWatchList" parameterType="integer" resultType="com.tickerbell.jujuclub.invest.stockList.dto.StockDTO">
+    <select id="findStockListFromUserWatchList" parameterType="integer" resultType="com.tickerbell.jujuclub.invest.stockList.dto.StockDTO">
         SELECT STOCK_MASTER.*
         FROM USER_WATCHLIST join STOCK_MASTER
         ON (USER_WATCHLIST.stock_seq = STOCK_MASTER.stock_seq)

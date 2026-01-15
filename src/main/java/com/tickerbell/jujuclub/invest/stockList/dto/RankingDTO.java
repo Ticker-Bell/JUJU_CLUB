@@ -5,14 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class StockDTO {
-    private Integer stockSeq;
-    private String stockCode;
+@AllArgsConstructor
+@Builder
+public class RankingDTO {
     private String stockName;
-    private String marketType;
-    private String sector;
+    private String stockCode;
+    private Integer rank;
 }

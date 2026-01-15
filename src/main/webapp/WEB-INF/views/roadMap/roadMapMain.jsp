@@ -9,6 +9,7 @@
 <%--<%@ include file="../common/common.jsp"%>--%>
 <div>
     <h1>로드맵</h1>
+    <span>${test}</span>
     <button type="button"
             class="bg-blue-500 text-white p-2 rounded"
             hx-post="${cpath}/lesson/lessonInfo"

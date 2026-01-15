@@ -24,4 +24,14 @@ public class QstChatMsgDTO {
     private String sender;
   }
 
+  @Alias("QstSelectJsonDTO")
+  @Builder
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class QstSelectJsonDTO{
+    private String choices;
+    private String correct;
+  }
+
 }

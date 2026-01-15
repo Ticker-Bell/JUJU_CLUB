@@ -16,32 +16,32 @@
 
     <%-- 로드맵  --%>
     <nav class="flex flex-col justify-center gap-5 w-full pr-4 my-auto">
-        <a href="${cpath}/main/roadMapMain.do" class="nav-item group"
-            hx-get="${cpath}/main/roadMapMain.do"
+        <a href="${cpath}/roadMap/main.do" class="nav-item group"
+            hx-get="${cpath}/roadMap/main.do"
             hx-target="#main"
             hx-swap="innerHTML"
             hx-push-url="true">
             <div class="nav-icon-box"><img class="w-5 h-5 stroke-[2]" src="${cpath}/resources/images/navIcons/map.svg" alt="맵아이콘"></div>
             <span class="text-sm font-bold mt-0.5">학습 로드맵</span>
         </a>
-        <a href="${cpath}/main/myPageMain.do" class="nav-item group"
-           hx-get="${cpath}/main/myPageMain.do"
+        <a href="${cpath}/myPage/main.do" class="nav-item group"
+           hx-get="${cpath}/myPage/main.do"
            hx-target="#main"
            hx-swap="innerHTML"
            hx-push-url="true">
             <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/user.svg" alt="마이아이콘" class="w-5 h-5 stroke-[2]"></div>
             <span class="text-sm font-bold mt-0.5">마이페이지</span>
         </a>
-        <a href="${cpath}/main/investMain.do" class="nav-item group"
-           hx-get="${cpath}/main/investMain.do"
+        <a href="${cpath}/invest/main.do" class="nav-item group"
+           hx-get="${cpath}/invest/main.do"
            hx-target="#main"
            hx-swap="innerHTML"
            hx-push-url="true">
             <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/bar-chart.svg" alt="차트아이콘" class="w-5 h-5 stroke-[2]"></div>
             <span class="text-sm font-bold mt-0.5">모의투자</span>
         </a>
-        <a href="${cpath}/main/rankingMain.do" class="nav-item group"
-           hx-get="${cpath}/main/rankingMain.do"
+        <a href="${cpath}/ranking/main.do" class="nav-item group"
+           hx-get="${cpath}/ranking/main.do"
            hx-target="#main"
            hx-swap="innerHTML"
            hx-push-url="true">

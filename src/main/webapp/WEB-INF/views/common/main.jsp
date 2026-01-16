@@ -10,11 +10,15 @@
 <c:set var="cpath" value="${pageContext.request.contextPath}" scope="request"/>
 <html>
 <head>
+    <script>window.projectContextPath = "${pageContext.request.contextPath}";</script>
     <%--얘 없으면 기능 활성화가 안돼요--%>
     <script src="https://unpkg.com/lucide@latest"></script>
         <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
         <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <%--차트 라이브러리--%>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <%--개념형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">

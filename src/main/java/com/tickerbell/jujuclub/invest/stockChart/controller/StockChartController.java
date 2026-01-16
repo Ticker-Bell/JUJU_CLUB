@@ -33,11 +33,19 @@ public class StockChartController {
 
     @MessageMapping("/invest/request/chartData")
     @SendTo("/topic/stock")
-    public void handleStockRequest(@Payload Map<String, String> message) {
+    public void handleStockRequest(@Payload Map<String, Object> message) {
+        Object codes = message.get("stockCodes");
+        if (codes instanceof List) {
+            List<String> stockCodes = (List<String>) codes;
+            for (String code : stockCodes) {
+                System.out.println("다중 요청 종목: " + code);
+                stockChartService.connectToStockChartApi(code);
+            }
+        } else {
+            String stockCode = (String) message.get("stockCode");
+            System.out.println("단일 용청 종목: " + stockCode);
+            stockChartService.connectToStockChartApi(stockCode);
+        }
 
-        String stockCode = message.get("stockCode");
-        System.out.println("요청받은 종목 코드: " + stockCode);
-
-        stockChartService.connectToStockChartApi(stockCode);
     }
 }

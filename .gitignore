@@ -86,6 +86,10 @@ temp/
 ################################
 # local DB & secret
 *.properties
+jdbc.properties
+jdbc-local.properties
+application-local.properties
+application-dev.properties
 *.env
 
 ################################

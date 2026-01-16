@@ -8,7 +8,7 @@
          * @param {Array|String} chartData - [{label, percentage, color}, ...] 또는 JSON 문자열
          * @returns {Chart|null}
          */
-        //캔버스가 없다면
+            //캔버스가 없다면
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
             console.warn("[DonutChart] canvas not found:", canvasId);

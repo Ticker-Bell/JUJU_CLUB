@@ -23,9 +23,6 @@
 	
 	<context:component-scan base-package="com.tickerbell.jujuclub" />
 
-	<!--properties 파일 읽기용도 추가 -->
-	<context:property-placeholder location="classpath:kis.properties"/>
-
 	<!-- HtmxHandler -->
 	<interceptors>
 		<interceptor>

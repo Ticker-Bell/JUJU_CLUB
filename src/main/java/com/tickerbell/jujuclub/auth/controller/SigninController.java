@@ -42,7 +42,7 @@ public class SigninController {
             // 레벨 유무에 따른 다음 동작 결정
             if (user.getUserLevel() != null) {
                 res.put("nextAction", "main");
-                res.put("redirectUrl", request.getContextPath() + "/roadMap/main.do");
+                res.put("redirectUrl", request.getContextPath() + "/main");
             } else {
                 res.put("nextAction", "survey");
             }

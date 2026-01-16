@@ -73,21 +73,40 @@ public class LessonService {
               new TypeReference<List<String>>() {}
           );
 
-      // answer 파싱 (String)
+      // answer 파싱
       JsonNode answerNode = objectMapper.readTree(lessonQst.getAnswer());
-      String answer = answerNode.get("correct").get(0).asText();
+      JsonNode correctNode = answerNode.get("correct");
       String explanation = answerNode.get("explanation").asText();
 
       LessonDTO.LessonQst qst = new LessonDTO.LessonQst();
       qst.setQuestionText(lessonQst.getQuestionText());
       qst.setOptionList(options);
-      qst.setAnswer(answer);
       qst.setExplanation(explanation);
+
+      // questionType 분기
+      if ("드래그형".equals(lessonQst.getQuestionType())) {
+
+        List<Integer> answerList =
+            objectMapper.readValue(
+                correctNode.traverse(),
+                new TypeReference<List<Integer>>() {}
+            );
+
+        qst.setAnswerList(answerList);
+
+
+      } else {
+
+        // 기존 객관식 로직
+        String answer = correctNode.get(0).asText();
+        qst.setAnswer(answer);
+      }
 
       result.add(qst);
     }
 
     return result;
+
   }
 
 

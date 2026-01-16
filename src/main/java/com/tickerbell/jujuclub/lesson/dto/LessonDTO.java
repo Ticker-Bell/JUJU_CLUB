@@ -27,11 +27,13 @@ public class LessonDTO {
   @NoArgsConstructor
   public static class LessonQst{
 
+    private String questionType;
     private String questionText;
     private String options;
     private String answer;
     private String explanation;
 
+    private List<Integer> answerList;
     private List<String> optionList;
   }
 

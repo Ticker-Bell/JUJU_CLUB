@@ -146,8 +146,6 @@
   (function () {
     lucide.createIcons();
 
-    // 🔥 서버에서 전달된 데이터 사용
-    // qstList는 controller에서 model.addAttribute("qstList", getLssnQst(lessonId))로 JSP에 전달된 리스트
     const question = {
       questionText: "${fn:escapeXml(qst[2].questionText)}",
       optionList: [
@@ -155,7 +153,7 @@
         "${opt}"<c:if test="${!st.last}">, </c:if>
         </c:forEach>
       ],
-      answer: JSON.parse('${qst[2].answer}') // 항상 배열 형태로 사용 가능
+      answer: JSON.parse('${qst[2].answerList}') // 항상 배열 형태로 사용 가능
     };
 
     console.log("question object:", question);
@@ -287,8 +285,8 @@
     }
 
     function checkAnswer() {
-      const userAns = Array.from(dropZones).map(z => parseInt(z.firstChild.dataset.id));
-      const correctAns = question.answer.correct;
+      const userAns = Array.from(dropZones).map(z => parseInt(z.firstChild.dataset.id)+1);
+      const correctAns = question.answer;
       const modal = document.getElementById('resultModal');
       const icon = document.getElementById('modalIcon');
       const title = document.getElementById('modalTitle');
@@ -305,7 +303,7 @@
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-green-100 text-green-600";
         title.textContent = "정답입니다!";
         title.className = "text-2xl font-extrabold text-green-600 mb-2";
-        desc.innerHTML = question.answer.explanation;
+        desc.innerHTML = "${qst[2].explanation}"
         bar.className = "h-2 w-full bg-green-500";
         btn.textContent = "다음 문제로";
 
@@ -317,8 +315,14 @@
         });
 
         btn.onclick = function () {
-          alert("다음 문제로 이동!");
-        }
+          htmx.ajax('POST', '${cpath}/lesson/qst', {
+            target: '#main',
+            values: {
+              lessonId: 'lesson_stock_01',
+              questionId: 'Q005'
+            }
+          });
+        };
 
       } else {
         icon.textContent = "💪";

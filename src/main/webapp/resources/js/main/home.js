@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnSubmitSurvey.innerText = originalBtnText;
         }
     }
-    //주석2
+    //주석22
     function goToFinalStep() {
         formAccountSuccess.style.opacity = "0";
         formAccountSuccess.style.transform = "translateY(10px)";

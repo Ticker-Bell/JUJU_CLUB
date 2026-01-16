@@ -85,7 +85,7 @@ temp/
 # Environment / DB 설정
 ################################
 # local DB & secret
-db.properties
+*.properties
 jdbc.properties
 jdbc-local.properties
 application-local.properties

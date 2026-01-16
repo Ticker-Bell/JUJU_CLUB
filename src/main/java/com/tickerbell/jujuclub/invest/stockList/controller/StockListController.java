@@ -63,10 +63,10 @@ public class StockListController {
 
             case "volume":  //거래량순
                 return rankingApiService.getTradingVolumeRanking();
-            case "rising":  //상승률순
-                return new ArrayList<>();
-            case "falling":  //하락률순
-                return new ArrayList<>();
+            case "rising":  //상승률순 (전날 종가 대비)
+                return rankingApiService.getTopGainersRanking();
+            case "falling":  //하락률순 (전날 종가 대비)
+                return rankingApiService.getTopLosersRanking();
             case "marketCap":  //시가총액순
                 return rankingApiService.getMarketCapRanking();
             default: return new ArrayList<>();

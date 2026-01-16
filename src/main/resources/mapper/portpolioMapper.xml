@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.PortfolioMapper">
+
+  <!-- 유저 포트폴리오, 보유종목리스트 -->
+  <select id = "selectPortfolioList"  parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO" >
+    select mp.stock_seq as stockSeq, sm.stock_code as stockCode, sm.stock_name as stockName, mp.quantity as quantity, mp.avg_price as avgPrice
+    from mock_portfolio mp
+    join stock_master sm on mp.stock_seq = sm.stock_seq
+    where mp.user_seq = #{user_seq}
+    and mp.quantity > 0
+    order by mp.updated_at DESC
+  </select>
+
+  <select id = "selectPortfolioItem" parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
+    select portfolio_seq, user_seq, stock_seq, quantity, avg_price
+    from mock_portfolio
+    where user_seq = #{user_seq}
+    and stock_seq = #{stock_seq}
+  </select>
+
+  <insert id = "insertPortfolioItem" parameterType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
+    insert into mock_portfolio(user_seq, stock_seq, quantity, avg_price, updated_at)
+    values(#{user_seq}, #{stock_seq}, #{quantity}, #{avg_price}, now())
+  </insert>
+
+  <update id = "updatePortfolioItem" parameterType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
+    update mock_portfolio
+    set quantity = #{quentity},
+        avg_price = #{avg_price},
+        updated_at = now()
+    where portfolio_seq = #{portfolio_seq}
+  </update>
+
+</mapper>

@@ -29,7 +29,7 @@ public class StockListController {
     public String investMain(Model model, HttpSession session) {
 
         // 세션에서 user_seq 가져오기
-        session.setAttribute("userSeq", 1); // 일단 구현안되어있으므로 임시 값
+        session.setAttribute("userSeq", 2); // 일단 구현안되어있으므로 임시 값
 
         Integer userSeq = (Integer)session.getAttribute("userSeq");
 

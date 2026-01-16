@@ -95,29 +95,54 @@
 
     <div class="stock-list-container">
         <div class="stock-scroll-area" id="stockList">
-            <c:forEach items="${stockDTOList}" var="stock">
-                <div class="stock-item">
-                    <div class="text-col">
-                        <c:catch var="e">
-                            <c:if test="${not empty stock.rank}">
-                                <span class="rank">${stock.rank}</span>
-                            </c:if>
-                        </c:catch>
-                        <span class="txt-name">${stock.stockName}</span>
-                        <span class="txt-code num-font">${stock.stockCode}</span>
+            <c:if test="${empty stockDTOList}">
+                <div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>
+            </c:if>
+            <c:if test="${not empty stockDTOList}">
+                <c:forEach items="${stockDTOList}" var="stock">
+                    <div class="stock-item" data-code="${stock.stockCode}">
+                        <div class="text-col">
+                            <c:catch var="e">
+                                <c:if test="${not empty stock.rank}">
+                                    <span class="rank">${stock.rank}</span>
+                                </c:if>
+                            </c:catch>
+                            <span class="txt-name">${stock.stockName}</span>
+                            <span class="txt-code num-font">${stock.stockCode}</span>
+                        </div>
+                        <div class="text-col items-end">
+                            <span class="txt-price color-red num-font">000000</span>
+                            <span class="txt-rate color-red num-font">+0.00%</span>
+                        </div>
                     </div>
-                    <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">000000</span>
-                        <span class="txt-rate color-red num-font">+0.00%</span>
-                    </div>
-                </div>
-            </c:forEach>
+                </c:forEach>
+            </c:if>
         </div>
     </div>
 </div>
 
 <script>
     const contextPath = "${pageContext.request.contextPath}";
+
+    // 종목 리스트 중 하나를 선택했을때 차트, 기업 정보 출력하는 url에 종목코드 보내기
+    $(document).on("click", "stock-item", function () {
+        const code = $(this).data("code");
+
+        // 차트에 전달
+        $.ajax({
+            url: contextPath + "/invest/chart/selectedStockCode",
+            type: "GET",
+            data: {stockCode: code}
+        })
+
+        // 기업정보에 전달
+        $.ajax({
+            url: contextPath + "/invest/corpoInfo/selectedStockCode",
+            type: "GET",
+            data: {stockCode: code}
+        })
+    })
+
 
     // jQuery Ready Function
     $(document).ready(function() {
@@ -166,7 +191,7 @@
             data: { sortType: sortType }, // 파라미터 전달
             dataType: 'json', // 응답을 JSON으로 기대함
             success: function(data) {
-                renderStockList(data);
+                renderStockList(data, sortType);
             },
             error: function(xhr, status, error) {
                 console.error("AJAX Error:", error);
@@ -176,11 +201,15 @@
     }
 
     // 리스트 렌더링 함수
-    function renderStockList(data) {
+    function renderStockList(data, sortType) {
         const $container = $('#stockList');
 
         if (!data || data.length === 0) {
-            $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+            if(sortType === 'interest'){
+                $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
+            }else{
+                $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+            }
             return;
         }
 
@@ -197,7 +226,7 @@
             // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
 
             html += `
-                <div class="stock-item">
+                <div class="stock-item" data-code="\${item.stockCode}">
                     <div class="text-col">
                         \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>

@@ -39,6 +39,9 @@
         const labels = chartData.map(item => item.date);
         const prices = chartData.map(item => item.price);
 
+        prices.pop();
+        prices.push(null);
+
         const ctx = document.getElementById('myChart');
         if (ctx) {
             // 차트를 변수에 할당하여 나중에 접근 가능하게 함
@@ -89,35 +92,33 @@
         }
     }
 </script>
-<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>--%>
-<%--<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>--%>
-<%--<script>--%>
-<%--    const socket = new SockJS("${pageContext.request.contextPath}/ws-jujuclub");--%>
-<%--    const stompClient = Stomp.over(socket);--%>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    const socket = new SockJS("${pageContext.request.contextPath}/ws-jujuclub");
+    const stompClient = Stomp.over(socket);
 
-<%--    stompClient.connect({}, function (frame) {--%>
-<%--        console.log('connected' + frame);--%>
-<%--        const targetStock = "005930";--%>
-<%--        stompClient.subscribe('/topic/stock/'+targetStock, function (response) {--%>
-<%--            const stockData = JSON.parse(response.body);--%>
-<%--            console.log("받은 데이터: ", stockData);--%>
-<%--            if (myChart) {--%>
-<%--                myChart.data.labels.push(stockData.displayTime);--%>
-<%--                myChart.data.datasets[0].data.push(stockData.currentPrice);--%>
+    stompClient.connect({}, function (frame) {
+        console.log('connected' + frame);
+        const targetStock = "005930";
+        stompClient.subscribe('/topic/stock/' + targetStock, function (response) {
+            const stockData = JSON.parse(response.body);
+            console.log("받은 데이터: ", stockData);
+            if (myChart.data.datasets[0].data.length > 0) {
+                myChart.data.datasets[0].data[myChart.data.datasets[0].data.length - 1] = stockData.currentPrice;
+            }
 
-<%--                myChart.update();--%>
-<%--            }--%>
-<%--        });--%>
+            myChart.update();
+        });
+        const initialRequest = {
+            stockCode: targetStock
+        };
 
-<%--        const initialRequest = {--%>
-<%--            stockCode:targetStock--%>
-<%--        };--%>
-
-<%--        stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(initialRequest));--%>
-<%--        console.log("기본종목 요청 보냄");--%>
-<%--    }, function (error) {--%>
-<%--        console.log("websocket연결 실패: ", error);--%>
-<%--    });--%>
-<%--</script>--%>
+        stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(initialRequest));
+        console.log("기본종목 요청 보냄");
+    }, function (error) {
+        console.log("websocket연결 실패: ", error);
+    });
+</script>
 </body>
 </html>

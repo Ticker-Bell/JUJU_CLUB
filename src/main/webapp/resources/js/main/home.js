@@ -439,7 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btnSubmitSurvey.innerText = originalBtnText;
         }
     }
-
+    //주석22
     function goToFinalStep() {
         formAccountSuccess.style.opacity = "0";
         formAccountSuccess.style.transform = "translateY(10px)";
@@ -508,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(btnSubmitSurvey) btnSubmitSurvey.addEventListener("click", handleSurveySubmit);
     if(btnGoMain) btnGoMain.addEventListener("click", () => window.location.href=ctx+"/main");
     if(btnToFinal) btnToFinal.addEventListener("click", goToFinalStep);
-    if(btnStartLearning) btnStartLearning.addEventListener("click", () => window.location.href=ctx+"/main");
+    if(btnStartLearning) btnStartLearning.addEventListener("click", () => window.location.href=ctx+"/roadMap/main.do");
 
     ['loginEmail', 'loginPassword'].forEach(id => { const el=$(id); if(el) el.addEventListener("keyup", e=>{if(e.key==="Enter") handleLogin();}); });
     ['signupEmail', 'signupUsername', 'signupPassword'].forEach(id => { const el=$(id); if(el) el.addEventListener("keyup", e=>{if(e.key==="Enter") handleSignup();}); });

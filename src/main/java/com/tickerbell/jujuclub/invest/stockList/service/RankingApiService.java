@@ -71,17 +71,17 @@ public class RankingApiService {
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
                     .path("/uapi/domestic-stock/v1/quotations/volume-rank")
-                    .queryParam("FID_COND_MRKT_DIV_CODE", "J")
-                    .queryParam("FID_COND_SCR_DIV_CODE", "20171")
-                    .queryParam("FID_INPUT_ISCD", "0000")
-                    .queryParam("FID_DIV_CLS_CODE", "0")
-                    .queryParam("FID_BLNG_CLS_CODE", "0")
-                    .queryParam("FID_TRGT_CLS_CODE", "111111111")
-                    .queryParam("FID_TRGT_EXLS_CLS_CODE", "1111101111")
-                    .queryParam("FID_INPUT_PRICE_1", "")
-                    .queryParam("FID_INPUT_PRICE_2", "")
-                    .queryParam("FID_VOL_CNT", "")
-                    .queryParam("FID_INPUT_DATE_1", "")
+                    .queryParam("FID_COND_MRKT_DIV_CODE", "J")  //조건 시장 분류 코드 - J:KRX, NX:NXT
+                    .queryParam("FID_COND_SCR_DIV_CODE", "20171")  //조건 화면 분류 코드 - 20171
+                    .queryParam("FID_INPUT_ISCD", "0000")  //입력 종목코드 - 0000(전체) 기타(업종코드)
+                    .queryParam("FID_DIV_CLS_CODE", "0")  //분류 구분 코드 - 0(전체) 1(보통주) 2(우선주)
+                    .queryParam("FID_BLNG_CLS_CODE", "0")  //소속 구분 코드 - 0 : 평균거래량 1:거래증가율 2:평균거래회전율 3:거래금액순 4:평균거래금액회전율
+                    .queryParam("FID_TRGT_CLS_CODE", "111111111")  //대상 구분 코드 - 1 or 0 9자리 (차례대로 증거금 30% 40% 50% 60% 100% 신용보증금 30% 40% 50% 60%) ex) "111111111"
+                    .queryParam("FID_TRGT_EXLS_CLS_CODE", "1111101111")  //대상 제외 구분 코드 - 1 or 0 10자리 (차례대로 투자위험/경고/주의 관리종목 정리매매 불성실공시 우선주 거래정지 ETF ETN 신용주문불가 SPAC) ex) "0000000000"
+                    .queryParam("FID_INPUT_PRICE_1", "")  //입력 가격1 - 가격 ~  ex) "0"  전체 가격 대상 조회 시 FID_INPUT_PRICE_1, FID_INPUT_PRICE_2 모두 ""(공란) 입력
+                    .queryParam("FID_INPUT_PRICE_2", "")  //입력 가격2 - ~ 가격  ex) "1000000"  전체 가격 대상 조회 시 FID_INPUT_PRICE_1, FID_INPUT_PRICE_2 모두 ""(공란) 입력
+                    .queryParam("FID_VOL_CNT", "")  //거래량 수 - 거래량 ~  ex) "100000"  전체 거래량 대상 조회 시 FID_VOL_CNT ""(공란) 입력
+                    .queryParam("FID_INPUT_DATE_1", "")  //입력 날짜1 - ""(공란) 입력
                     .build()
                     .toUri();
 
@@ -89,10 +89,69 @@ public class RankingApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
             headers.set("authorization", "Bearer " + this.accessToken);
-            headers.set("appkey", APP_KEY);
-            headers.set("appsecret", APP_SECRET);
-            headers.set("tr_id", "FHPST01710000");
-            headers.set("custtype", "P");
+            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("tr_id", "FHPST01710000");  //거래ID - FHPST01710000
+            headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
+
+            // 요청 엔티티 생성 (GET이라 Body는 null)
+            HttpEntity<Void> request = new HttpEntity<>(headers);
+
+            // 호출 (GET)
+            ResponseEntity<JsonNode> response = restTemplate.exchange(uri, HttpMethod.GET, request, JsonNode.class);
+
+            // 결과 확인 및 로직 처리
+            JsonNode root = response.getBody();
+
+            String rtCd = root.path("rt_cd").asText();  //성공 여부 코드
+            String msgCd = root.path("msg_cd").asText();  //메세지 코드
+
+            if(response.getStatusCode() == HttpStatus.OK && "0".equals(rtCd)){
+                // 정상 성공
+                // output에는 순위별로 JSON데이터가 여러개 존재
+                return JsonToDto(root.path("output"));
+            }
+//            else if ("EGW00123".equals(msgCd)){
+//                System.out.println("토큰 만료됨. 재발급 후 다시 시도");
+//                getAccessToken();
+//                return getTradingVolumeRanking();
+//            }
+            else{
+                System.out.println("Error Code: " + response.getStatusCode());
+                return null;
+            }
+
+        } catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<RankingDTO> getMarketCapRanking(){
+        try{
+            // URL 및 쿼리 파라미터 설정
+            URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
+                    .path("/uapi/domestic-stock/v1/ranking/market-cap")
+                    .queryParam("fid_input_price_2", "")  // 입력 가격2 - 입력값 없을때 전체 (~ 가격)
+                    .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
+                    .queryParam("fid_cond_scr_div_code", "20174")  //조건 화면 분류 코드 - Unique key( 20174 )
+                    .queryParam("fid_div_cls_code", "0")  //분류 구분 코드 - 0: 전체, 1:보통주, 2:우선주
+                    .queryParam("fid_input_iscd", "0000")  //입력 종목코드 - 0000:전체, 0001:거래소, 1001:코스닥, 2001:코스피200
+                    .queryParam("fid_trgt_cls_code", "0")  //대상 구분 코드 - 0 : 전체
+                    .queryParam("fid_trgt_exls_cls_code", "0")  //대상 제외 구분 코드 - 0 : 전체
+                    .queryParam("fid_input_price_1", "")  //입력 가격1 - 입력값 없을때 전체 (가격 ~)
+                    .queryParam("fid_vol_cnt", "")  //거래량 수 - 입력값 없을때 전체 (거래량 ~)
+                    .build()
+                    .toUri();
+
+            // 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("content-type", "application/json; charset=utf-8");
+            headers.set("authorization", "Bearer " + this.accessToken);
+            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("tr_id", "FHPST01740000");  //거래ID - FHPST01740000
+            headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
 
             // 요청 엔티티 생성 (GET이라 Body는 null)
             HttpEntity<Void> request = new HttpEntity<>(headers);

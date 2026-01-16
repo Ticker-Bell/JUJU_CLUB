@@ -45,7 +45,7 @@ public class StockListController {
     public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, HttpSession session) {
 
         switch (sortType) {
-            case "interest":
+            case "interest":  //관심종목
                 Integer userSeq = (Integer)session.getAttribute("userSeq");
                 List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
                 List<RankingDTO> rankingDTOList = new ArrayList<>();
@@ -61,14 +61,14 @@ public class StockListController {
                 }
                 return rankingDTOList;
 
-            case "volume":
+            case "volume":  //거래량순
                 return rankingApiService.getTradingVolumeRanking();
-            case "rising":
+            case "rising":  //상승률순
                 return new ArrayList<>();
-            case "falling":
+            case "falling":  //하락률순
                 return new ArrayList<>();
-            case "marketCap":
-                return new ArrayList<>();
+            case "marketCap":  //시가총액순
+                return rankingApiService.getMarketCapRanking();
             default: return new ArrayList<>();
         }
     }

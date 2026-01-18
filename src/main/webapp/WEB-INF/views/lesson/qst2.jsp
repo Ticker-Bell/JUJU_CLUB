@@ -9,9 +9,10 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 <%--레슨 공통 css--%>
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
-<%--선택형 문제 css--%>
+<%--문항 버튼, 모달 css--%>
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
 
 <link rel="stylesheet" as="style" crossorigin

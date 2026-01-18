@@ -76,6 +76,8 @@ public class LessonController {
         return "/lesson/qst3";
       case "Q004":
         return "/lesson/qst4";
+      case "Q005":
+        return "/lesson/qst5";
       default:
         // 잘못된 questionId
         return "/lesson/error";

@@ -153,7 +153,7 @@
           target: '#main',
           values: {
             lessonId: 'lesson_stock_01',
-            questionId: 'Q002'
+            questionId: 'Q005'
           }
         });
 

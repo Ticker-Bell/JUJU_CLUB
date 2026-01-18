@@ -10,6 +10,11 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
+<%--레슨 공통 css--%>
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
+<%--문항 버튼, 모달 css--%>
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
@@ -98,6 +103,9 @@
   }
 </style>
 
+<%--챕터명,레슨명,문제 진행바--%>
+<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+
 <section class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
 
     <div class="w-full max-w-2xl flex flex-col gap-12">
@@ -121,26 +129,8 @@
     </div>
 </section>
 
-<div id="resultModal"
-     class="fixed inset-0 z-[100] modal-bg hidden flex items-center justify-center p-4">
-    <div class="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative">
-        <button onclick="closeModal()"
-                class="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition">
-            <i data-lucide="x" class="w-6 h-6"></i>
-        </button>
-        <div class="p-8 text-center">
-            <div id="modalIcon"
-                 class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg"></div>
-            <h3 id="modalTitle" class="text-2xl font-extrabold text-gray-900 mb-2"></h3>
-            <p id="modalDesc" class="text-gray-600 font-medium leading-relaxed mb-6"></p>
-            <button id="modalActionBtn"
-                    class="w-full py-3.5 rounded-xl bg-primary text-white font-extrabold shadow-lg hover:brightness-105 transition-all">
-                다음 문제로
-            </button>
-        </div>
-        <div id="modalBar" class="h-2 w-full bg-primary"></div>
-    </div>
-</div>
+<%--레슨 선택형,드래그형,매치형,라인형 결과 모달창--%>
+<%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 <script>
   (function () {

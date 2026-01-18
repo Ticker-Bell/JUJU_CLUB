@@ -17,13 +17,11 @@
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <%---개념형 문제 css---%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
-    <%--객관식 선택 박스 css (구 선택형 문제 css)--%>
-    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
 
-    <%--레슨 공통 css--%>
-    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
-    <%--드래형 문제 css (div 동적 생성후 css 후적용이라 main.jsp에 있어야합니데이--%>
+    <%--드래형 문제 css (div 동적 생성후 css 후적용이라 main.jsp에 있어야함--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonDrag.css">
+    <%--매치형 문제 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonMatch.css">
 
 
 </head>

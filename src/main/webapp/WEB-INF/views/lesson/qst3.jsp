@@ -10,8 +10,11 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<%--선택형 문제 css--%>
+<%--레슨 공통 css--%>
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
+<%--문항 버튼, 모달 css--%>
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 

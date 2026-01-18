@@ -92,7 +92,6 @@ window.addEventListener("DOMContentLoaded", () => {
   // 대기시간 없이 즉시 표시(말풍선 애니메이션 유지)
   function step() {
     if (idx >= script.length) {
-      alert("개념 문제 완료! 다음문제로 이동");
       location.href = "<c:url value='/lesson/lessonInfo' />";
       return;
     }

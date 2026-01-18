@@ -31,15 +31,13 @@
 </script>
 
 <%--챕터명,레슨명,문제 진행바--%>
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section
         class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative overflow-hidden">
-
     <div class="w-full max-w-5xl flex flex-col h-full relative">
-
-        <div class="text-center mb-8 shrink-0">
-                        <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-extrabold mb-3">
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center shadow-inner">
+        <span class="inline-block px-3 py-1 rounded-full bg-white border border-gray-200 text-primary text-xs font-extrabold mb-5 shadow-sm">
                             Final Question
                         </span>
             <h2 class="text-2xl font-bold text-gray-900 leading-snug">
@@ -79,23 +77,43 @@
 <%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 <script>
+
+  updateActiveDot('${titles[4].questionId}');
+
   (function () {
     lucide.createIcons();
 
-    // Data: Harder terms
-    const terms = [
-      {id: 'per', text: 'PER (주가수익비율)'},
-      {id: 'pbr', text: 'PBR (주가순자산비율)'},
-      {id: 'roe', text: 'ROE (자기자본이익률)'},
-      {id: 'cap', text: '시가총액 (Market Cap)'}
-    ];
+    // DB에서 가져온 연결형 문제
+    const matchQst = {
+      questionText: "${fn:escapeXml(qst[3].questionText)}",
+      leftOptions: [
+        <c:forEach var="opt" items="${qst[3].leftOptions}" varStatus="st">
+        {id: "${opt.id}", text: "${fn:escapeXml(opt.text)}"}<c:if test="${!st.last}">, </c:if>
+        </c:forEach>
+      ],
+      rightOptions: [
+        <c:forEach var="opt" items="${qst[3].rightOptions}" varStatus="st">
+        {id: "${opt.id}", text: "${fn:escapeXml(opt.text)}"}<c:if test="${!st.last}">, </c:if>
+        </c:forEach>
+      ],
+      matchAnswer: {
+        <c:forEach var="entry" items="${qst[3].matchAnswer}" varStatus="st">
+        "${entry.key}": "${entry.value}"<c:if test="${!st.last}">, </c:if>
+        </c:forEach>
+      },
+      explanation: "${fn:escapeXml(qst[3].explanation)}"
 
-    const definitions = [
-      {id: 'def-cap', matchId: 'cap', text: '발행주식수 × 현재 주가. 기업의 총 가치를 나타냄'},
-      {id: 'def-roe', matchId: 'roe', text: '투입한 자본 대비 이익을 얼마나 냈는지 보여주는 지표'},
-      {id: 'def-per', matchId: 'per', text: '순이익 대비 주가가 몇 배인지 나타내는 지표 (이익 기준)'},
-      {id: 'def-pbr', matchId: 'pbr', text: '보유 자산 대비 주가가 몇 배인지 나타내는 지표 (자산 기준)'}
-    ];
+    };
+
+    // JS에서 terms와 definitions 생성
+    const terms = matchQst.leftOptions.map(opt => ({id: opt.id, text: opt.text}));
+    const definitions = matchQst.rightOptions.map(opt => {
+      return {
+        id: opt.id,
+        matchId: Object.entries(matchQst.matchAnswer).find(([lId, rId]) => rId === opt.id)[0],
+        text: opt.text
+      };
+    });
 
     // Shuffle definitions only (Keep terms order for readability)
     definitions.sort(() => Math.random() - 0.5);
@@ -214,10 +232,11 @@
 
     function checkAnswer() {
       let correctCount = 0;
-      connections.forEach((rId, lId) => {
-        // Check logic: find the definition object where id == rId, and check if matchId == lId
-        const def = definitions.find(d => d.id === rId);
-        if (def && def.matchId === lId) {
+
+      // Map형태 foreach
+      connections.forEach((rightId, leftId) => {
+        const correctRightId = matchQst.matchAnswer[leftId]; // key = leftId
+        if (correctRightId === rightId) {
           correctCount++;
         }
       });
@@ -237,7 +256,7 @@
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-green-100 text-green-600";
         title.textContent = "모든 과정을 수료했습니다!";
         title.className = "text-2xl font-extrabold text-green-600 mb-2";
-        desc.innerHTML = `어려운 용어까지 완벽하게 이해하셨네요.<br>이제 실전 모의투자로 떠날 준비가 되셨습니다!`;
+        desc.innerHTML = matchQst.explanation;
         bar.className = "h-2 w-full bg-green-500";
         btn.textContent = "학습 완료하고 로드맵 가기";
 
@@ -257,12 +276,13 @@
         };
 
       } else {
+
         // Wrong
         icon.textContent = "🤔";
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-yellow-100 text-yellow-600";
-        title.textContent = `${correctCount}개만 맞았습니다`;
+        title.textContent = correctCount + "개만 맞았습니다"
         title.className = "text-2xl font-extrabold text-gray-700 mb-2";
-        desc.innerHTML = `PER는 이익, PBR은 자산, ROE는 자본!<br>헷갈리는 용어를 다시 연결해보세요.`;
+        desc.innerHTML = `정답을 다시 확인하고 연결해보세요.`;
         bar.className = "h-2 w-full bg-yellow-400";
         btn.textContent = "다시 시도하기";
         btn.onclick = closeModal;

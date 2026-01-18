@@ -1,9 +1,7 @@
 package com.tickerbell.jujuclub.lesson.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonQst;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonTitle;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
@@ -56,50 +54,33 @@ public class LessonService {
   /**
    * 레슨 문항 조회
    */
-  public List<LessonDTO.LessonQst> getLssnQst(String lessonId) throws IOException {
+  public List<LessonQst> getLssnQst(String lessonId) throws IOException {
 
     List<LessonQst> lessonQsts = lessonMapper.selectQSt(lessonId);
-    List<LessonDTO.LessonQst> result = new ArrayList<>();
+    List<LessonQst> result = new ArrayList<>();
 
     for (LessonQst lessonQst : lessonQsts) {
 
-      // options 파싱
-      JsonNode optionsNode = objectMapper.readTree(lessonQst.getOptions());
-      JsonNode choicesNode = optionsNode.get("choices");
-
-      List<String> options =
-          objectMapper.readValue(
-              choicesNode.traverse(),
-              new TypeReference<List<String>>() {}
-          );
-
-      // answer 파싱
-      JsonNode answerNode = objectMapper.readTree(lessonQst.getAnswer());
-      JsonNode correctNode = answerNode.get("correct");
-      String explanation = answerNode.get("explanation").asText();
-
-      LessonDTO.LessonQst qst = new LessonDTO.LessonQst();
+      LessonQst qst = new LessonQst();
       qst.setQuestionText(lessonQst.getQuestionText());
-      qst.setOptionList(options);
-      qst.setExplanation(explanation);
+      qst.setExplanation(LessonJsonParse.parseExplanation(lessonQst.getAnswer()));
 
-      // questionType 분기
-      if ("드래그형".equals(lessonQst.getQuestionType())) {
+      switch (lessonQst.getQuestionType()) {
+        case "드래그형":
+          qst.setOptionList(LessonJsonParse.parseChoices(lessonQst.getOptions()));
+          qst.setAnswerList(LessonJsonParse.parseDragAnswer(lessonQst.getAnswer()));
+          break;
 
-        List<Integer> answerList =
-            objectMapper.readValue(
-                correctNode.traverse(),
-                new TypeReference<List<Integer>>() {}
-            );
+        case "연결형":
+          Map<String, List<Map<String, String>>> matchOptions = LessonJsonParse.parseMatchOptions(lessonQst.getOptions());
+          qst.setLeftOptions(matchOptions.get("left"));
+          qst.setRightOptions(matchOptions.get("right"));
+          qst.setMatchAnswer(LessonJsonParse.parseMatchAnswer(lessonQst.getAnswer()));
+          break;
 
-        qst.setAnswerList(answerList);
-
-
-      } else {
-
-        // 기존 객관식 로직
-        String answer = correctNode.get(0).asText();
-        qst.setAnswer(answer);
+        default: // 나머지 선택형
+          qst.setOptionList(LessonJsonParse.parseChoices(lessonQst.getOptions()));
+          qst.setAnswer(LessonJsonParse.parseSingleAnswer(lessonQst.getAnswer()));
       }
 
       result.add(qst);

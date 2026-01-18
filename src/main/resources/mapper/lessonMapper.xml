@@ -24,7 +24,8 @@
 
   <select id="selectQSt" parameterType="String"
     resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
-    select question_text
+    select question_type
+         ,question_text
          , options
          , answer
     from learning_question

@@ -51,7 +51,7 @@
 </script>
 
 <%--챕터명,레슨명,문제 진행바--%>
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
     <div class="w-full max-w-2xl flex flex-col gap-10">
@@ -89,9 +89,9 @@
 
 
 <script>
+  updateActiveDot('${titles[2].questionId}');
 
   const rawQuestion = `${qst[1].questionText}`;
-
   const renderedQuestion = rawQuestion.replace(
       '{{blank}}',
       '<span id="targetBlank" class="blank-box">______</span>'
@@ -103,7 +103,7 @@
     lucide.createIcons();
 
     let selectedIdx = null;
-    const CORRECT_IDX = 4;
+    const CORRECT_IDX =  ${qst[1].answer};
     const EXPLANATION = `${fn:escapeXml(qst[1].explanation)}`;
 
     function selectOption(el, idx, text) {

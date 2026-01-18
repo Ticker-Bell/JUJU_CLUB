@@ -12,7 +12,7 @@
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
 
 <%--챕터명,레슨명,문제 진행바--%>
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -153,7 +153,7 @@
           target: '#main',
           values: {
             lessonId: 'lesson_stock_01',
-            questionId: 'Q005'
+            questionId: 'Q002'
           }
         });
 
@@ -196,4 +196,12 @@
     // 첫 메시지 자동
     step();
   })();
+  // 문제 진행바 활성화 (전역)
+  function updateActiveDot(currentQId) {
+    document.querySelectorAll('.q-dot').forEach(dot => {
+      dot.classList.toggle('active', dot.dataset.q === currentQId);
+    });
+  }
+  // 매 화면마다 udateActiveDot으로 활성화
+  updateActiveDot('${titles[0].questionId}');
 </script>

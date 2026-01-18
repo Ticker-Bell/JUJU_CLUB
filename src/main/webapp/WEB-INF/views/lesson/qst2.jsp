@@ -31,13 +31,13 @@
 </script>
 
 <%--챕터명,레슨명,문제 진행바--%>
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
 
     <div class="w-full max-w-3xl flex flex-col gap-8">
-        <div class="text-center">
-        <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-extrabold mb-4">
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center shadow-inner">
+        <span class="inline-block px-3 py-1 rounded-full bg-white border border-gray-200 text-primary text-xs font-extrabold mb-5 shadow-sm">
             Question 2
         </span>
             <h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-tight">
@@ -74,6 +74,7 @@
 <%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 <script>
+  updateActiveDot('${titles[1].questionId}');
   (function () {
     lucide.createIcons();
 

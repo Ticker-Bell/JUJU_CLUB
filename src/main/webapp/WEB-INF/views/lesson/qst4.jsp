@@ -18,99 +18,15 @@
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
-<style>
-  body {
-    font-family: 'Pretendard', sans-serif;
-    background: #fff;
-    color: #191919;
-    letter-spacing: -0.015em;
-  }
-
-  .draggable-item {
-    display: inline-flex;
-    padding: 8px 16px;
-    background: #fff;
-    border: 1px solid #E5E7EB;
-    border-radius: 12px;
-    font-weight: 700;
-    color: #4B5563;
-    cursor: grab;
-    transition: all 0.2s;
-    user-select: none;
-  }
-
-  .draggable-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-  }
-
-  .draggable-item.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-  }
-
-  .draggable-item.selected {
-    background: #5E45EB;
-    color: #fff;
-    border-color: #5E45EB;
-    transform: scale(1.05);
-  }
-
-  .drop-zone {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    height: 38px;
-    margin: 0 4px;
-    border: 2px dashed #D1D5DB;
-    border-radius: 8px;
-    background: #F9FAFB;
-    transition: all 0.2s ease;
-  }
-
-  .drop-zone.hovered {
-    border-color: #5E45EB;
-    background-color: rgba(94, 69, 235, 0.05);
-  }
-
-  .drop-zone.filled {
-    border-style: solid;
-    border-color: transparent;
-    background: transparent;
-    width: auto;
-    min-width: 80px;
-  }
-
-  .modal-bg {
-    background-color: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(4px);
-  }
-
-  .modal-content {
-    animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  @keyframes modalUp {
-    from {
-      opacity: 0;
-      transform: scale(0.95) translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-</style>
 
 <%--챕터명,레슨명,문제 진행바--%>
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col items-center justify-center p-8 relative">
 
     <div class="w-full max-w-2xl flex flex-col gap-12">
-        <div class="bg-white p-6 rounded-2xl sentence-box font-medium text-gray-800 text-center leading-loose">
-            <span class="inline-block px-3 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-extrabold mb-4">
+        <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 text-center shadow-inner">
+        <span class="inline-block px-3 py-1 rounded-full bg-white border border-gray-200 text-primary text-xs font-extrabold mb-5 shadow-sm">
                 Question 4
             </span>
             <div id="questionText" class="text-2xl leading-relaxed text-gray-900 font-bold"></div>
@@ -133,6 +49,8 @@
 <%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 <script>
+  updateActiveDot('${titles[3].questionId}');
+
   (function () {
     lucide.createIcons();
 
@@ -146,13 +64,9 @@
       answer: JSON.parse('${qst[2].answerList}') // 항상 배열 형태로 사용 가능
     };
 
-    console.log("question object:", question);
-    console.log("DB answer raw:", "${qst[2].answer}");
-
-
     const dropCount = (question.questionText.match(/{{blank}}/g) || []).length;
 
-    // 1️⃣ 빈칸을 drop-zone으로 변환
+    // 빈칸을 drop-zone으로 변환
     let renderedQuestion = question.questionText;
     for (let i = 0; i < dropCount; i++) {
       renderedQuestion = renderedQuestion.replace("{{blank}}",

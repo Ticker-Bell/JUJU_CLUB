@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.lesson.dto;
 
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,6 +33,10 @@ public class LessonDTO {
     private String options;
     private String answer;
     private String explanation;
+
+    private Map<String, String> matchAnswer;
+    private List<Map<String, String>> leftOptions;
+    private List<Map<String, String>> rightOptions;
 
     private List<Integer> answerList;
     private List<String> optionList;

@@ -178,7 +178,10 @@
 
         let debounceTimer; // 디바운싱을 위한 타이머
 
-        $('.search-input').on('keyup',function (){
+        $('.search-input').on('keyup',function (e){
+            // 엔터키(13)이나 방향키 등은 keyup에서 처리하지 않고 keydown이나 별도 로직으로 넘김
+            if(e.keyCode === 13) return;
+
             let keyword = $(this).val();
             let $resultBox = $('.search-result'); //선택자 캐싱
 
@@ -236,6 +239,18 @@
             }, 300); // 0.3초 대기 시간
         });
 
+        // 엔ㅌ너키 입력 시 첫 번째 결과 자동 선택
+        $('.search-input').on('keydown', function (e){
+            if(e.keyCode === 13){  //Enter key
+                // 검색 결과창이 열려있고, 결과 아이템이 하나라도 있다면
+                let $firstItem = $('.search-result .result-item').first();
+                if($firstItem.length > 0){
+                    $firstItem.trigger('click');  // 첫 번째 항목응ㄹ 클릭한 것처럼 처리
+                    $(this).blur();
+                }
+            }
+        })
+
         // 리스트 항목 클릭시 검색창에 값 넣기
         $(document).on('click', '.result-item', function(){
             let selectedName = $(this).data('name');
@@ -264,6 +279,10 @@
             `;
 
             $('#stockList').html(singleItemHtml);
+
+            // 리스트에 그려진 종목을 클릭한 것으로 트리거 발동
+            // 아래에 정의된 .stock-item 클릭 이벤트가 실행되면서 차트/기업정보 AJAX가 나감
+            $('#stockList .stock-item').trigger('click');
         });
 
         // 검색 결과 외 클릭 시 닫기
@@ -392,7 +411,7 @@
             // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
 
             html += `
-                <div class="stock-item data-code="\${item.stockCode}" data-name="\${item.stockName}">
+                <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
                         \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>

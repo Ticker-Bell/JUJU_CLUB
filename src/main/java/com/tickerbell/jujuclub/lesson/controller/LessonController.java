@@ -25,6 +25,16 @@ public class LessonController {
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       Model model) throws Exception {
+// 세션 연결예쩡
+    Integer userSeq = 1;
+
+//    if (userSeq == null) {
+//      // 로그인 안된 상태면 처리
+//      return "redirect:/login";
+//    }
+
+    // 레슨 시작 정보 등록
+    lessonService.insertLssnInfo(userSeq,lessonId);
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
@@ -36,6 +46,7 @@ public class LessonController {
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
+    model.addAttribute("userSeq",userSeq);
 
     if (isHtmx) {
       return "/lesson/lessonInfo";

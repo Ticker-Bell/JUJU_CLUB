@@ -2,7 +2,9 @@ package com.tickerbell.jujuclub.lesson.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonQst;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonTitle;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.mapper.LessonMapper;
@@ -13,9 +15,11 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LessonService {
 
   private final LessonMapper lessonMapper;
@@ -90,6 +94,13 @@ public class LessonService {
 
   }
 
-
-
+  /**
+   * 레슨 시작 정보 등록
+   */
+  public void insertLssnInfo(int userSeq,String lessonId) throws IOException {
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+    lessonRequest.setUserSeq(String.valueOf(userSeq));
+    lessonRequest.setLessonId(lessonId);
+    lessonMapper.insertLssnInfo(lessonRequest);
+  }
 }

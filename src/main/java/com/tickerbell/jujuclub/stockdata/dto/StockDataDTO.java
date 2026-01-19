@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StockDataDTO {
-    String stock_code;
-    String stock_name;
-    String market_type;
+    String stockCode;
+    String stockName;
+    String marketType;
     String sector;
 }

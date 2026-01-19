@@ -2,16 +2,17 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<!doctype html>
-<html lang="ko">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 
-<%@ include file="/WEB-INF/views/lesson/common/lesson2.jsp" %>
+<%--개념형 문제 css--%>
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
+
+<%--챕터명,레슨명,문제 진행바--%>
+<%@ include file="/WEB-INF/views/lesson/common/lessonCommon.jsp" %>
 
 <section class="web-card flex-1 min-h-0 flex flex-col">
     <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -77,8 +78,12 @@
     </div>
 </section>
 
+<%--레슨 선택형,드래그형,매치형,라인형 결과 모달창--%>
+<%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
+
 <script>
-  (function() {
+
+  (function () {
     if (!document.getElementById("chatList")) return; // htmx 로딩 후 DOM 확인
 
     const script = [];
@@ -106,7 +111,7 @@
     const resetBtn = document.getElementById("resetBtn");
     let idx = 0;
 
-    function scrollToBottom(){
+    function scrollToBottom() {
       chatScroll.scrollTop = chatScroll.scrollHeight;
     }
 
@@ -122,7 +127,8 @@
 
       const meta = document.createElement("div");
       meta.className = `meta ${isRight ? "right" : ""}`;
-      meta.textContent = msg.name + ' · ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+      meta.textContent = msg.name + ' · ' + new Date().toLocaleTimeString([],
+          {hour: '2-digit', minute: '2-digit'});
 
       const bubbleWrap = document.createElement("div");
       bubbleWrap.className = "bubble-wrap";
@@ -163,7 +169,7 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    function reset(){
+    function reset() {
       idx = 0;
       chatList.innerHTML = "";
       typingRow.classList.add("hidden");
@@ -172,9 +178,9 @@
       scrollToBottom();
     }
 
-    function skipAll(){
+    function skipAll() {
       typingRow.classList.add("hidden");
-      while(idx < script.length){
+      while (idx < script.length) {
         addMessage(script[idx]);
         idx++;
       }
@@ -190,9 +196,12 @@
     // 첫 메시지 자동
     step();
   })();
+  // 문제 진행바 활성화 (전역)
+  function updateActiveDot(currentQId) {
+    document.querySelectorAll('.q-dot').forEach(dot => {
+      dot.classList.toggle('active', dot.dataset.q === currentQId);
+    });
+  }
+  // 매 화면마다 udateActiveDot으로 활성화
+  updateActiveDot('${titles[0].questionId}');
 </script>
-
-
-
-
-</html>

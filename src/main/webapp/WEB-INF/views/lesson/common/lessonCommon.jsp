@@ -28,10 +28,8 @@
 
         <div id="qDots" class="q-dots absolute left-1/2 -translate-x-1/2 bottom-2"
              aria-label="문제 진행도">
-            <c:forEach var="t" items="${titles}" varStatus="s">
-                <span class="q-dot ${s.first ? 'active' : ''}"
-                      data-q="${t.questionId}"
-                      title="${t.questionId}번 문제"></span>
+            <c:forEach var="t" items="${titles}">
+                <span class="q-dot" data-q="${t.questionId}" title="${t.questionId}번 문제"></span>
             </c:forEach>
         </div>
     </div>

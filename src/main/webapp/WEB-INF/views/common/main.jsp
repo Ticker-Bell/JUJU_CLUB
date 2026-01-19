@@ -10,21 +10,24 @@
 <c:set var="cpath" value="${pageContext.request.contextPath}" scope="request"/>
 <html>
 <head>
-    <script>window.projectContextPath = "${pageContext.request.contextPath}";</script>
     <%--얘 없으면 기능 활성화가 안돼요--%>
     <script src="https://unpkg.com/lucide@latest"></script>
-        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-        <%--차트 라이브러리--%>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <%--개념형 문제 css--%>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <%--(div 동적 생성후 css 후적용이라 main.jsp에 있어야함, 삭제 노노--%>
+    <%---레슨 공통 css---%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
+    <%---개념형 문제 css---%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
-
-    <%--선택형 문제 css--%>
+    <%--문항 버튼, 모달 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+    <%--드래형 문제 css --%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonDrag.css">
+    <%--연결형 문제 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonMatch.css">
+
 </head>
 
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
@@ -37,11 +40,7 @@
 
     <!-- Main -->
     <main id="main" class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
-<%--        <div id="main" class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">--%>
-
-            <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
-
-<%--        </div>--%>
+        <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
     </main>
 </div>
 

@@ -70,13 +70,13 @@ public class LessonController {
     }
 
     switch (questionId) {
-      case "Q002":
+      case "LV1_CH001_LSN001_Q002":
         return "/lesson/qst2";
-      case "Q003":
+      case "LV1_CH001_LSN001_Q003":
         return "/lesson/qst3";
-      case "Q004":
+      case "LV1_CH001_LSN001_Q004":
         return "/lesson/qst4";
-      case "Q005":
+      case "LV1_CH001_LSN001_Q005":
         return "/lesson/qst5";
       default:
         // 잘못된 questionId

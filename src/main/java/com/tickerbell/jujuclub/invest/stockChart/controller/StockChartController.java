@@ -6,7 +6,6 @@ import com.tickerbell.jujuclub.invest.stockChart.service.StockChartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,8 +28,10 @@ public class StockChartController {
 
     @GetMapping("api/invest/chartData")
     @ResponseBody
-    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode){
-        return stockChartRestService.getStockRestData(periodCode);
+    public List<StockChartRestDTO> getRestChartData(
+            @RequestParam(value = "periodCode", defaultValue = "D") String periodCode,
+            @RequestParam(value = "stockCode") String stockCode) {
+        return stockChartRestService.getStockRestData(periodCode, stockCode);
     }
 
     @MessageMapping("/invest/request/chartData")

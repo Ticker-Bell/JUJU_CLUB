@@ -114,7 +114,7 @@
         updateButtonUI(periodCode);
 
         //rest api 연결
-        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=` + periodCode;
+        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=${periodCode}&stockCode=${stockCode}`;
 
         fetch(url)
             .then(response => response.json())

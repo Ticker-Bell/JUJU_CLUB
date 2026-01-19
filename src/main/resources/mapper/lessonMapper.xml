@@ -2,13 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tickerbell.jujuclub.lesson.mapper.LessonMapper">
+  <insert id="insertLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    INSERT INTO USER_QUESTION_RESULT(
+                                     user_seq
+                                    ,lesson_id
+    )
+    VALUES(
+           #{userSeq}
+          ,#{lessonId}
+          )
+  </insert>
 
   <select id="selectQstChat" parameterType="String"
     resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
     SELECT OPTIONS
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND question_id = 'Q001'
+    AND question_id = 'LV1_CH001_LSN001_Q001'
   </select>
 
   <select id="selectLssnTitle" parameterType="String"
@@ -30,7 +40,7 @@
          , answer
     from learning_question
     where lesson_id = #{lessonId}
-    and question_id !='Q001'
+    and question_id !='LV1_CH001_LSN001_Q001'
   </select>
 
 

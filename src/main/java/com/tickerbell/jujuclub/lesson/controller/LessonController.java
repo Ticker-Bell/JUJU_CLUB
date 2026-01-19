@@ -25,6 +25,16 @@ public class LessonController {
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       Model model) throws Exception {
+// 세션 연결예쩡
+    Integer userSeq = 1;
+
+//    if (userSeq == null) {
+//      // 로그인 안된 상태면 처리
+//      return "redirect:/login";
+//    }
+
+    // 레슨 시작 정보 등록
+    lessonService.insertLssnInfo(userSeq,lessonId);
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
@@ -36,6 +46,7 @@ public class LessonController {
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
+    model.addAttribute("userSeq",userSeq);
 
     if (isHtmx) {
       return "/lesson/lessonInfo";
@@ -70,13 +81,13 @@ public class LessonController {
     }
 
     switch (questionId) {
-      case "Q002":
+      case "LV1_CH001_LSN001_Q002":
         return "/lesson/qst2";
-      case "Q003":
+      case "LV1_CH001_LSN001_Q003":
         return "/lesson/qst3";
-      case "Q004":
+      case "LV1_CH001_LSN001_Q004":
         return "/lesson/qst4";
-      case "Q005":
+      case "LV1_CH001_LSN001_Q005":
         return "/lesson/qst5";
       default:
         // 잘못된 questionId

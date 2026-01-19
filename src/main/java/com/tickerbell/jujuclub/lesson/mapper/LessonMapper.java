@@ -13,4 +13,5 @@ public interface LessonMapper {
 
   List<LessonDTO.LessonQst> selectQSt(String lessonId);
 
+  int insertLssnInfo(LessonDTO.LessonRequest lessonRequest);
 }

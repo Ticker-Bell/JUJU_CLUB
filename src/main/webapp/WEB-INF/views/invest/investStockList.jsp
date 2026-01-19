@@ -113,6 +113,11 @@
             font-weight: 500;
         }
 
+        .stock-item.selected{
+            background-color: #F5F3FF;
+            box-shadow: inset 0 0 0 2px #5E45EB;
+        }
+
 
     </style>
 </head>
@@ -246,7 +251,7 @@
 
             // 메인 리스트에 선택한 항목 1개만 출력하기
             let singleItemHtml = `
-                <div class="stock-item" data-code="\${selectedCode}" data-name="\${selectedName}">
+                <div class="stock-item selected" data-code="\${selectedCode}" data-name="\${selectedName}">
                     <div class="text-col">
                         <span class="txt-name">\${selectedName}</span>
                         <span class="txt-code num-font">\${selectedCode}</span>
@@ -271,6 +276,10 @@
 
     // 종목 리스트 중 하나를 선택했을때 차트, 기업 정보 출력하는 url에 종목코드 보내기
     $(document).on("click", ".stock-item", function () {
+
+        $(".stock-item").removeClass("selected");  // 다른 모든 항목의 선택 효과 제거
+        $(this).addClass("selected");  // 현재 클릭한 항목에만 효과 추가
+
         const code = $(this).data("code");
         const name = $(this).data("name");
 
@@ -383,7 +392,7 @@
             // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
 
             html += `
-                <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
+                <div class="stock-item data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
                         \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>

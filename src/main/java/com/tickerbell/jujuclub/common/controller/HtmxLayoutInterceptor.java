@@ -25,14 +25,14 @@ public class HtmxLayoutInterceptor implements HandlerInterceptor {
         // Htmx 요청 확인 (header 체크)
         boolean isHtmx = request.getHeader("HX-Request") != null;
 
-        // session 확인  TODO: session에서 userId 확인로직으로 수정 필요
+        // session 확인  TODO: session에서 userSeq 확인로직으로 수정 필요
         HttpSession session = request.getSession();
         if (session.getAttribute("user") == null) {
             String testId = "hi";
             UserInfoDTO userInfo = userInfoService.getUserInfo(testId);
 
             if(userInfo != null) {
-                System.out.println("=== [Interceptor] userInfo 세션 저장 성공: " + userInfo.getUserId());
+                System.out.println("=== [Interceptor] userInfo 세션 저장 성공: " + userInfo.getUserSeq());
                 session.setAttribute("user", userInfo);
             } else {
                 System.out.println("=== [Interceptor] userInfo 조회 실패");

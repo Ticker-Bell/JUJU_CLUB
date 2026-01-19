@@ -6,5 +6,5 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface UserInfoMapper {
-    UserInfoDTO userInfo(@Param("userId") String userId);
+    UserInfoDTO userInfo(@Param("userSeq") String userSeq);
 }

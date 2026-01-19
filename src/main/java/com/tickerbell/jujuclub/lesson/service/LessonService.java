@@ -66,12 +66,12 @@ public class LessonService {
       qst.setExplanation(LessonJsonParse.parseExplanation(lessonQst.getAnswer()));
 
       switch (lessonQst.getQuestionType()) {
-        case "드래그형":
+        case "DRAG":
           qst.setOptionList(LessonJsonParse.parseChoices(lessonQst.getOptions()));
           qst.setAnswerList(LessonJsonParse.parseDragAnswer(lessonQst.getAnswer()));
           break;
 
-        case "연결형":
+        case "LINK":
           Map<String, List<Map<String, String>>> matchOptions = LessonJsonParse.parseMatchOptions(lessonQst.getOptions());
           qst.setLeftOptions(matchOptions.get("left"));
           qst.setRightOptions(matchOptions.get("right"));

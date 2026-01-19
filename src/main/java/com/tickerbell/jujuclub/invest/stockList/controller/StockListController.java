@@ -8,10 +8,7 @@ import com.tickerbell.jujuclub.invest.stockList.service.StockService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -29,7 +26,7 @@ public class StockListController {
     public String investMain(Model model, HttpSession session) {
 
         // 세션에서 user_seq 가져오기
-        session.setAttribute("userSeq", 2); // 일단 구현안되어있으므로 임시 값
+        session.setAttribute("userSeq", 1); // 일단 구현안되어있으므로 임시 값
 
         Integer userSeq = (Integer)session.getAttribute("userSeq");
 
@@ -73,25 +70,37 @@ public class StockListController {
         }
     }
 
+    @PostMapping("/search/autocomplete")
+    @ResponseBody
+    public List<StockDTO> autocomplete(@RequestParam("keyword") String keyword) {
+        // 검색어가 없으면 빈 리스트 리턴
+        if (keyword == null || keyword.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // DB 조회 결과 리턴 (Jackson 라이브러리가 자동으로 JSON 배열로 변환해줌)
+        return stockService.getSearchList(keyword);
+    }
+
     // 테스트용  나중에 제거하기
     @GetMapping("/chart/selectedStockInfo")
     @ResponseBody
-    public String paramTest(Model model, @RequestParam String stockCode, @RequestParam String stockName) {
+    public StockDTO paramTest(@RequestParam String stockCode, @RequestParam String stockName) {
 
-        model.addAttribute("stockCode", stockCode);
-        model.addAttribute("stockName", stockName);
-
-        return "invest/investMain";
+        return StockDTO.builder()
+                .stockCode(stockCode)
+                .stockName(stockName)
+                .build();
     }
 
     // 테스트용  나중에 제거하기
     @GetMapping("/corpoInfo/selectedStockInfo")
     @ResponseBody
-    public String paramTest2(Model model, @RequestParam String stockCode) {
+    public StockDTO paramTest2(Model model, @RequestParam String stockCode) {
 
-        model.addAttribute("infoStockCode", stockCode);
-
-        return "invest/investMain";
+        return StockDTO.builder()
+                .stockCode(stockCode)
+                .build();
     }
 
 }

@@ -17,4 +17,12 @@
         WHERE user_seq = #{userSeq}
     </select>
 
+    <!-- 검색창에서 입력한 내용을 포함한 종목들 조회 -->
+    <select id="getSearchList" resultType="com.tickerbell.jujuclub.invest.stockList.dto.StockDTO">
+        SELECT stock_code, stock_name
+        FROM STOCK_MASTER
+        WHERE stock_name LIKE CONCAT('%', #{keyword}, '%')
+           OR stock_code LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
 </mapper>

@@ -10,4 +10,6 @@ public interface StockMapper {
     StockDTO findBySeq(Integer seq);
 
     List<StockDTO> findStockListFromUserWatchList(Integer UserSeq);
+
+    List<StockDTO> getSearchList(String keyword);
 }

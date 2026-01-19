@@ -6,6 +6,7 @@ import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -21,11 +22,16 @@ import java.util.Map;
 @Slf4j
 public class RankingApiService {
 
-    private static final String APP_KEY = "PSEwye9EwwaHCT6TlEJBejuGmtuDmsZRLsTP";
-    private static final String APP_SECRET = "1Zxqr/7cOzLRg7nEsU2BJM8rSekIxQPnvCcUcxoPVGexTHQyDSiMXaYlGmGAkJYi/s7bWUdWI9H4gETBWiNyl4j5gfuiz7NuVEKi6vTTNL3ptWfBXQFe5cesH35tmEnPuSKWZ8U8++HM0LF+GQxQ9nZtRWZX0MR1CDQuUStqIHd4ase/mhQ=";
-    private static final String URL_BASE = "https://openapi.koreainvestment.com:9443";
+    @Value("${kis.appkey}")
+    private String appkey;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjllOGFkMTk1LTM3NWUtNDhhYS1iNDBhLTk0YWQ2NjgyYjhkZiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODU1NDI4MCwiaWF0IjoxNzY4NDY3ODgwLCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.4-D8h1xZJMMVCBOQLA5crEh0CT7ovrUSmEmxWmFstD3pAcawzWx-gTuk787Ry1rQkewhykiLVAteLhP_QI7iQg";
+    @Value("${kis.appsecret}")
+    private String appsecret;
+
+    @Value("${kis.baseurl}")
+    private String baseurl;
+
+    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjQ2MmI0ZDdmLTM4YWUtNDMwNS04MDcyLWVmNmI4NzM1YzQ4NCIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODg3NzAzNSwiaWF0IjoxNzY4NzkwNjM1LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.0EymY-NjLn61Gjr7ga8_rW78p4v5y4V06DxiYFSOkxZtMgckcqC3it70xWCq2-aK-Nx4OriF0SU_5MDGW7nF0Q";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -69,7 +75,7 @@ public class RankingApiService {
 
         try{
             // URL 및 쿼리 파라미터 설정
-            URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
+            URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
                     .path("/uapi/domestic-stock/v1/quotations/volume-rank")
                     .queryParam("FID_COND_MRKT_DIV_CODE", "J")  //조건 시장 분류 코드 - J:KRX, NX:NXT
                     .queryParam("FID_COND_SCR_DIV_CODE", "20171")  //조건 화면 분류 코드 - 20171
@@ -89,8 +95,8 @@ public class RankingApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
             headers.set("authorization", "Bearer " + this.accessToken);
-            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
-            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01710000");  //거래ID - FHPST01710000
             headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
 
@@ -130,7 +136,7 @@ public class RankingApiService {
     public List<RankingDTO> getMarketCapRanking(){
         try{
             // URL 및 쿼리 파라미터 설정
-            URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
+            URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
                     .path("/uapi/domestic-stock/v1/ranking/market-cap")
                     .queryParam("fid_input_price_2", "")  // 입력 가격2 - 입력값 없을때 전체 (~ 가격)
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
@@ -148,8 +154,8 @@ public class RankingApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
             headers.set("authorization", "Bearer " + this.accessToken);
-            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
-            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01740000");  //거래ID - FHPST01740000
             headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
 
@@ -189,7 +195,7 @@ public class RankingApiService {
     public List<RankingDTO> getTopGainersRanking(){
         try{
             // URL 및 쿼리 파라미터 설정
-            URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
+            URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
                     .path("//uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
@@ -212,8 +218,8 @@ public class RankingApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
             headers.set("authorization", "Bearer " + this.accessToken);
-            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
-            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01700000");  //거래ID - FHPST01700000
             headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
 
@@ -253,7 +259,7 @@ public class RankingApiService {
     public List<RankingDTO> getTopLosersRanking(){
         try{
             // URL 및 쿼리 파라미터 설정
-            URI uri = UriComponentsBuilder.fromHttpUrl(URL_BASE)
+            URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
                     .path("//uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
@@ -276,8 +282,8 @@ public class RankingApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
             headers.set("authorization", "Bearer " + this.accessToken);
-            headers.set("appkey", APP_KEY);  //한국투자증권 홈페이지에서 발급받은 appkey
-            headers.set("appsecret", APP_SECRET);  //한국투자증권 홈페이지에서 발급받은 appsecret
+            headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
+            headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01700000");  //거래ID - FHPST01700000
             headers.set("custtype", "P");  //고객 타입 - B : 법인  P : 개인
 

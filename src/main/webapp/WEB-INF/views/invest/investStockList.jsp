@@ -27,10 +27,10 @@
         }
 
         .search-wrapper { position: relative; flex-shrink: 0; }
-        .search-icon { position: absolute; left: 0; top: 10px; width: 16px; height: 16px; color: #9CA3AF; }
+        .search-icon { position: absolute; left: 10px; top: 10px; width: 16px; height: 16px; color: #9CA3AF; }
         .search-input {
             width: 100%; background-color: transparent; border: none; border-bottom: 1px solid #E5E7EB;
-            padding: 8px 8px 8px 24px; font-size: 14px; font-weight: 800; color: #111827; outline: none; transition: border-color 0.2s;
+            padding: 8px 8px 8px 40px; font-size: 14px; font-weight: 800; color: #111827; outline: none; transition: border-color 0.2s;
         }
         .search-input::placeholder { color: #D1D5DB; }
         .search-input:focus { border-bottom-color: #5E45EB; }
@@ -71,6 +71,49 @@
 
         /* 랭크 스타일 (필요시 추가) */
         .rank { font-size: 10px; color: #5E45EB; font-weight: bold; margin-bottom: 2px;}
+
+
+        /* 검색창 감싸는 wrapper */
+        .search-wrapper{
+            position: relative;
+            width: 300px;
+        }
+
+        /* 자동완성 결과 박스 */
+        .search-result{
+            position: absolute; /* 바로 아래 배치 */
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
+            z-index: 1000; /* 다른 요소보다 위에 오도록 */
+            display: none; /* 평소엔 숨김 */
+            max-height: 200px; /* 너무 길면 스크롤 */
+            overflow-y: auto;
+        }
+
+        /* 리스트 아이템 스타일 */
+        .result-item{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .result-item:hover{
+            background-color: #f0f0f0;
+        }
+
+        .sub-text{
+            font-size: 12px;
+            color: #9CA3AF;
+            font-weight: 500;
+        }
+
+
     </style>
 </head>
 <body>
@@ -80,6 +123,7 @@
     <div class="search-wrapper">
         <i data-lucide="search" class="search-icon"></i>
         <input type="text" placeholder="종목명/코드 검색" class="search-input">
+        <div class="search-result"></div>
     </div>
 
     <div class="tab-wrapper">
@@ -124,6 +168,107 @@
 <script>
     const contextPath = "${pageContext.request.contextPath}";
 
+    // 검색창
+    $(document).ready(function (){
+
+        let debounceTimer; // 디바운싱을 위한 타이머
+
+        $('.search-input').on('keyup',function (){
+            let keyword = $(this).val();
+            let $resultBox = $('.search-result'); //선택자 캐싱
+
+            // 입력값이 없으면 리스트 숨기기
+            if (keyword.length === 0){
+                clearTimeout(debounceTimer);  // 대기 중이던 요청 취소
+                $resultBox.hide();
+                return;
+            }
+
+            // 이전에 예약된 요청이 있다면 취소 (타이머 초기화)
+            clearTimeout(debounceTimer);
+
+            // 0.3초 뒤에 실행하도록 예약
+            debounceTimer = setTimeout(function (){
+                $.ajax({
+                    url: contextPath + "/invest/search/autocomplete",
+                    type: 'POST',
+                    data: {keyword: keyword},
+                    success: function (data){
+                        // 데이터가 있으면 리스트 보여주기
+                        if (data.length > 0) {
+                            let html = '';
+                            $.each(data, function (index, item){
+                                // 정규식 생성: keyword를 찾되, g(전체 찾기), i(대소문자 무시) 옵션 적용
+                                let regex = new RegExp(keyword, "gi");
+
+                                // 검색어(종목명) 강조 효과
+                                let highlightName = item.stockName.replace(regex, function (match){
+                                    return '<span style="color:#5E45EB; font-weight:bold;">' + match + '</span>';
+                                });
+
+                                // 검색어(종목코드) 강조 효과
+                                let highlightCode = item.stockCode.replace(regex, function (match){
+                                    return '<span style="color:#5E45EB; font-weight:bold;">' + match + '</span>';
+                                });
+
+                                // 화면에 보여줄 HTML 생성
+                                html += '<div class="result-item" data-code="' + item.stockCode + '" data-name="' + item.stockName + '">';
+                                html += '<span>' + highlightName + '</span>';
+                                html += '<span class="sub-text">' + highlightCode + '</span>';
+                                html += '</div>';
+                            });
+
+                            $resultBox.html(html).show();
+                        } else{
+                            $resultBox.hide();
+                        }
+                    },
+                    error: function (){
+                        console.log('에러 발생');
+                    }
+                });
+
+            }, 300); // 0.3초 대기 시간
+        });
+
+        // 리스트 항목 클릭시 검색창에 값 넣기
+        $(document).on('click', '.result-item', function(){
+            let selectedName = $(this).data('name');
+            let selectedCode = $(this).data('code');
+
+            // 검색창에 이름 넣고 결과창 숨기기
+            $('.search-input').val(selectedName);
+            $('.search-result').hide();
+
+            // 탭 UI 초기화 (슬라이더 숨기기)
+            $('#left-tab-slider').hide();
+            $('.tab-btn').removeClass('active');
+
+            // 메인 리스트에 선택한 항목 1개만 출력하기
+            let singleItemHtml = `
+                <div class="stock-item" data-code="\${selectedCode}" data-name="\${selectedName}">
+                    <div class="text-col">
+                        <span class="txt-name">\${selectedName}</span>
+                        <span class="txt-code num-font">\${selectedCode}</span>
+                    </div>
+                    <div class="text-col items-end">
+                        <span class="txt-price color-red num-font">000000</span>
+                        <span class="txt-rate color-red num-font">+0.00%</span>
+                    </div>
+                </div>
+            `;
+
+            $('#stockList').html(singleItemHtml);
+        });
+
+        // 검색 결과 외 클릭 시 닫기
+        $(document).on('click', function (e){
+            if (!$(e.target).closest('.search-wrapper').length){
+                $('.search-result').hide();
+            }
+        });
+    });
+
     // 종목 리스트 중 하나를 선택했을때 차트, 기업 정보 출력하는 url에 종목코드 보내기
     $(document).on("click", ".stock-item", function () {
         const code = $(this).data("code");
@@ -136,6 +281,10 @@
             data: {
                 stockCode: code,
                 stockName: name
+            },
+            success: function (res){
+                $("#chartStockCode").text(res.stockCode);
+                $("#chartStockName").text(res.stockName);
             }
         })
 
@@ -143,7 +292,10 @@
         $.ajax({
             url: contextPath + "/invest/corpoInfo/selectedStockInfo",
             type: "GET",
-            data: {stockCode: code}
+            data: {stockCode: code},
+            success: function (res){
+                $("#infoStockCode").text(res.stockCode);
+            }
         })
     })
 
@@ -160,6 +312,9 @@
         $('.tab-btn').on('click', function() {
             const $this = $(this);
             const sortType = $this.data('sort'); // data-sort 값 가져오기
+
+            // 슬라이더 다시 보이기 (검색으로 숨겨졌을 수 있으므로)
+            $('#left-tab-slider').show();
 
             // 탭 활성화 UI 변경
             $('.tab-btn').removeClass('active');
@@ -186,8 +341,6 @@
     function fetchStockList(sortType) {
         // URL 생성
         const url = contextPath + '/invest/main/stock/list';
-
-        console.log("요청 URL:", url, "Sort:", sortType);
 
         $.ajax({
             url: url,

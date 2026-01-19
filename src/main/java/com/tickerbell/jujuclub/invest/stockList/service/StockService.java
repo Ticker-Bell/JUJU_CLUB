@@ -16,4 +16,6 @@ public class StockService {
     public StockDTO findBySeq(Integer seq) {return stockMapper.findBySeq(seq);}
 
     public List<StockDTO> findStockListFromUserWatchList(Integer UserSeq) {return stockMapper.findStockListFromUserWatchList(UserSeq);}
+
+    public List<StockDTO> getSearchList(String keyword) {return stockMapper.getSearchList(keyword);}
 }

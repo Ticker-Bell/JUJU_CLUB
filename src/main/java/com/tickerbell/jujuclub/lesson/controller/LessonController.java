@@ -95,4 +95,24 @@ public class LessonController {
     }
 
   }
+
+  @PostMapping("/updateLssnInfo")
+  public String getLessonInfo(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String lessonId) throws Exception {
+// 세션 연결예쩡
+    Integer userSeq = 1;
+
+    lessonService.updateLssnInfo(userSeq,lessonId);
+
+
+    if (isHtmx) {
+      return "/roadMap/roadMapMain";
+    } else {
+      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
+      // Redirect를 하거나 에러 페이지를 띄움
+      return "redirect:/main";
+    }
+
+  }
 }

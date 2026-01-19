@@ -99,8 +99,25 @@ public class LessonService {
    */
   public void insertLssnInfo(int userSeq,String lessonId) throws IOException {
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+
     lessonRequest.setUserSeq(String.valueOf(userSeq));
     lessonRequest.setLessonId(lessonId);
-    lessonMapper.insertLssnInfo(lessonRequest);
+
+    int usrLssnRslt = lessonMapper.countUsrLssnRslt(lessonRequest);
+    //레슨
+    if(usrLssnRslt == 0 ){
+      lessonMapper.insertLssnInfo(lessonRequest);
+    }
+  }
+
+  /**
+   * 레슨 완료 정보 등록
+   */
+  public void updateLssnInfo(int userSeq,String lessonId) throws IOException {
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+
+    lessonRequest.setUserSeq(String.valueOf(userSeq));
+    lessonRequest.setLessonId(lessonId);
+    lessonMapper.updateLssnInfo(lessonRequest);
   }
 }

@@ -28,8 +28,8 @@ public class HtmxLayoutInterceptor implements HandlerInterceptor {
         // session 확인  TODO: session에서 userSeq 확인로직으로 수정 필요
         HttpSession session = request.getSession();
         if (session.getAttribute("user") == null) {
-            String testId = "hi";
-            UserInfoDTO userInfo = userInfoService.getUserInfo(testId);
+            int testSeq = 1111;
+            UserInfoDTO userInfo = userInfoService.getUserInfo(testSeq);
 
             if(userInfo != null) {
                 System.out.println("=== [Interceptor] userInfo 세션 저장 성공: " + userInfo.getUserSeq());

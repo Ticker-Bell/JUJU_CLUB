@@ -1,6 +1,5 @@
-package com.tickerbell.jujuclub.auth.controller;
+package com.tickerbell.jujuclub.common.controller;
 
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

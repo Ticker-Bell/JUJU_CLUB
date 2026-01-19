@@ -9,11 +9,10 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SigninDTO {
-
-  private int userSeq;
-  private String userId;
-  private String userPw;
-  private String userName;
-  private Date createdAt;
-  private Integer userLevel;
+    private Long userSeq;
+    private String userId;
+    private String userPw;
+    private String userName;
+    private Date createdAt;
+    private Integer userLevel;
 }

@@ -93,9 +93,9 @@ public class StockDataInitRunner{
         for(Map<String, String> stock : kospiStocks){
             if(stock.get("단축코드").length() != 6) continue;
             StockDataDTO stockDataDTO = StockDataDTO.builder()
-                    .stock_code(stock.get("단축코드"))
-                    .stock_name(stock.get("한글명"))
-                    .market_type("KOSPI")
+                    .stockCode(stock.get("단축코드"))
+                    .stockName(stock.get("한글명"))
+                    .marketType("KOSPI")
                     .sector(stock.get("지수업종대분류"))
                     .build();
             stockDataDTOList.add(stockDataDTO);
@@ -104,9 +104,9 @@ public class StockDataInitRunner{
         for(Map<String, String> stock : kosdaqStocks){
             if(stock.get("단축코드").length() != 6) continue;
             StockDataDTO stockDataDTO = StockDataDTO.builder()
-                    .stock_code(stock.get("단축코드"))
-                    .stock_name(stock.get("한글명"))
-                    .market_type("KOSDAQ")
+                    .stockCode(stock.get("단축코드"))
+                    .stockName(stock.get("한글명"))
+                    .marketType("KOSDAQ")
                     .sector(stock.get("지수업종대분류"))
                     .build();
             stockDataDTOList.add(stockDataDTO);

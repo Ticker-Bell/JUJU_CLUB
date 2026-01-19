@@ -7,6 +7,6 @@
                                  stock_name,
                                  market_type,
                                  sector)
-        VALUES (#{stock_code}, #{stock_name}, #{market_type}, #{sector})
+        VALUES (#{stockCode}, #{stockName}, #{marketType}, #{sector})
     </insert>
 </mapper>

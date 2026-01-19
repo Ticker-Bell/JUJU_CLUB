@@ -73,4 +73,33 @@
         where user_seq = #{user_seq}
         order by levelId desc, chapterId desc, lessonId desc
     </select>
+    <select id="missionList" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionDTO">
+        select
+            mission_seq AS missionId,
+            mission_type AS type,
+            mission_title AS content,
+            mission_reward AS reward,
+            target_value AS count
+            from mission
+    </select>
+
+    <select id="missionCheck" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionCheckDTO">
+        SELECT
+            (SELECT COUNT(*)
+             FROM user_question_result
+             WHERE DATE_FORMAT(finished_at, '%Y-%m-%d') = CURDATE()) AS lesson,
+
+            (SELECT COUNT(*)
+             FROM user_test_result
+             WHERE DATE_FORMAT(tested_at, '%Y-%m-%d') = CURDATE())   AS chapterTest,
+
+            (SELECT COUNT(*)
+             FROM mock_trade
+             WHERE DATE_FORMAT(traded_at, '%Y-%m-%d') = CURDATE())   AS buyStocks,
+
+            (SELECT COUNT(*)
+             FROM user_watchlist
+             WHERE DATE_FORMAT(created_at, '%Y-%m-%d') = CURDATE())  AS watchList
+        FROM DUAL
+    </select>
 </mapper>

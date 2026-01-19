@@ -28,6 +28,10 @@ public class RoadMapController {
         List<RoadMapLessonDTO> lessonList = roadMapService.lessonList("CHAPTER_STOCK_02");
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(11);
 
+        // 미션 확인용
+        List<MissionDTO> missionList = roadMapService.missionList();
+        int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
+
         levelList.forEach(System.out::println);
         chptList.forEach(System.out::println);
         lessonList.forEach(System.out::println);
@@ -37,6 +41,7 @@ public class RoadMapController {
         model.addAttribute("chptList",chptList); // 레벨 선택하면 챕터리스트 조회
         model.addAttribute("lessonList",lessonList);
         model.addAttribute("userLessonList",userLessonList.stream().findFirst());
+        model.addAttribute("isMissionClear", 4 > successCount); // 미션 클리어 확인
 
         return "roadMap/roadMapMain";
     }
@@ -50,4 +55,13 @@ public class RoadMapController {
         return null;
     }
 
+    @GetMapping("/mission.do")
+    public String getMission(Model model) {
+        List<MissionDTO> missionList = roadMapService.missionList();
+        int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
+
+        model.addAttribute("mission", missionList);
+        model.addAttribute("successCount", successCount);
+        return "roadMap/missionModal";
+    }
 }

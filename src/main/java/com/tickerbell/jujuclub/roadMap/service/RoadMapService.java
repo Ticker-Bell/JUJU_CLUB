@@ -44,5 +44,27 @@ public class RoadMapService {
         return roadMapMapper.selectLearningList(levelId, chapterId);
     }
 
+    // 미션 모두 조회
+    public List<MissionDTO> missionList() {
+        List<MissionDTO> list = roadMapMapper.missionList();
+        MissionCheckDTO check = roadMapMapper.missionCheck();
 
+        for(MissionDTO mission: list) {
+            switch (mission.getType()) {
+                case "lesson":
+                    mission.setProgress(check.getLesson());
+                    break;
+                case "chapterTest":
+                    mission.setProgress(check.getChapterTest());
+                    break;
+                case "buyStocks":
+                    mission.setProgress(check.getBuyStocks());
+                    break;
+                case "watchList":
+                    mission.setProgress(check.getWatchList());
+                    break;
+            }
+        }
+        return list;
+    }
 }

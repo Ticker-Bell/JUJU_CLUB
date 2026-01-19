@@ -5,7 +5,7 @@
 
 <mapper namespace="com.tickerbell.jujuclub.auth.mapper.SigninMapper">
 
-  <select id="selectUserById" parameterType="string" resultType="com.tickerbell.jujuclub.auth.dto.SigninDTO">
+  <select id="selectUserById" parameterType="string" resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
     SELECT
       user_seq as userSeq,
       user_id as userId,

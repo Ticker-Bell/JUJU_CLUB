@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.auth.controller;
 
+import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.auth.dto.SigninDTO;
 import com.tickerbell.jujuclub.auth.service.SigninService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class SigninController {
         Map<String, Object> res = new HashMap<>();
         try {
             // 로그인 서비스 호출
-            SigninDTO user = signinService.signin(req.getEmail(), req.getPassword());
+            MemberDTO user = signinService.signin(req.getEmail(), req.getPassword());
             user.setUserPw(null); // 비밀번호 제거
 
             // 세션 생성 (키: loginUser)
@@ -70,7 +71,7 @@ public class SigninController {
         Map<String, Object> res = new HashMap<>();
 
         try {
-            SigninDTO loginUser = (SigninDTO) session.getAttribute("loginUser");
+            MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
             if (loginUser == null) {
                 res.put("ok", false);
                 res.put("message", "로그인이 필요합니다.");

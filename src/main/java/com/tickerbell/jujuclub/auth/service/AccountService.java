@@ -12,18 +12,18 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     // [수정] void -> Long (생성된 계좌번호 반환)
-    public Long createAccount(String userId) {
+    public String createAccount(Long userSeq) {
         // 1. 중복 계좌 확인
-        if (accountMapper.checkAccountExist(userId) > 0) {
+        if (accountMapper.checkAccountExist(userSeq) > 0) {
             return null; // 이미 존재하면 null 반환 (혹은 예외 처리)
         }
 
         // 2. 계좌번호 생성 (14자리)
-        long accountNo = generateRandomAccountNo();
+        String accountNo = generateRandomAccountNo();
 
         // 3. DTO 생성 (초기 자본금 100만원 설정)
         AccountDTO account = AccountDTO.builder()
-                .userId(userId)
+                .userSeq(userSeq)
                 .accountNo(accountNo)
                 .cashBalance(1000000L) // [수정] 1,000,000원
                 .build();
@@ -35,8 +35,11 @@ public class AccountService {
         return accountNo;
     }
 
-    private Long generateRandomAccountNo() {
+    private String generateRandomAccountNo() {
         // 14자리 랜덤 숫자 (10조 ~ 99조 사이)
-        return (long) (Math.random() * 90000000000000L) + 10000000000000L;
+        long randomNumber = (long) (Math.random() * 90000000000000L) + 10000000000000L;
+
+        // [핵심] 숫자를 String으로 변환하여 반환
+        return String.valueOf(randomNumber);
     }
 }

@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.auth.controller;
 
+import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.auth.dto.SigninDTO;
 import com.tickerbell.jujuclub.auth.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class AccountController {
     public Map<String, Object> createAccount(HttpSession session) {
         Map<String, Object> res = new HashMap<>();
 
-        SigninDTO loginUser = (SigninDTO) session.getAttribute("loginUser");
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
 
         if (loginUser == null) {
             res.put("ok", false);
@@ -34,7 +35,7 @@ public class AccountController {
 
         try {
             // [수정] 서비스에서 생성된 계좌번호를 받음
-            Long createdAccountNo = accountService.createAccount(loginUser.getUserId());
+            String createdAccountNo = accountService.createAccount(loginUser.getUserSeq());
 
             if (createdAccountNo != null) {
                 res.put("ok", true);

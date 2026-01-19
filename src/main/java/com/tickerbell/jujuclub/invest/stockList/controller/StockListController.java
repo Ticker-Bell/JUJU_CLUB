@@ -73,4 +73,25 @@ public class StockListController {
         }
     }
 
+    // 테스트용  나중에 제거하기
+    @GetMapping("/chart/selectedStockInfo")
+    @ResponseBody
+    public String paramTest(Model model, @RequestParam String stockCode, @RequestParam String stockName) {
+
+        model.addAttribute("stockCode", stockCode);
+        model.addAttribute("stockName", stockName);
+
+        return "invest/investMain";
+    }
+
+    // 테스트용  나중에 제거하기
+    @GetMapping("/corpoInfo/selectedStockInfo")
+    @ResponseBody
+    public String paramTest2(Model model, @RequestParam String stockCode) {
+
+        model.addAttribute("infoStockCode", stockCode);
+
+        return "invest/investMain";
+    }
+
 }

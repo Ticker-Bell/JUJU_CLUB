@@ -100,7 +100,7 @@
             </c:if>
             <c:if test="${not empty stockDTOList}">
                 <c:forEach items="${stockDTOList}" var="stock">
-                    <div class="stock-item" data-code="${stock.stockCode}">
+                    <div class="stock-item" data-code="${stock.stockCode}" data-name="${stock.stockName}">
                         <div class="text-col">
                             <c:catch var="e">
                                 <c:if test="${not empty stock.rank}">
@@ -125,19 +125,23 @@
     const contextPath = "${pageContext.request.contextPath}";
 
     // 종목 리스트 중 하나를 선택했을때 차트, 기업 정보 출력하는 url에 종목코드 보내기
-    $(document).on("click", "stock-item", function () {
+    $(document).on("click", ".stock-item", function () {
         const code = $(this).data("code");
+        const name = $(this).data("name");
 
         // 차트에 전달
         $.ajax({
-            url: contextPath + "/invest/chart/selectedStockCode",
+            url: contextPath + "/invest/chart/selectedStockInfo",
             type: "GET",
-            data: {stockCode: code}
+            data: {
+                stockCode: code,
+                stockName: name
+            }
         })
 
         // 기업정보에 전달
         $.ajax({
-            url: contextPath + "/invest/corpoInfo/selectedStockCode",
+            url: contextPath + "/invest/corpoInfo/selectedStockInfo",
             type: "GET",
             data: {stockCode: code}
         })
@@ -226,7 +230,7 @@
             // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
 
             html += `
-                <div class="stock-item" data-code="\${item.stockCode}">
+                <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
                         \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>

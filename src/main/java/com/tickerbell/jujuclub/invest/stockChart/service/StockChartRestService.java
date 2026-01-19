@@ -14,13 +14,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class StockChartRestService {
-    private final String ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjIxNTcxYTFlLTZjMTYtNDJkNi04OGRlLTdiNDdlNzM2MWU4ZSIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODYzMTM4MywiaWF0IjoxNzY4NTQ0OTgzLCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.jadPrlL5usfUuFQA0WKZ0DZ6785WKY5um8uHLxd_QCOl6f22fkvw-ryuFP_LWCAe1V-guiK3VTTyaweROMFPfQ";
+    private final String ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImQzNTUzYTRjLWI2NzYtNDdiMy04NDA3LWFjNTk2NjIxNjFjYiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODgxNDc1NCwiaWF0IjoxNzY4NzI4MzU0LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.RS5qZNfcTNduBiCDrLeY4ChWejx-Z-IbHg5VEDUtnWULQRsZ_cmmvCqlqBUOk4RcH83T70t_zVB9eLHPRYaIhw";
     private final String APPKEY = "PSEwye9EwwaHCT6TlEJBejuGmtuDmsZRLsTP";
     private final String APPSECRET = "1Zxqr/7cOzLRg7nEsU2BJM8rSekIxQPnvCcUcxoPVGexTHQyDSiMXaYlGmGAkJYi/s7bWUdWI9H4gETBWiNyl4j5gfuiz7NuVEKi6vTTNL3ptWfBXQFe5cesH35tmEnPuSKWZ8U8++HM0LF+GQxQ9nZtRWZX0MR1CDQuUStqIHd4ase/mhQ=";
     private final StockChartParser stockChartParser;
 
 
-    public List<StockChartRestDTO> getStockRestData() {
+    public List<StockChartRestDTO> getStockRestData(String periodCode) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price";
         HttpHeaders headers = new HttpHeaders();
@@ -32,9 +32,9 @@ public class StockChartRestService {
         headers.set("custtype", "P");
 
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpUrl(url)
-                .queryParam("FID_COND_MRKT_DIV_CODE", "UN")
+                .queryParam("FID_COND_MRKT_DIV_CODE", "J")
                 .queryParam("FID_INPUT_ISCD", "005930")
-                .queryParam("FID_PERIOD_DIV_CODE", "D")
+                .queryParam("FID_PERIOD_DIV_CODE", periodCode)
                 .queryParam("FID_ORG_ADJ_PRC", "0");
 
         HttpEntity<?> entity = new HttpEntity<>(headers);
@@ -44,6 +44,6 @@ public class StockChartRestService {
                 entity,
                 String.class
         );
-        return stockChartParser.parseStockRestData(response.getBody());
+        return stockChartParser.parseStockRestData(response.getBody(), periodCode);
     }
 }

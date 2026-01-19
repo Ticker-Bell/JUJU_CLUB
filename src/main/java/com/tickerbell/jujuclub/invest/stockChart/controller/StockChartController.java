@@ -12,6 +12,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
 
@@ -23,12 +25,14 @@ public class StockChartController {
     private final StockChartRestService stockChartRestService;
 
     @GetMapping("invest/investChart.do")
-//
-    public String stockChartPage(Model model) {
-        List<StockChartRestDTO> chartRestData = stockChartRestService.getStockRestData();
-        model.addAttribute("stockList", chartRestData);
-
+    public String stockChartPage() {
         return "invest/investChart";
+    }
+
+    @GetMapping("api/invest/chartData")
+    @ResponseBody
+    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode){
+        return stockChartRestService.getStockRestData(periodCode);
     }
 
     @MessageMapping("/invest/request/chartData")
@@ -43,7 +47,7 @@ public class StockChartController {
             }
         } else {
             String stockCode = (String) message.get("stockCode");
-            System.out.println("단일 용청 종목: " + stockCode);
+            System.out.println("단일 요청 종목: " + stockCode);
             stockChartService.connectToStockChartApi(stockCode);
         }
 

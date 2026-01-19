@@ -3,106 +3,140 @@
 <html>
 <head>
     <title>Stock Chart</title>
-</head>
-<body>
-<div style="width: 800px; height: 400px;">
-    <canvas id="myChart"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
-<script>
-    let myChart;
-    //차트
-    window.onload = function () {
-        function getGradient(ctx, chartArea) {
-            const chartWidth = chartArea.right - chartArea.left;
-            const chartHeight = chartArea.bottom - chartArea.top;
-
-            // 위(top)에서 아래(bottom)로 흐르는 그라데이션 생성
-            const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-
-            // 아래쪽 (10% 투명도)
-            gradient.addColorStop(0, 'rgba(191, 15, 6, 0.1)');
-            // 위쪽 (80% 투명도)
-            gradient.addColorStop(1, 'rgba(191, 15, 6, 0.8)');
-
-            return gradient;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <style>
+        .btn-active {
+            background-color: #bf0f06;
+            color: white;
+            border-color: #bf0f06;
+            font-weight: 700;
+        }
+        .period-btn {
+            background-color: white;
+            color: #4b5563; /* gray-600 */
+            border-color: #d1d5db; /* gray-300 */
+            font-weight: 500;
         }
 
-        //rest api
-        const chartData = [];
-        <c:forEach var = "stock" items="${stockList}">
-        chartData.push({
-            date: "${stock.displayDate}",
-            price: parseFloat("${stock.displayPrice}".replace(/,/g, ''))
-        });
-        </c:forEach>
+        .period-btn.btn-active {
+            background-color: #bf0f06;
+            color: white;
+            border-color: #bf0f06;
+            font-weight: 700;
+        }
 
-        const labels = chartData.map(item => item.date);
-        const prices = chartData.map(item => item.price);
+    </style>
 
-        prices.pop();
-        prices.push(null);
+</head>
+<body>
 
-        const ctx = document.getElementById('myChart');
-        if (ctx) {
-            // 차트를 변수에 할당하여 나중에 접근 가능하게 함
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels, // 실시간 데이터를 위해 빈 배열로 시작하거나 초기값 사용
-                    datasets: [{
-                        label: '주식 현재가',
-                        data: prices,
-                        fill: true,
-                        backgroundColor: function (context) {
+     <div class="p-6 border-bottom border-gray-100 stock-info-header">
+        <div class="flex items-baseline gap-4">
+            <h2 id="header-stock" class="text-gray-500 text-lg font-medium">0</h2>
+            <h2 id="header-price" class="text-3xl font-extrabold tracking-tight text-gray-900">0원</h2>
+            <div class="change-info">
+                <span id="header-change" class="text-lg font-semibold">0</span>
+            </div>
+        </div>
+    </div>
 
-                            const chart = context.chart;
+    <div id="button-group" class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
+        <button id="btn-D" onclick="loadChartData('D')"
+                class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+            일별
+        </button>
 
-                            const {ctx, chartArea} = chart;
+        <button id="btn-W" onclick="loadChartData('W')"
+                class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+            주별
+        </button>
+
+        <button id="btn-M" onclick="loadChartData('M')"
+                class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+            월별
+        </button>
+
+    </div>
+    <div class="p-4 h-[400px]">
+        <canvas id="myChart"></canvas>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/invest/stockLineChart.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
+
+<script>
+    let myChartInstance;
+    let currentPeriod = null;
 
 
-                            if (!chartArea) {
+    window.onload = function() {
+        loadChartData('D'); // 기본값 일별 데이터 로드
+        updateButtonUI('D');
+    };
 
-// 차트가 처음 렌더링될 때 chartArea가 없을 수 있음
+    function loadChartData(periodCode) {
+        currentPeriod = periodCode;
+        updateButtonUI(periodCode);
 
-                                return null;
+        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=` + periodCode;
 
-                            }
-
-                            return getGradient(ctx, chartArea);
-
-                        },
-                        borderColor: 'rgba(191, 15, 6, 0.8)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        x: {
-                            ticks: {
-                                y: {
-                                    beginAtZero: false // 주가는 0부터 시작하지 않는 게 보기 좋습니다
-                                }
-
-                            }
-                        }
-                    }
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const formattedData = data.map(item => ({
+                    date: item.displayDate,
+                    price: parseFloat(item.displayPrice.replace(/,/g, ''))
+                }));
+                if (myChartInstance) {
+                    myChartInstance.destroy();
                 }
-            });
-            initSocket(myChart);
+                myChartInstance = renderStockChart('myChart', formattedData, periodCode);
+
+                if(periodCode === 'D'){
+                    initSocket(myChartInstance, ["005930"]); //배열 형태의 stockCode가 들어가야함
+                }
+                updateButtonUI(periodCode);
+            })
+            .catch(error => console.error('Error fetching chart data:', error));
+    }
+
+    function updateButtonUI(periodCode) {
+        const buttons = document.querySelectorAll('.period-btn');
+
+        buttons.forEach(btn => btn.classList.remove('btn-active'));
+
+        const activeBtn = document.getElementById('btn-' + periodCode);
+        if (activeBtn) {
+            activeBtn.classList.add('btn-active');
         }
     }
 
-    //websocket api
-    function initSocket(targetChart) {
+
+    function updateHeaderInfo(stock) {
+        if(!stock) return;
+        const stockEl = document.getElementById('header-stock');
+        const priceEl = document.getElementById('header-price');
+        const changeEl = document.getElementById('header-change');
+
+        if (stock.stockCode) stockEl.innerText = stock.stockCode;
+        if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
+        if (stock.displayChange) changeEl.innerText = stock.displayChange;
+
+
+        const sign = stock.dayOverDaySign;
+        let color = "#666"; // 보합
+        if (sign === "1" || sign === "2") color = "#bf0f06"; // 빨강
+        if (sign === "4" || sign === "5") color = "#0051af"; // 파랑
+
+        changeEl.style.color = color;
+    }
+    function initSocket(targetChart,stockCodes) {
         StockSocket.connect(
             "${pageContext.request.contextPath}",
-            ["005930"],
+            stockCodes,
             function (stockData) {
                 const dataArray = targetChart.data.datasets[0].data;
                 const lastIdx = dataArray.length - 1;
@@ -110,6 +144,8 @@
                 dataArray[lastIdx] = stockData.currentPrice;
 
                 targetChart.update('none');
+
+                updateHeaderInfo(stockData);
             }
         );
     }

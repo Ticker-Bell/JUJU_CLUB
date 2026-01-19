@@ -43,7 +43,7 @@ public class StockChartParser {
         return stockChartDTOList;
     }
 
-    public List<StockChartRestDTO> parseStockRestData(String response) {
+    public List<StockChartRestDTO> parseStockRestData(String response, String periodCode) {
         List<StockChartRestDTO> stockChartRestList;
         try {
             String trimmedJson = response.trim();
@@ -57,13 +57,15 @@ public class StockChartParser {
 
             stockChartRestList = objectMapper.convertValue(
                     outputNode,
-                    new TypeReference<List<StockChartRestDTO>>() {
-                    }
+                    new TypeReference<List<StockChartRestDTO>>() { }
             );
+
             stockChartRestList.sort(Comparator.comparing(StockChartRestDTO::getTradeDate));
-            stockChartRestList.forEach(StockChartParser::applyRestFormatting);
+
+            stockChartRestList.forEach(dto -> applyRestFormatting(dto, periodCode));
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("차트 데이터 파싱 에러", e);
         }
         return stockChartRestList;
     }
@@ -78,10 +80,19 @@ public class StockChartParser {
     }
 
 
-    private static void applyRestFormatting(StockChartRestDTO stockChartRestDTO) {
-        //rest 데이터 포맷팅
+    private static void applyRestFormatting(StockChartRestDTO stockChartRestDTO, String periodCode) {
+        //rest data 포맷팅
         stockChartRestDTO.setDisplayPrice(StockChartFormatter.formatPrice(stockChartRestDTO.getCurrentPrice()));
-        stockChartRestDTO.setDisplayDate(StockChartFormatter.formatDate(stockChartRestDTO.getTradeDate()));
+
+        String rawDate = stockChartRestDTO.getTradeDate();
+
+        if ("M".equals(periodCode)) {
+            String yearMonth = rawDate.substring(0, 4) + "/" + rawDate.substring(4, 6);
+            stockChartRestDTO.setDisplayDate(yearMonth);
+        } else {
+            String monthDay = rawDate.substring(4, 6) + "/" + rawDate.substring(6, 8);
+            stockChartRestDTO.setDisplayDate(monthDay);
+        }
     }
 
 

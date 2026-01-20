@@ -37,32 +37,23 @@ public class StockChartController {
     @MessageMapping("/invest/request/chartData")
     public void handleStockRequest(@Payload Map<String, Object> message) {
         //messagingTemplate을 사용하여 주소를 동적으로 바꾸고, 서버 부하를 줄임
+
+        //모든 주식코드를 리스트 형식으로 받음
+        List<String> stockCodes = new ArrayList<>();
+
         Object codes = message.get("stockCodes");
         if (codes instanceof List) {
-            List<String> stockCodes = (List<String>) codes;
-            for (String code : stockCodes) {
-                System.out.println("다중 요청 종목: " + code);
-                stockChartService.connectToStockChartApi(code);
-
-                Map<String, Object> initialResponse = new HashMap<>();
-                initialResponse.put("stockCode", code);
-                initialResponse.put("status", "CONNECTED");
-                initialResponse.put("message", "데이터 로드 시작");
-
-                messagingTemplate.convertAndSend("/topic/stock/" + code, initialResponse); //
-            }
-        } else {
-            String stockCode = (String) message.get("stockCode");
-            System.out.println("단일 요청 종목: " + stockCode);
-            stockChartService.connectToStockChartApi(stockCode);
-
-            Map<String, Object> initialResponse = new HashMap<>();
-            initialResponse.put("stockCode", stockCode);
-            initialResponse.put("status", "CONNECTED");
-            initialResponse.put("message", "단일 데이터 로드 시작");
-
-            messagingTemplate.convertAndSend("/topic/stock/" + stockCode, initialResponse);
+            stockCodes = (List<String>) codes;
+        } else if (codes instanceof String) {
+            stockCodes.add((String) codes);
         }
+        if (!stockCodes.isEmpty()) {
+            stockChartService.connectToStockChartApi(stockCodes);
 
+            for (String stockCode : stockCodes) {
+                messagingTemplate.convertAndSend("/topic/stock/" + stockCode,
+                        Map.of("stockCode", stockCode, "status", "Init", "message", "데이터 로드 시작"));
+            }
+        }
     }
 }

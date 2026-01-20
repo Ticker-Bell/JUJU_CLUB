@@ -43,13 +43,25 @@ public class StockChartController {
             for (String code : stockCodes) {
                 System.out.println("다중 요청 종목: " + code);
                 stockChartService.connectToStockChartApi(code);
-                messagingTemplate.convertAndSend("/topic/stock/" + code, "데이터 로드 시작: " + code); //
+
+                Map<String, Object> initialResponse = new HashMap<>();
+                initialResponse.put("stockCode", code);
+                initialResponse.put("status", "CONNECTED");
+                initialResponse.put("message", "데이터 로드 시작");
+
+                messagingTemplate.convertAndSend("/topic/stock/" + code, initialResponse); //
             }
         } else {
             String stockCode = (String) message.get("stockCode");
             System.out.println("단일 요청 종목: " + stockCode);
             stockChartService.connectToStockChartApi(stockCode);
-            messagingTemplate.convertAndSend("/topic/stock/" + stockCode, "단일 데이터 로드 시작: " + stockCode);
+
+            Map<String, Object> initialResponse = new HashMap<>();
+            initialResponse.put("stockCode", stockCode);
+            initialResponse.put("status", "CONNECTED");
+            initialResponse.put("message", "단일 데이터 로드 시작");
+
+            messagingTemplate.convertAndSend("/topic/stock/" + stockCode, initialResponse);
         }
 
     }

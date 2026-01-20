@@ -27,7 +27,7 @@
 
     <update id = "updatePortfolioItem" parameterType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
         update mock_portfolio
-        set quantity = #{quentity},
+        set quantity = #{quantity},
             avg_price = #{avg_price},
             updated_at = now()
         where portfolio_seq = #{portfolio_seq}

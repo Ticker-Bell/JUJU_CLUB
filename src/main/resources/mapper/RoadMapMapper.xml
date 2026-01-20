@@ -63,7 +63,7 @@
                lv.level_seq AS levelId,
                ch.chapter_id AS chapterId,
                us.lesson_id as lessonId,
-               us.user_seq as userId,
+               us.user_seq as userSeq,
                us.started_at as startDate,
                us.finished_at as endDate
         from user_question_result AS us
@@ -102,4 +102,12 @@
              WHERE DATE_FORMAT(created_at, '%Y-%m-%d') = CURDATE())  AS watchList
         FROM DUAL
     </select>
+    <select id="currentLssn" resultType="com.tickerbell.jujuclub.roadMap.dto.RoadMapLessonDTO">
+--             select ch.chapter_id AS chapterId,
+--                    ls.lesson_id AS lessonId,
+--                    ls.lesson_name AS lessonName,
+--                    ls.lesson_type AS lessonType
+--             from learning_lesson where lesson_id = #{lesson_id}
+    </select>
+
 </mapper>

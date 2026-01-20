@@ -29,14 +29,18 @@ public class RoadMapService {
         return roadMapMapper.lessonList(chapterId);
     }
 
-    // userid에 따라 현재까지 진행한 레슨 전부 조회
-    public List<UserLessonDTO> userLessonList(Integer userId) {
-        return roadMapMapper.userLessonList(userId);
+    // user seq에 따라 현재까지 진행한 레슨 전부 조회
+    public List<UserLessonDTO> userLessonList(Integer userSeq) {
+        return roadMapMapper.userLessonList(userSeq);
     }
 
     // 레벨/챕터에 해당하는 레슨 데이터 모두 조회
     public List<LevelChapterLessonDTO> levelChptSelectAllList(Integer levelId, String chapterId) {
         return roadMapMapper.levelChptSelectAllList(levelId, chapterId);
+    }
+
+    // 현재 레슨 id 넘기기
+    public RoadMapLessonDTO currentLssn(String lessonId) { return roadMapMapper.currentLssn(lessonId);
     }
 
     // level id or chapter id로 조회시, 레벨/챕터에 해당하는 레슨 데이터 보여줘야함
@@ -67,4 +71,6 @@ public class RoadMapService {
         }
         return list;
     }
+
+
 }

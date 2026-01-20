@@ -1,3 +1,8 @@
+/* underline toggle */
+.rank-tab-btn{position:relative;padding-bottom:10px;font-weight:900;font-size:13px;color:#9CA3AF;}
+.rank-tab-btn.active{color:#111827;}
+
+#rank-tab-slider{height:2px;background:#5E45EB;bottom:0;position:absolute;transition:all .25s ease;}
 /* ===== Scroll-driven vars ===== */
 #rankScroll {
   --trophyBoost: 1; /* 트로피 확대 */
@@ -268,17 +273,3 @@
   will-change: opacity, transform, filter;
 }
 
-/* scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #E5E7EB;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #D1D5DB;
-}

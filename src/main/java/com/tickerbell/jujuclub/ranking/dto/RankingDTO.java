@@ -22,6 +22,7 @@ public class RankingDTO {
     private int userRevenueRank;
     private int totalAsset;
     private double totalRevenueRate;
+    private int totUserCnt;
     List<RankingListOBA> RankingBorardListOBA;
     List<RankingListOBR> RankingBorardListOBR;
   }

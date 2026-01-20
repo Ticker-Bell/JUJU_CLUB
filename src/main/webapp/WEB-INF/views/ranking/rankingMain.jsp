@@ -1,15 +1,34 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>JUJU CLUB - Ranking</title>
+
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
+<%--css 삭제 x--%>
+<style>
+  /* underline toggle */
+  .rank-tab-btn{position:relative;padding-bottom:10px;font-weight:900;font-size:13px;color:#9CA3AF;}
+  .rank-tab-btn.active{color:#111827;}
+
+  #rank-tab-slider{height:2px;background:#5E45EB;bottom:0;position:absolute;transition:all .25s ease;}
+
+</style>
+
+<c:set var="topAsset" value="${rankingInfo.rankingBorardListOBA}"/>
+<c:set var="gold" value="${topAsset[0]}"/>
+<c:set var="silver" value="${topAsset[1]}"/>
+<c:set var="bronze" value="${topAsset[2]}"/>
 
 <script>
   tailwind.config = {
@@ -22,11 +41,11 @@
   }
 </script>
 
+<!-- 스크롤영영 -->
+<div id="rankScroll"
+     class="flex-1 min-h-0 overflow-y-auto pr-2 max-w-[1800px] mx-auto w-full">
 
-<!-- ✅ 스크롤은 여기서만 발생하도록(동작 보장) -->
-<div id="rankScroll" class="flex-1 min-h-0 overflow-y-auto pr-2 max-w-[1800px] mx-auto w-full">
-
-    <!-- TOP: trophies -->
+    <!-- 상단 트로피 -->
     <section class="trophy-stage shrink-0">
         <div class="relative">
             <span class="spark s1"></span>
@@ -39,7 +58,9 @@
                     <div class="icon">
                         <i data-lucide="trophy" class="w-full h-auto"></i>
                     </div>
-                    <div class="mt-3 text-[12px] font-extrabold text-gray-700">은메달러</div>
+                    <div class="mt-3 text-[12px] font-extrabold text-gray-700">
+                        ${silver.userName}
+                    </div>
                 </div>
 
                 <!-- Gold -->
@@ -47,7 +68,9 @@
                     <div class="icon">
                         <i data-lucide="trophy" class="w-full h-auto"></i>
                     </div>
-                    <div class="mt-3 text-[12px] font-extrabold text-gray-900">황금손</div>
+                    <div class="mt-3 text-[12px] font-extrabold text-gray-900">
+                        ${gold.userName}
+                    </div>
                 </div>
 
                 <!-- Bronze -->
@@ -55,27 +78,37 @@
                     <div class="icon">
                         <i data-lucide="trophy" class="w-full h-auto"></i>
                     </div>
-                    <div class="mt-3 text-[12px] font-extrabold text-gray-800">동메달각</div>
+                    <div class="mt-3 text-[12px] font-extrabold text-gray-800">
+                        ${bronze.userName}
+                    </div>
                 </div>
             </div>
 
-            <!-- ✅ 포트폴리오는 처음엔 숨김 → 스크롤 시 펼쳐짐 -->
+            <!-- 포트폴리오는 처음엔 숨김 → 스크롤 시 펼쳐짐 -->
             <div class="portfolio-wrap mt-2">
                 <div class="portfolio-grid">
                     <!-- #2 -->
                     <div class="winner-card">
                         <div class="top">
-                            <div class="text-[11px] font-extrabold text-gray-900">은메달러 포트폴리오</div>
+                            <div class="text-[11px] font-extrabold text-gray-900">
+                                ${rankingInfo.rankingBorardListOBR[1].userName}님의 포트폴리오
+                            </div>
                             <span class="text-[10px] font-extrabold text-gray-500">#2</span>
                         </div>
                         <div class="grid">
                             <div class="kv">
                                 <div class="k">누적수익률</div>
-                                <div class="v num-font text-red-500">+28.1%</div>
+                                <div class="v num-font text-red-500">
+                                    +<fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[1].totalRevenueRate}"/>%
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">총자산</div>
-                                <div class="v num-font">₩ 54,200,000</div>
+                                <div class="v num-font">
+                                    ₩ <fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[1].totalAsset}"/>
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">대표보유</div>
@@ -83,7 +116,9 @@
                             </div>
                             <div class="kv">
                                 <div class="k">이메일</div>
-                                <div class="v small">silver***@mail.com</div>
+                                <div class="v small">
+                                    ${rankingInfo.rankingBorardListOBR[1].userId}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -91,17 +126,25 @@
                     <!-- #1 -->
                     <div class="winner-card">
                         <div class="top">
-                            <div class="text-[11px] font-extrabold text-gray-900">황금손 포트폴리오</div>
+                            <div class="text-[11px] font-extrabold text-gray-900">
+                                ${rankingInfo.rankingBorardListOBR[0].userName}님의 포트폴리오
+                            </div>
                             <span class="text-[10px] font-extrabold text-yellow-700">#1</span>
                         </div>
                         <div class="grid">
                             <div class="kv">
                                 <div class="k">누적수익률</div>
-                                <div class="v num-font text-red-600">+35.7%</div>
+                                <div class="v num-font text-red-600">
+                                    +<fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[0].totalRevenueRate}"/>%
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">총자산</div>
-                                <div class="v num-font">₩ 98,400,000</div>
+                                <div class="v num-font">
+                                    ₩ <fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[0].totalAsset}"/>
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">대표보유</div>
@@ -109,7 +152,9 @@
                             </div>
                             <div class="kv">
                                 <div class="k">이메일</div>
-                                <div class="v small">gold***@mail.com</div>
+                                <div class="v small">
+                                    ${rankingInfo.rankingBorardListOBR[0].userId}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -117,17 +162,25 @@
                     <!-- #3 -->
                     <div class="winner-card">
                         <div class="top">
-                            <div class="text-[11px] font-extrabold text-gray-900">동메달각 포트폴리오</div>
+                            <div class="text-[11px] font-extrabold text-gray-900">
+                                ${rankingInfo.rankingBorardListOBR[2].userName}님의 포트폴리오
+                            </div>
                             <span class="text-[10px] font-extrabold text-orange-700">#3</span>
                         </div>
                         <div class="grid">
                             <div class="kv">
                                 <div class="k">누적수익률</div>
-                                <div class="v num-font text-red-500">+21.3%</div>
+                                <div class="v num-font text-red-500">
+                                    +<fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[2].totalRevenueRate}"/>%
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">총자산</div>
-                                <div class="v num-font">₩ 41,800,000</div>
+                                <div class="v num-font">
+                                    ₩ <fmt:formatNumber
+                                        value="${rankingInfo.rankingBorardListOBR[2].totalAsset}"/>
+                                </div>
                             </div>
                             <div class="kv">
                                 <div class="k">대표보유</div>
@@ -135,7 +188,9 @@
                             </div>
                             <div class="kv">
                                 <div class="k">이메일</div>
-                                <div class="v small">bron***@mail.com</div>
+                                <div class="v small">
+                                    ${rankingInfo.rankingBorardListOBR[2].userId}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -156,36 +211,49 @@
                         <span class="w-2 h-2 rounded-full bg-primary"></span> 나의 랭킹
                     </div>
                     <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-4xl font-extrabold text-gray-900 num-font"># 47</span>
-                        <span class="text-sm font-extrabold text-gray-400">/ 12,384명</span>
+                        <span id="my-rank-number" class="text-4xl font-extrabold num-font">
+                            # ${rankingInfo.userAssetRank}
+                        </span>
+
+                        <span class="text-sm font-extrabold text-gray-400">
+                            / <fmt:formatNumber value="${rankingInfo.totUserCnt}"/>
+                        </span>
+                        <span class="font-semibold text-gray-400 ">
+                            명
+                        </span>
                     </div>
                 </div>
-                <span class="text-[10px] font-extrabold text-primary bg-primary/10 border border-primary/20 px-2 py-1 rounded-full">
-                고급
-              </span>
             </div>
 
             <div class="mt-6 grid grid-cols-2 gap-3">
                 <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <div class="text-[10px] font-extrabold text-gray-400">누적수익률</div>
-                    <div class="mt-1 text-xl font-extrabold num-font text-red-500">+13.2%</div>
+                    <div class="mt-1 text-xl font-extrabold num-font text-red-500">
+                        +${rankingInfo.totalRevenueRate}%
+                    </div>
+
                 </div>
                 <div class="p-4 rounded-xl bg-gray-50 border border-gray-100">
                     <div class="text-[10px] font-extrabold text-gray-400">누적수익금</div>
-                    <div class="mt-1 text-xl font-extrabold num-font text-gray-900">₩ 1,450,000
+                    <div class="mt-1 text-2xl font-extrabold num-font text-primary">
+                        ₩ <fmt:formatNumber value="${rankingInfo.totalAsset}"/>
                     </div>
+
                 </div>
                 <div class="p-4 rounded-xl bg-gray-50 border border-gray-100 col-span-2">
                     <div class="text-[10px] font-extrabold text-gray-400">총 보유자금</div>
-                    <div class="mt-1 text-2xl font-extrabold num-font text-primary">₩ 12,450,000
+                    <div class="mt-1 text-2xl font-extrabold num-font text-primary">
+                        ₩ <fmt:formatNumber value="${rankingInfo.totalAsset}"/>
                     </div>
-                    <div class="mt-2 text-[10px] font-bold text-gray-400">* 시즌 종료 시 보상(뱃지/포인트) 지급
+                    <div class="mt-2 text-[10px] font-bold text-gray-400">* 시즌 종료 시
+                        보상(뱃지/포인트)
+                        지급
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- User Ranking List -->
+        <!-- 랭킹 보드  -->
         <section class="col-span-12 lg:col-span-8 web-card flex flex-col overflow-hidden">
             <div class="p-5 border-b border-gray-100 bg-gray-50/30">
                 <div class="flex items-end justify-between gap-4 flex-wrap">
@@ -201,7 +269,8 @@
                             <button id="rank-tab-0" class="rank-tab-btn active"
                                     onclick="switchRankTab(0)">누적수익률
                             </button>
-                            <button id="rank-tab-1" class="rank-tab-btn" onclick="switchRankTab(1)">
+                            <button id="rank-tab-1" class="rank-tab-btn"
+                                    onclick="switchRankTab(1)">
                                 총 보유자금
                             </button>
                         </div>
@@ -210,7 +279,7 @@
                 </div>
             </div>
 
-            <!-- Profit Table -->
+            <!-- 누적 수익률 탭 -->
             <div id="table-profit" class="flex-1 overflow-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-white text-[11px] font-extrabold text-gray-400 sticky top-0">
@@ -220,51 +289,33 @@
                         <th class="p-4 border-b border-gray-100 text-right pr-6">누적수익률</th>
                     </tr>
                     </thead>
-                    <tbody class="text-sm font-bold text-gray-700">
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">1</td>
-                        <td class="p-4 font-extrabold text-gray-900">황금손</td>
-                        <td class="p-4 text-right pr-6 num-font text-red-600">+35.7%</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">2</td>
-                        <td class="p-4 font-extrabold text-gray-900">은메달러</td>
-                        <td class="p-4 text-right pr-6 num-font text-red-500">+28.1%</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">3</td>
-                        <td class="p-4 font-extrabold text-gray-900">동메달각</td>
-                        <td class="p-4 text-right pr-6 num-font text-red-500">+21.3%</td>
-                    </tr>
-
-                    <tr class="bg-primary/5 border-b border-primary/10">
-                        <td class="p-4 pl-6 num-font text-primary font-extrabold">47</td>
-                        <td class="p-4">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-primary">김주린 (나)</span>
-                                <span class="text-[10px] font-extrabold text-primary bg-white border border-primary/20 px-2 py-0.5 rounded">ME</span>
-                            </div>
-                        </td>
-                        <td class="p-4 text-right pr-6 num-font text-red-500 font-extrabold">
-                            +13.2%
-                        </td>
-                    </tr>
-
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">48</td>
-                        <td class="p-4 font-extrabold text-gray-900">주식고수</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-700">+13.1%</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="p-4 pl-6 num-font text-gray-900">49</td>
-                        <td class="p-4 font-extrabold text-gray-900">장기투자러</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-700">+13.0%</td>
-                    </tr>
+                    <tbody>
+                    <c:forEach var="row" items="${rankingInfo.rankingBorardListOBR}">
+                        <tr class="${row.userSeq == rankingInfo.userSeq ? 'bg-primary/5 border-primary/10' : 'hover:bg-gray-50'}">
+                            <td class="p-4 pl-6 num-font">
+                                    ${row.userRevenueRank}
+                            </td>
+                            <td class="p-4 font-extrabold">
+                                <c:choose>
+                                    <c:when test="${row.userSeq == rankingInfo.userSeq}">
+                                        <span class="text-primary">${row.userName} (나)</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${row.userName}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="p-4 text-right pr-6 num-font">
+                                +${row.totalRevenueRate}%
+                            </td>
+                        </tr>
+                    </c:forEach>
                     </tbody>
+
                 </table>
             </div>
 
-            <!-- Asset Table -->
+            <!-- 총 보유 자금 탭 -->
             <div id="table-asset" class="hidden flex-1 overflow-auto">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-white text-[11px] font-extrabold text-gray-400 sticky top-0">
@@ -274,41 +325,27 @@
                         <th class="p-4 border-b border-gray-100 text-right pr-6">총 보유자금</th>
                     </tr>
                     </thead>
-                    <tbody class="text-sm font-bold text-gray-700">
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">1</td>
-                        <td class="p-4 font-extrabold text-gray-900">현금왕</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-900">₩ 98,400,000</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">2</td>
-                        <td class="p-4 font-extrabold text-gray-900">자산불리기</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-900">₩ 76,120,000</td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 transition-colors border-b border-gray-50">
-                        <td class="p-4 pl-6 num-font text-gray-900">3</td>
-                        <td class="p-4 font-extrabold text-gray-900">큰손</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-900">₩ 61,030,000</td>
-                    </tr>
-
-                    <tr class="bg-primary/5 border-b border-primary/10">
-                        <td class="p-4 pl-6 num-font text-primary font-extrabold">47</td>
-                        <td class="p-4">
-                            <div class="flex items-center justify-between">
-                                <span class="font-extrabold text-primary">김주린 (나)</span>
-                                <span class="text-[10px] font-extrabold text-primary bg-white border border-primary/20 px-2 py-0.5 rounded">ME</span>
-                            </div>
-                        </td>
-                        <td class="p-4 text-right pr-6 num-font text-primary font-extrabold">₩
-                            12,450,000
-                        </td>
-                    </tr>
-
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="p-4 pl-6 num-font text-gray-900">48</td>
-                        <td class="p-4 font-extrabold text-gray-900">주식고수</td>
-                        <td class="p-4 text-right pr-6 num-font text-gray-900">₩ 12,200,000</td>
-                    </tr>
+                    <tbody>
+                    <c:forEach var="row" items="${rankingInfo.rankingBorardListOBA}">
+                        <tr class="${row.userSeq == rankingInfo.userSeq ? 'bg-primary/5 border-primary/10' : 'hover:bg-gray-50'}">
+                            <td class="p-4 pl-6 num-font">
+                                    ${row.userAssetRank}
+                            </td>
+                            <td class="p-4 font-extrabold">
+                                <c:choose>
+                                    <c:when test="${row.userSeq == rankingInfo.userSeq}">
+                                        <span class="text-primary">${row.userName} (나)</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${row.userName}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td class="p-4 text-right pr-6 num-font">
+                                ₩ <fmt:formatNumber value="${row.totalAsset}"/>
+                            </td>
+                        </tr>
+                    </c:forEach>
                     </tbody>
                 </table>
             </div>
@@ -319,9 +356,40 @@
 </div>
 <!-- /rankScroll -->
 
+
 <script>
   (function () {
     lucide.createIcons();
+    window.RANKING_DATA = {
+      profit: {
+        myRank: ${rankingInfo.userRevenueRank},
+        list: [
+          <c:forEach var="r" items="${rankingInfo.rankingBorardListOBR}" varStatus="s">
+          {
+            userSeq: ${r.userSeq},
+            userName: "${r.userName}",
+            rank: ${r.userRevenueRank},
+            totalRevenueRate: ${r.totalRevenueRate},
+            totalAsset: ${r.totalAsset}
+          }${!s.last ? ',' : ''}
+          </c:forEach>
+        ]
+      },
+      asset: {
+        myRank: ${rankingInfo.userAssetRank},
+        list: [
+          <c:forEach var="r" items="${rankingInfo.rankingBorardListOBA}" varStatus="s">
+          {
+            userSeq: ${r.userSeq},
+            userName: "${r.userName}",
+            rank: ${r.userAssetRank},
+            totalRevenueRate: ${r.totalRevenueRate},
+            totalAsset: ${r.totalAsset}
+          }${!s.last ? ',' : ''}
+          </c:forEach>
+        ]
+      }
+    };
 
     function positionRankSlider() {
       const slider = document.getElementById('rank-tab-slider');
@@ -333,12 +401,15 @@
       slider.style.left = activeBtn.offsetLeft + 'px';
     }
 
-    function switchRankTab(idx) {
+    window.switchRankTab = function (idx) {
       const a = document.getElementById('rank-tab-0');
       const b = document.getElementById('rank-tab-1');
       const tProfit = document.getElementById('table-profit');
       const tAsset = document.getElementById('table-asset');
 
+      const type = (idx === 0) ? 'profit' : 'asset';
+
+      // 탭 UI
       if (idx === 0) {
         a.classList.add('active');
         b.classList.remove('active');
@@ -350,7 +421,53 @@
         tAsset.classList.remove('hidden');
         tProfit.classList.add('hidden');
       }
+
+      // 🔥 나의 랭킹 변경
+      document.getElementById('my-rank-number').innerText =
+          '# ' + window.RANKING_DATA[type].myRank;
+
+      // 🔥 트로피 + 포트폴리오 변경
+      updateTop3(type);
+
       positionRankSlider();
+    }
+
+    function updateTop3(type) {
+      const list = window.RANKING_DATA[type].list;
+      if (!list || list.length < 3) return;
+
+      const gold = list[0];
+      const silver = list[1];
+      const bronze = list[2];
+
+      const goldEl = document.querySelector('.trophy.gold .mt-3');
+      const silverEl = document.querySelector('.trophy.silver .mt-3');
+      const bronzeEl = document.querySelector('.trophy.bronze .mt-3');
+
+      if (goldEl) goldEl.innerText = gold.userName;
+      if (silverEl) silverEl.innerText = silver.userName;
+      if (bronzeEl) bronzeEl.innerText = bronze.userName;
+
+      // 포트폴리오 카드
+      const cards = document.querySelectorAll('.winner-card');
+
+      [silver, gold, bronze].forEach((u, i) => {
+        const card = cards[i];
+        if (!card) return;
+
+        card.querySelector('.top div').innerText =
+            `${u.userName}님의 포트폴리오`;
+
+        const values = card.querySelectorAll('.kv .v');
+
+        if (type === 'profit') {
+          values[0].innerText = `+${u.totalRevenueRate}%`;
+          values[1].innerText = `₩ ${u.totalAsset.toLocaleString()}`;
+        } else {
+          values[0].innerText = `₩ ${u.totalAsset.toLocaleString()}`;
+          values[1].innerText = `+${u.totalRevenueRate}%`;
+        }
+      });
     }
 
     function clamp(n, min, max) {

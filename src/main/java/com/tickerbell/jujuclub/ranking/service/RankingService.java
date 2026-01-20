@@ -21,18 +21,23 @@ public class RankingService {
 
     RankingDTO.RankingResponse response = RankingResponse.builder().build();
 
+    int totUserCnt = rankingMapper.getTotalUserCount();
+
     RankingDTO.RankingResponse rankingResponse = rankingMapper.getUserRankingInfo(userSeq);
     // 총 자산 기준 정렬
     List<RankingListOBA> rankingListOBA = rankingMapper.getRankingBoardListOBA();
     // 누적 수익률 정렬
     List<RankingListOBR> rankingListOBR = rankingMapper.getRankingBoardListOBR();
 
-
     response.setUserSeq(rankingResponse.getUserSeq());
     response.setUserId(rankingResponse.getUserId());
     response.setUserName(rankingResponse.getUserName());
+    response.setUserAssetRank(rankingResponse.getUserAssetRank());
+    response.setUserRevenueRank(rankingResponse.getUserRevenueRank());
     response.setTotalAsset(rankingResponse.getTotalAsset());
-    response.setTotalRevenueRate(response.getTotalRevenueRate());
+    response.setTotalRevenueRate(rankingResponse.getTotalRevenueRate());
+    response.setTotUserCnt(totUserCnt);
+
     response.setRankingBorardListOBA(rankingListOBA);
     response.setRankingBorardListOBR(rankingListOBR);
 

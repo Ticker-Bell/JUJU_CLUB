@@ -161,7 +161,7 @@ CREATE TABLE `LEARNING_QUESTION`
     `question_id`   VARCHAR(50)  NOT NULL,
     `question_type` VARCHAR(20)  NOT NULL COMMENT '개념형,선택형,드래그형,설명형,실습형',
     `question_text` TEXT         NULL,
-    `options_json`  JSON         NOT NULL COMMENT '문항 유형에 따른 JSON DATA',
+    `options`  JSON         NOT NULL COMMENT '문항 유형에 따른 JSON DATA',
     `answer`        JSON         NULL COMMENT '정답 JSON + 해설 포함',
     `image`         TEXT         NULL COMMENT '실습용 이미지',
     PRIMARY KEY (`question_seq`),

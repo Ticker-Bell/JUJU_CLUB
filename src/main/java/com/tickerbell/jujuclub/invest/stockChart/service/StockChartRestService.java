@@ -20,7 +20,7 @@ public class StockChartRestService {
     private final StockChartParser stockChartParser;
 
 
-    public List<StockChartRestDTO> getStockRestData(String periodCode) {
+    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price";
         HttpHeaders headers = new HttpHeaders();
@@ -33,7 +33,7 @@ public class StockChartRestService {
 
         UriComponentsBuilder urlBuilder = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("FID_COND_MRKT_DIV_CODE", "J")
-                .queryParam("FID_INPUT_ISCD", "005930")
+                .queryParam("FID_INPUT_ISCD", stockCode)
                 .queryParam("FID_PERIOD_DIV_CODE", periodCode)
                 .queryParam("FID_ORG_ADJ_PRC", "0");
 

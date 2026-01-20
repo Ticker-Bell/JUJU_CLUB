@@ -10,6 +10,33 @@ import org.apache.ibatis.type.Alias;
 
 public class LessonDTO {
 
+
+  @Alias("LessonRequest")
+  @Builder
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class LessonRequest{
+
+    private String userSeq;
+    private String lessonId;
+
+  }
+
+  @Alias("LessonResponse")
+  @Builder
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class LessonResponse{
+
+    private int resultSeq;
+    private String userSeq;
+    private String lessonId;
+    private String startedAt;
+    private String finishedAt;
+
+  }
   @Alias("LessonTitle")
   @Builder
   @Data

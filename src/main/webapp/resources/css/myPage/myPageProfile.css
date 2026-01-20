@@ -1,0 +1,197 @@
+/* [기본 설정: Pure White Theme] */
+
+
+/* [플로팅 UI 카드] */
+.profile-card {
+    width: 100%;
+    max-width: 480px; /* 적당한 카드 폭 */
+    background: #ffffff;
+    border-radius: 24px;
+    /* 카드가 떠 보이는 핵심 그림자 */
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #F1F5F9; /* 아주 연한 테두리 */
+    padding: 40px;
+    position: relative;
+    z-index: 10;
+}
+
+/* [헤더 영역] */
+.card-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5E45EB 0%, #8B5CF6 100%); /* 포인트 그라데이션 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(94, 69, 235, 0.25);
+}
+
+.user-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: #F5F3FF; /* 연한 보라색 배경 */
+    color: #5E45EB; /* 포인트 컬러 텍스트 */
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+/* [입력 필드 스타일] */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.input-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-field {
+    width: 100%;
+    background-color: #F8FAFC; /* 입력 전: 연한 회색 */
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 16px 16px 16px 46px; /* 아이콘 공간 */
+    font-size: 15px;
+    font-weight: 600;
+    color: #1E293B;
+    transition: all 0.2s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* 포커스 시: 흰색 배경 + 포인트 테두리 + 그림자 */
+.input-field:focus {
+    background-color: #ffffff;
+    border-color: #5E45EB;
+    box-shadow: 0 0 0 4px rgba(94, 69, 235, 0.1);
+}
+
+/* 읽기 전용 필드 */
+.input-field[readonly] {
+    background-color: #F1F5F9;
+    color: #94A3B8;
+    cursor: default;
+    border-color: transparent;
+}
+
+/* [아이콘] */
+.field-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: #94A3B8;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.input-field:focus ~ .field-icon {
+    color: #5E45EB; /* 포커스 시 아이콘도 포인트 컬러로 */
+}
+
+/* [메인 버튼] */
+.btn-primary {
+    width: 100%;
+    padding: 18px;
+    background-color: #5E45EB; /* 포인트 컬러 */
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(94, 69, 235, 0.2);
+    margin-top: 12px;
+}
+
+.btn-primary:hover {
+    background-color: #4F46E5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(94, 69, 235, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* [위험 구역 - 탈퇴] */
+.danger-zone {
+    margin-top: 40px;
+    border-top: 1px solid #F1F5F9;
+    padding-top: 24px;
+}
+
+.danger-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #EF4444; /* Red */
+    cursor: pointer;
+    list-style: none;
+    transition: opacity 0.2s;
+}
+.danger-trigger:hover { opacity: 0.8; }
+
+.danger-content {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: #FEF2F2;
+    border-radius: 12px;
+    border: 1px solid #FEE2E2;
+}
+
+.btn-danger {
+    background-color: #EF4444;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-danger:hover { background-color: #DC2626; }
+
+/* [뒤로가기 링크] */
+.back-link {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748B;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.back-link:hover { color: #5E45EB; }

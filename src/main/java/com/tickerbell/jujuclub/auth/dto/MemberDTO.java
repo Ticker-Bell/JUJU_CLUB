@@ -11,11 +11,11 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountDTO {
-    private Long accountSeq;
+public class MemberDTO {
     private Long userSeq;
-    private String accountNo;
-    private Long cashBalance;
+    private String userId;
+    private String userPw;
+    private String userName;
     private Date createdAt;
-    private Date updatedAt;
+    private Integer userLevel;
 }

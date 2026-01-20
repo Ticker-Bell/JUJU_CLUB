@@ -3,12 +3,30 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tickerbell.jujuclub.lesson.mapper.LessonMapper">
 
+  <insert id="insertLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    INSERT INTO USER_QUESTION_RESULT
+        (USER_SEQ
+        ,LESSON_ID
+    )
+    VALUES(
+           #{userSeq}
+          ,#{lessonId}
+          )
+  </insert>
+
+  <update id="updateLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_QUESTION_RESULT
+    SET FINISHED_AT =CURRENT_TIMESTAMP
+    WHERE USER_SEQ = #{userSeq}
+    AND LESSON_ID = #{lessonId}
+  </update>
+
   <select id="selectQstChat" parameterType="String"
     resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
     SELECT OPTIONS
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND question_id = 'Q001'
+    AND question_id = 'LV1_CH001_LSN001_Q001'
   </select>
 
   <select id="selectLssnTitle" parameterType="String"
@@ -24,15 +42,34 @@
 
   <select id="selectQSt" parameterType="String"
     resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
-    select question_type
-         ,question_text
-         , options
-         , answer
-    from learning_question
-    where lesson_id = #{lessonId}
-    and question_id !='Q001'
+    SELECT QUESTION_TYPE
+         ,QUESTION_TEXT
+         , OPTIONS
+         , ANSWER
+    FROM LEARNING_QUESTION
+    WHERE LESSON_ID = #{lessonId}
+    AND QUESTION_ID !='LV1_CH001_LSN001_Q001'
   </select>
 
+  <select id="countUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+          resultType="int">
+    SELECT COUNT(LESSON_ID)
+    FROM USER_QUESTION_RESULT
+    WHERE USER_SEQ = #{userSeq}
+    AND LESSON_ID = #{lessonId}
+  </select>
+
+  <select id="selectUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+          resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonResponse">
+    SELECT RESULT_SEQ
+         , USER_SEQ
+         , LESSON_ID
+         , STARTED_AT
+         , FINISHED_AT
+    FROM USER_QUESTION_RESULT
+    WHERE USER_SEQ = #{userSeq}
+      AND LESSON_ID = #{lessonId}
+  </select>
 
 
 </mapper>

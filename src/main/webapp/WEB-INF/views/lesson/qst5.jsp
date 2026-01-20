@@ -271,8 +271,14 @@
           colors: ['#10B981', '#34D399', '#6EE7B7']
         });
 
-        btn.onclick = () => {
-          window.location.href = 'roadmap.html';
+        btn.onclick = function () {
+          htmx.ajax('POST', '${cpath}/lesson/updateLssnInfo', {
+            target: '#main',
+            values: {
+              usrSeq: 1,
+              lessonId: 'LV1_CH001_LSN001',
+            }
+          });
         };
 
       } else {

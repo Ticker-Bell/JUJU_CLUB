@@ -25,6 +25,26 @@
 	<!-- properties 파일 읽기용도 추가  -->
 <!--	<context:property-placeholder location="classpath:kis.properties"/>-->
 
+	<!--properties 파일 읽기용도 추가 -->
+<!--	<context:property-placeholder location="classpath:kis.properties"/>-->
+
+    <!-- 한투API를 사용하기 위한 restTemplate -->
+    <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <beans:property name="messageConverters">
+            <beans:list>
+                <beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+                <beans:bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                    <beans:property name="supportedMediaTypes">
+                        <beans:list>
+                            <beans:value>text/html;charset=UTF-8</beans:value>
+                            <beans:value>application/json;charset=UTF-8</beans:value>
+                        </beans:list>
+                    </beans:property>
+                </beans:bean>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
+
 	<!-- HtmxHandler -->
 	<interceptors>
 		<interceptor>

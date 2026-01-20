@@ -32,65 +32,83 @@ public class KISApiService {
         if (accessToken != null && System.currentTimeMillis() < tokenExpireTime - 60000) {
             return accessToken;
         }
-        //토큰 발급 요청 보낼 주소
-        URL url = new URL(BASE_URL + "/oauth2/tokenP");
-        //연결
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        //데이터보내는방식
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        //보낼 데이터
-        String requestBody = "{"
-                + "\"grant_type\": \"client_credentials\","
-                + "\"appkey\": \"" + APP_KEY + "\","
-                + "\"appsecret\": \"" + APP_SECRET + "\""
-                + "}";
-        //데이터 전송
-        OutputStream os = conn.getOutputStream();
-        os.write(requestBody.getBytes("UTF-8"));
-        os.close();
-        //응답 받기
-        BufferedReader br = new BufferedReader(
-                new InputStreamReader(conn.getInputStream(), "UTF-8"));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = br.readLine()) != null) {
-            response.append(line);
-        }
-        br.close();
-        //토큰 추출
-        String jsonResponse = response.toString();
-        int startIndex = jsonResponse.indexOf("\"access_token\":\"") + 16;
-        int endIndex = jsonResponse.indexOf("\"", startIndex);
-        accessToken = jsonResponse.substring(startIndex, endIndex);
-        //토큰 만료시간 가져오기
-        int expiresKey = jsonResponse.indexOf("\"expires_in\":");
-        if (expiresKey != -1) {
-            int startExpires = expiresKey + 13; //expires_in:길이13칸
-            int endExpires = jsonResponse.indexOf(",", startExpires);
-            if (endExpires == -1) {
-                endExpires = jsonResponse.indexOf("}", startExpires);
-            }
-            //시간 추출
-            String expiresTimeStr = jsonResponse.substring(startExpires, endExpires).trim();
-            long expiresTime = Long.parseLong(expiresTimeStr);//사용가능시간
-            tokenExpireTime = System.currentTimeMillis() + (expiresTime * 1000); //만료시간
 
-            System.out.println("토큰발급완료");
-        } else {
-            tokenExpireTime = System.currentTimeMillis() + (86400 * 1000); //못찾을경우 기본값 처리
+        HttpURLConnection conn = null;
+
+        try{
+            //토큰 발급 요청 보낼 주소
+            URL url = new URL(BASE_URL + "/oauth2/tokenP");
+
+            //연결
+            conn = (HttpURLConnection) url.openConnection();
+
+            //데이터보내는방식
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setDoOutput(true);
+
+            //보낼 데이터
+            String requestBody = "{"
+                    + "\"grant_type\": \"client_credentials\","
+                    + "\"appkey\": \"" + APP_KEY + "\","
+                    + "\"appsecret\": \"" + APP_SECRET + "\""
+                    + "}";
+
+            //데이터 전송
+            try(OutputStream os = conn.getOutputStream()){
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+
+            //응답 받기
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                String line;
+                while ((line = br.readLine()) != null){
+                    response.append(line);
+                }
+            }
+
+            //토큰 추출
+            String jsonResponse = response.toString();
+            int startIndex = jsonResponse.indexOf("\"access_token\":\"") + 16;
+            int endIndex = jsonResponse.indexOf("\"", startIndex);
+            accessToken = jsonResponse.substring(startIndex, endIndex);
+            //토큰 만료시간 가져오기
+            int expiresKey = jsonResponse.indexOf("\"expires_in\":");
+            if (expiresKey != -1) {
+                int startExpires = expiresKey + 13; //expires_in:길이13칸
+                int endExpires = jsonResponse.indexOf(",", startExpires);
+                if (endExpires == -1) {
+                    endExpires = jsonResponse.indexOf("}", startExpires);
+                }
+                //시간 추출
+                String expiresTimeStr = jsonResponse.substring(startExpires, endExpires).trim();
+                long expiresTime = Long.parseLong(expiresTimeStr);//사용가능시간
+                tokenExpireTime = System.currentTimeMillis() + (expiresTime * 1000); //만료시간
+
+                System.out.println("토큰발급완료");
+            } else {
+                tokenExpireTime = System.currentTimeMillis() + (86400 * 1000); //못찾을경우 기본값 처리
+            }
+            return accessToken;
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
         }
-        return accessToken;
     }
 
     //현재가 조회 : 토큰 준비, KIS API 호출(토큰 + 종목코드), 응답에서 추출
     //등락률
     //등락부호
     public KISDataDTO getPriceData(String stockCode) {
+
+        HttpURLConnection conn = null;
+
         try {
             //토큰가져오기
             String token = getAccessToken();
+
             //URL만들기(REST 주식현재가 시세[v1_국내주식-008] 사용)
             String urlStr = BASE_URL
                     + "/uapi/domestic-stock/v1/quotations/inquire-price"
@@ -98,26 +116,25 @@ public class KISApiService {
                     + "&FID_INPUT_ISCD="
                     + stockCode;
             URL url = new URL(urlStr);
+
             //연결설정
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
+
             //데이터받는방식
             conn.setRequestMethod("GET");
+
             //헤더
             conn.setRequestProperty("authorization", "Bearer " + token); //Bearer 공백필수
             conn.setRequestProperty("appkey", APP_KEY);
             conn.setRequestProperty("appsecret", APP_SECRET);
             conn.setRequestProperty("tr_id", "FHKST01010100"); //현재가
-            //응답받기
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), "UTF-8")
-            );
 
+            //응답받기
             StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = br.readLine()) != null) {
-                response.append(line);
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                String line;
+                while ((line = br.readLine()) != null) response.append(line);
             }
-            br.close();
             //데이터 추출, 파싱
             String json = response.toString();
 
@@ -140,6 +157,10 @@ public class KISApiService {
             System.out.println("API 호출 에러 " + e.getMessage());
             e.printStackTrace();
             return null;
+        } finally {
+            if(conn != null){
+                conn.disconnect();
+            }
         }
 
     }

@@ -6,6 +6,7 @@ import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
 import com.tickerbell.jujuclub.invest.service.WatchlistService;
+import com.tickerbell.jujuclub.invest.util.ColorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -56,7 +57,7 @@ public class StockMyController {
             Map<String, Object> data = new HashMap<>();
             data.put("stockName", portfolioAllocationItemDTO.getStockName());
             data.put("weightPct", portfolioAllocationItemDTO.getWeightPct());
-            data.put("color", randomHex(portfolioAllocationItemDTO.getStockCode())); //종목코드별 랜덤색상
+            data.put("color", ColorUtil.colorByStockCode(portfolioAllocationItemDTO.getStockCode())); //종목코드별 색상
             chartData.add(data);
         }
         model.addAttribute("chartData", chartData); //범례 데이터
@@ -75,20 +76,6 @@ public class StockMyController {
         model.addAttribute("userAsset", userAssetSummary);
 
         return "invest/my"; //my.jsp
-    }
-
-    //색상뽑기
-    private String randomHex(String stockCode){
-        if(stockCode == null || stockCode.isBlank()){
-            return "#BAB0AC"; //default
-        }
-        int randomData = stockCode.hashCode(); //stockCode별 같은 해시값
-        //RGB
-        int r = 80 + (randomData & 0x7F);          // 80~207
-        int g = 80 + ((randomData >> 7) & 0x7F);   // 80~207
-        int b = 80 + ((randomData >> 14) & 0x7F);  // 80~207
-
-        return String.format("#%02X%02X%02X", r, g, b);
     }
 
 }

@@ -44,8 +44,10 @@ const StockSocket = {
                     });
                 }, 3000); //화면 업데이트 시간
             }
-            const initialRequest = {stockCodes: stockCodes};
-            self.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(initialRequest));
+            const payload = {
+                stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes]
+            }; //stockCodes로 메시지 보냄
+            self.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
         }, function (error) {
             console.error("websocket error: ", error);
             self.isConnected = false;

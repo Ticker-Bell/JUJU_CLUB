@@ -4,10 +4,9 @@
 <mapper namespace="com.tickerbell.jujuclub.invest.mapper.UserAssetMapper">
     <!--보유 이용가능자금 조회-->
     <select id="selectCashBalance" parameterType="int" resultType="long">
-        select ua.cash_balance
-        from users u
-                 join user_account ua on u.user_id = ua.user_id
-        where u.user_seq = #{user_seq}
+        select cash_balance
+        from user_account
+        where user_seq = #{user_seq}
     </select>
 
 </mapper>

@@ -21,7 +21,6 @@ public class TradeService {
         int totalAmount = tradeDTO.getTradePrice() * tradeQuantity;
 
         int amountChange = "Y".equals(tradeDTO.getTradeType()) ? -totalAmount : totalAmount;
-        System.out.println(amountChange);
         tradeMapper.updateBalance(userSeq, amountChange);
 
 

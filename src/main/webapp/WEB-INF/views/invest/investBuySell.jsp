@@ -101,7 +101,6 @@
         }
 
         const data = {
-            userSeq: 2,
             stockSeq: 1,
             tradeType: tradeType,
             tradePrice: price,

@@ -9,6 +9,8 @@
     <title>Stock List Component</title>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
@@ -170,8 +172,55 @@
     </div>
 </div>
 
+
+<script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
 <script>
     const contextPath = "${pageContext.request.contextPath}";
+
+    //리스트의 종목 가격을 실시간으로 업데이트
+    function initListSocket(stockCodes){
+
+        if(!stockCodes || stockCodes.length === 0) return;
+
+        if(StockSocket.stompClient && StockSocket.stompClient.connected){
+            StockSocket.stompClient.disconnect();
+        }
+
+        // StockSocket 연결 시작
+        StockSocket.connect(
+            contextPath,      // 서버 주소
+            stockCodes,       // 구독할 종목 코드들
+            function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                const $item = $('.stock-item[data-code="\${data.stockCode}"]');
+
+                // 해당 종목이 화면에 있다면
+                if($item.length > 0){
+                    // 2.가격 업데이트 (콤마 찍기)
+                    const formattedPrice = stockData.currentPrice
+                    $item.find('.txt-price').text(formattedPrice);
+
+                    // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                    let rate = parseFloat(stockData.changeRate);
+                    let rateText = rate > 0 ? "+" + rate + "%" : rate + "%";
+                    $item.find('.txt-rate').text(rateText);
+
+                    // 4. 색상 변경 (빨강/파랑/검정)
+                    // 기존 색상 클래스 다 지우고 새로 입히기
+                    const $priceTexts = $item.find('.txt-price, .txt-rate');
+                    $priceTexts.removeClass('color-red color-blue color-gray');
+
+                    if(rate > 0){
+                        $priceTexts.addClass('color-red');
+                    } else if(rate < 0){
+                        $priceTexts.addClass('color-blue');
+                    } else{
+                        $priceTexts.addClass('color-gray');
+                    }
+                }
+            }
+        )
+    }
 
     // 검색창
     $(document).ready(function (){
@@ -239,13 +288,13 @@
             }, 300); // 0.3초 대기 시간
         });
 
-        // 엔ㅌ너키 입력 시 첫 번째 결과 자동 선택
+        // 엔터키 입력 시 첫 번째 결과 자동 선택
         $('.search-input').on('keydown', function (e){
             if(e.keyCode === 13){  //Enter key
                 // 검색 결과창이 열려있고, 결과 아이템이 하나라도 있다면
                 let $firstItem = $('.search-result .result-item').first();
                 if($firstItem.length > 0){
-                    $firstItem.trigger('click');  // 첫 번째 항목응ㄹ 클릭한 것처럼 처리
+                    $firstItem.trigger('click');  // 첫 번째 항목을 클릭한 것처럼 처리
                     $(this).blur();
                 }
             }
@@ -335,6 +384,19 @@
 
         // 2. 초기 탭 슬라이더 위치 잡기 (첫 번째 탭 기준)
         updateTabSlider($('.tab-btn.active'));
+
+        // 초기 로딩된 리스트(관심종목)에 대해 소켓 연결
+        // 화면에 있는 .stock-item 들을 찾아서 코드를 수집
+        let initialCodes = [];
+        $('.stock-item').each(function (){
+            // data-code 값을 가져와서 배열에 담기
+            initialCodes.push($(this).data('code'));
+        })
+
+        // 코드가 하나라도 있으면 소켓 연결 시작
+        if(initialCodes.length > 0){
+            initListSocket(initialCodes);
+        }
 
         // 3. 탭 클릭 이벤트 바인딩
         $('.tab-btn').on('click', function() {
@@ -427,6 +489,13 @@
 
         // DOM 업데이트
         $container.html(html);
+
+        // 화면에 뿌린 종목들의 코드 긁어오기
+        // map을 사용해 data 배열에서 stockCode만 뽑아서 새 배열로 만들기
+        const codes = data.map(item => item.stockCode);
+
+        // 소켓 연결 함수 호출
+        initListSocket(codes);
     }
 </script>
 </body>

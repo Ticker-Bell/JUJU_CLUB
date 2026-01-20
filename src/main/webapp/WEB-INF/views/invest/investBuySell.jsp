@@ -46,7 +46,7 @@
                 </div>
             </div>
             <p id="warningMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
-            <button id="buyButton" onclick="buy()"
+            <button id="buyButton" onclick="trade()"
                     class="mt-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매수하기
             </button>
@@ -58,6 +58,7 @@
 
 <script>
     function switchTab(element, type) {
+        //매수 매도 탭 전환
         const tabs = document.querySelectorAll('.tab-item');
 
         tabs.forEach(tab => {
@@ -77,6 +78,7 @@
     }
 
     function expectedPrice() {
+        //예상 금액 계산
         const price = Number(document.getElementById('priceInput').value);
         const amount = Number(document.getElementById('amountInput').value);
         const total = price * amount;
@@ -88,8 +90,39 @@
         document.getElementById('expectedPrice').innerText = total.toLocaleString();
     }
 
-    function buy(){
-        document.getElementById('warningMessage').innerText = "매수 금액이 보유 자금을 초과했습니다.";
+    function trade() {
+        //매수, 매도 버튼 로직
+        const price = Number(document.getElementById('priceInput').value);
+        const amount = Number(document.getElementById('amountInput').value);
+        const tradeType = document.querySelector('.tab-item.active').innerText.trim() === '매수' ? 'Y' : 'N';
+
+        if (price <= 0 || amount <= 0) {
+            document.getElementById('warningMessage').innerText = "가격과 수량을 정확히 입력해주세요!";
+        }
+
+        const data = {
+            userSeq: 2,
+            stockSeq: 1,
+            tradeType: tradeType,
+            tradePrice: price,
+            tradeQuantity: amount
+        };
+
+        fetch('${pageContext.request.contextPath}/trade/BuySell', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
+                    location.reload();
+                } else {
+                    document.getElementById('warningMessage').innerText = result.message;
+                }
+            })
+            .catch(error => console.log('Error: ' + error));
     }
 </script>
 

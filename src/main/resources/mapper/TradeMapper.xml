@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.invest.trade.mapper.TradeMapper">
+
+    <!--유저 계좌 잔고 가져오기-->
+    <select id="selectBalance" resultType="int">
+        SELECT cash_balance
+        FROM user_account
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <!--유저 계좌 잔고 업데이트-->
+    <update id="updateBalance">
+        UPDATE user_account
+        Set cash_balance = cash_balance + #{amount}
+        WHERE user_seq = #{userSeq}
+    </update>
+
+    <!--보유주식 insert and update-->
+    <insert id="upsertHoldings">
+        INSERT INTO mock_portfolio(user_seq, stock_seq, quantity, avg_price)
+        VALUES (#{userSeq}, #{stockSeq}, #{tradeQuantity}, #{tradePrice}) ON DUPLICATE KEY
+        UPDATE
+            avg_price = (avg_price * quantity + #{tradePrice} * #{tradeQuantity}) / (quantity + #{tradeQuantity}),
+            quantity = quantity + #{tradeQuantity}
+    </insert>
+
+    <!--거래 내역 insert-->
+    <insert id="insertTradeHistory">
+        INSERT INTO mock_trade(user_seq, stock_seq, trade_type, trade_price, trade_quantity)
+        VALUES (#{userSeq}, #{stockSeq}, #{tradeType}, #{tradePrice}, #{tradeQuantity})
+    </insert>
+</mapper>

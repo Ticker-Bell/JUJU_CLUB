@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ChapterDTO {
-    private String levelId; // level_seq
+    private String levelSeq; // level_seq
     private String chapterId; // chapter_id
     private String chapterName; // chapter_name
     private String testReward; // test_reward

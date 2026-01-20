@@ -98,6 +98,10 @@
 .btn-move {
     background: #191919; color: #fff; border: none;
     justify-content: center; /* 텍스트 중앙 정렬 */
+    padding: 15px 40px;
+    min-width: 160px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 .btn-move:hover {
     background: #333; color: #fff;

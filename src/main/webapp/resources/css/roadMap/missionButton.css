@@ -1,10 +1,9 @@
-
-    /* 1. 버튼 위치 잡기 */
+/* 1. 버튼 위치 잡기 */
 .mission-fab {
     position: absolute;
     top: 24px;
     right: 32px;
-    z-index: 35;
+    z-index: 40;
 }
 
 /* 2. 미션 버튼 전용 스타일 (독립시킴) */

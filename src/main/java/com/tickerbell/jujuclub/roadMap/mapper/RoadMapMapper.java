@@ -27,11 +27,17 @@ public interface RoadMapMapper {
     List<LevelChapterLessonDTO> levelChptSelectAllList(@Param("level_seq") Integer levelId, @Param("chapter_id") String chapterId);
 
     // level id or chapter id로 조회
-    List<LevelChapterLessonDTO> selectLearningList(@Param("level_seq") Integer levelId, @Param("chapter_id") String chapterId);
+    List<LevelChapterLessonDTO> selectLearningList(@Param("level_seq") Integer levelSeq, @Param("chapter_id") String chapterId);
+
+    // 전체 level, chapter, lesson 조회
+    List<LevelChapterLessonDTO> allLearningList();
 
     // mission 조회
     List<MissionDTO> missionList();
 
     // mission 진행 횟수 조회
     MissionCheckDTO missionCheck();
+
+    // chapter test 전부 조회
+    List<ChapterResultDTO> chapterTestResult(@Param("user_seq") Integer userSeq);
 }

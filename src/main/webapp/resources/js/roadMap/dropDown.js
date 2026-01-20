@@ -1,6 +1,4 @@
 function initRoadMapDropdowns() {
-    console.log("로드맵 드롭다운 스크립트 시작"); // 디버깅용 로그
-
     const wrappers = document.querySelectorAll('.select-wrapper');
 
     // 1. 초기화: 모든 드롭다운에 기본 동작 연결

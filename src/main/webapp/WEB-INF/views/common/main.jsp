@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 퍼스트존 아카데미02
-  Date: 2026-01-13
-  Time: 오후 12:11
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <c:set var="cpath" value="${pageContext.request.contextPath}" scope="request"/>
@@ -27,6 +20,8 @@
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonDrag.css">
     <%--연결형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonMatch.css">
+    <%--랭킹 메인 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/ranking/rankingMain.css">
 
 </head>
 

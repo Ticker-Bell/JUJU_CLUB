@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.ranking.mapper.RankingMapper">
+
+  <select id="getUserRankingInfo" parameterType="int"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingResponse">
+    SELECT *
+         ,(CC.cash_balance + CC.totalRevenue) AS totalAsset
+    FROM
+      (
+        SELECT UC.USER_SEQ
+             , U.USER_ID
+             , U.USER_NAME
+             , UC.CASH_BALANCE
+             , BB.totalRevenueRate AS totalRevenueRate
+             , BB.totalAsset AS totalRevenue
+        FROM USER_ACCOUNT UC
+               LEFT OUTER JOIN (SELECT AA.USER_SEQ
+                                     , AA.buySum           AS totalBuy
+                                     , AA.sellSum          AS totalSell
+                                     , CASE
+                                         WHEN buySum = 0 THEN 0
+                                         ELSE ROUND(((sellSum - buySum) / buySum) * 100, 2)
+            END AS totalRevenueRate
+                                     , (sellSum - buySum) AS totalAsset
+                                FROM (SELECT USER_SEQ,
+                                             SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                             SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                      FROM MOCK_TRADE
+                                      WHERE USER_SEQ = 1
+                                     ) AA
+        ) BB
+                               ON UC.USER_SEQ = BB.USER_SEQ
+
+               LEFT OUTER JOIN USERS U
+                               ON UC.USER_SEQ = U.USER_SEQ) CC
+  </select>
+  <select id="getRankingBoardListOBA"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingListOBA">
+    SELECT *
+         , RANK() over (PARTITION BY DD.totalAsset) AS userAssetRank
+    FROM (SELECT *
+               , (CC.cash_balance + CC.totalRevenue) AS totalAsset
+          FROM (SELECT UC.USER_SEQ
+                     , U.USER_ID
+                     , U.USER_NAME
+                     , UC.CASH_BALANCE
+                     , BB.totalRevenueRate AS totalRevenueRate
+                     , BB.totalAsset       AS totalRevenue
+                FROM USER_ACCOUNT UC
+                       LEFT OUTER JOIN (SELECT AA.USER_SEQ
+                                             , AA.buySum          AS totalBuy
+                                             , AA.sellSum         AS totalSell
+                                             , CASE
+                                                 WHEN buySum = 0 THEN 0
+                                                 ELSE ROUND(((sellSum - buySum) / buySum) * 100, 2)
+                    END                                         AS totalRevenueRate
+                                             , (sellSum - buySum) AS totalAsset
+                                        FROM (SELECT USER_SEQ,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                              FROM MOCK_TRADE
+                                              GROUP BY USER_SEQ) AA) BB
+                                       ON UC.USER_SEQ = BB.USER_SEQ
+
+                       LEFT OUTER JOIN USERS U
+                                       ON UC.USER_SEQ = U.USER_SEQ
+               )CC
+         ) DD
+    ORDER BY DD.totalAsset DESC
+  </select>
+  <select id="getRankingBoardListOBR"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingListOBR">
+    SELECT *
+    FROM (SELECT *
+               , (CC.cash_balance + CC.totalRevenue) AS totalAsset
+               ,RANK() over (PARTITION BY CC.totalRevenueRate) AS userRevenueRank
+
+          FROM (SELECT UC.USER_SEQ
+                     , U.USER_ID
+                     , U.USER_NAME
+                     , UC.CASH_BALANCE
+                     , BB.totalRevenueRate AS totalRevenueRate
+                     , BB.totalAsset       AS totalRevenue
+                FROM USER_ACCOUNT UC
+                       LEFT OUTER JOIN (SELECT AA.USER_SEQ
+                                             , AA.buySum          AS totalBuy
+                                             , AA.sellSum         AS totalSell
+                                             , CASE
+                                                 WHEN buySum = 0 THEN 0
+                                                 ELSE ROUND(((sellSum - buySum) / buySum) * 100, 2)
+                    END                                         AS totalRevenueRate
+                                             , (sellSum - buySum) AS totalAsset
+                                        FROM (SELECT USER_SEQ,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                              FROM MOCK_TRADE
+                                              GROUP BY USER_SEQ) AA) BB
+                                       ON UC.USER_SEQ = BB.USER_SEQ
+
+                       LEFT OUTER JOIN USERS U
+                                       ON UC.USER_SEQ = U.USER_SEQ
+               )CC
+         ) DD
+    ORDER BY DD.userRevenueRank DESC;
+  </select>
+</mapper>

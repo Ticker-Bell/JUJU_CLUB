@@ -33,11 +33,7 @@
 
     <!-- Main -->
     <main class="flex-1 overflow-y-auto p-8 flex flex-col bg-gray-50">
-<%--        <div id="main" class="flex flex-col w-full h-full max-w-[1800px] mx-auto min-h-0">--%>
-
             <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
-
-<%--        </div>--%>
     </main>
 </div>
 

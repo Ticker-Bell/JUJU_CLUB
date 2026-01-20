@@ -25,6 +25,16 @@ public class LessonController {
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       Model model) throws Exception {
+// 세션 연결예쩡
+    Integer userSeq = 1;
+
+//    if (userSeq == null) {
+//      // 로그인 안된 상태면 처리
+//      return "redirect:/login";
+//    }
+
+    // 레슨 시작 정보 등록
+    lessonService.insertLssnInfo(userSeq,lessonId);
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
@@ -36,6 +46,7 @@ public class LessonController {
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
+    model.addAttribute("userSeq",userSeq);
 
     if (isHtmx) {
       return "/lesson/lessonInfo";
@@ -64,8 +75,39 @@ public class LessonController {
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
 
+    if (!isHtmx) {
+      // 주소창 직접 접근 방지
+      return "redirect:/main";
+    }
+
+    switch (questionId) {
+      case "LV1_CH001_LSN001_Q002":
+        return "/lesson/qst2";
+      case "LV1_CH001_LSN001_Q003":
+        return "/lesson/qst3";
+      case "LV1_CH001_LSN001_Q004":
+        return "/lesson/qst4";
+      case "LV1_CH001_LSN001_Q005":
+        return "/lesson/qst5";
+      default:
+        // 잘못된 questionId
+        return "/lesson/error";
+    }
+
+  }
+
+  @PostMapping("/updateLssnInfo")
+  public String getLessonInfo(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String lessonId) throws Exception {
+// 세션 연결예쩡
+    Integer userSeq = 1;
+
+    lessonService.updateLssnInfo(userSeq,lessonId);
+
+
     if (isHtmx) {
-      return "/lesson/qst2";
+      return "/roadMap/roadMapMain";
     } else {
       // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
       // Redirect를 하거나 에러 페이지를 띄움

@@ -1,10 +1,10 @@
 package com.tickerbell.jujuclub.lesson.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonQst;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonTitle;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.mapper.LessonMapper;
@@ -15,9 +15,11 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LessonService {
 
   private final LessonMapper lessonMapper;
@@ -56,40 +58,66 @@ public class LessonService {
   /**
    * 레슨 문항 조회
    */
-  public List<LessonDTO.LessonQst> getLssnQst(String lessonId) throws IOException {
+  public List<LessonQst> getLssnQst(String lessonId) throws IOException {
 
     List<LessonQst> lessonQsts = lessonMapper.selectQSt(lessonId);
-    List<LessonDTO.LessonQst> result = new ArrayList<>();
+    List<LessonQst> result = new ArrayList<>();
 
     for (LessonQst lessonQst : lessonQsts) {
 
-      // options 파싱
-      JsonNode optionsNode = objectMapper.readTree(lessonQst.getOptions());
-      JsonNode choicesNode = optionsNode.get("choices");
-
-      List<String> options =
-          objectMapper.readValue(
-              choicesNode.traverse(),
-              new TypeReference<List<String>>() {}
-          );
-
-      // answer 파싱 (String)
-      JsonNode answerNode = objectMapper.readTree(lessonQst.getAnswer());
-      String answer = answerNode.get("correct").get(0).asText();
-      String explanation = answerNode.get("explanation").asText();
-
-      LessonDTO.LessonQst qst = new LessonDTO.LessonQst();
+      LessonQst qst = new LessonQst();
       qst.setQuestionText(lessonQst.getQuestionText());
-      qst.setOptionList(options);
-      qst.setAnswer(answer);
-      qst.setExplanation(explanation);
+      qst.setExplanation(LessonJsonParse.parseExplanation(lessonQst.getAnswer()));
+
+      switch (lessonQst.getQuestionType()) {
+        case "DRAG":
+          qst.setOptionList(LessonJsonParse.parseChoices(lessonQst.getOptions()));
+          qst.setAnswerList(LessonJsonParse.parseDragAnswer(lessonQst.getAnswer()));
+          break;
+
+        case "LINK":
+          Map<String, List<Map<String, String>>> matchOptions = LessonJsonParse.parseMatchOptions(lessonQst.getOptions());
+          qst.setLeftOptions(matchOptions.get("left"));
+          qst.setRightOptions(matchOptions.get("right"));
+          qst.setMatchAnswer(LessonJsonParse.parseMatchAnswer(lessonQst.getAnswer()));
+          break;
+
+        default: // 나머지 선택형
+          qst.setOptionList(LessonJsonParse.parseChoices(lessonQst.getOptions()));
+          qst.setAnswer(LessonJsonParse.parseSingleAnswer(lessonQst.getAnswer()));
+      }
 
       result.add(qst);
     }
 
     return result;
+
   }
 
+  /**
+   * 레슨 시작 정보 등록
+   */
+  public void insertLssnInfo(int userSeq,String lessonId) throws IOException {
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
 
+    lessonRequest.setUserSeq(String.valueOf(userSeq));
+    lessonRequest.setLessonId(lessonId);
 
+    int usrLssnRslt = lessonMapper.countUsrLssnRslt(lessonRequest);
+    //레슨
+    if(usrLssnRslt == 0 ){
+      lessonMapper.insertLssnInfo(lessonRequest);
+    }
+  }
+
+  /**
+   * 레슨 완료 정보 등록
+   */
+  public void updateLssnInfo(int userSeq,String lessonId) throws IOException {
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+
+    lessonRequest.setUserSeq(String.valueOf(userSeq));
+    lessonRequest.setLessonId(lessonId);
+    lessonMapper.updateLssnInfo(lessonRequest);
+  }
 }

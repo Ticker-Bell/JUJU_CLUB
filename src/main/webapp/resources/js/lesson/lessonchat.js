@@ -29,9 +29,6 @@ window.addEventListener("DOMContentLoaded", () => {
     msg.name = isUser ? '홍길동' : '멘토';       // 유저명 / 멘토명
   });
 
-// 테스트용: 콘솔 출력
-  console.log(script);
-
   // ====== UI refs ======
   const chatList = document.getElementById("chatList");
   const chatScroll = document.getElementById("chatScroll");
@@ -39,7 +36,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const skipBtn = document.getElementById("skipBtn");
   const resetBtn = document.getElementById("resetBtn");
-  console.log(chatList)
+
   let idx = 0;
 
   function mdBoldToHTML(s) {
@@ -92,7 +89,6 @@ window.addEventListener("DOMContentLoaded", () => {
   // 대기시간 없이 즉시 표시(말풍선 애니메이션 유지)
   function step() {
     if (idx >= script.length) {
-      alert("개념 문제 완료! 다음문제로 이동");
       location.href = "<c:url value='/lesson/lessonInfo' />";
       return;
     }

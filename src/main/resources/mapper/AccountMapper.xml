@@ -4,21 +4,21 @@
 
 <mapper namespace="com.tickerbell.jujuclub.auth.mapper.AccountMapper">
 
-    <select id="checkAccountExist" parameterType="string" resultType="int">
+    <select id="checkAccountExist" parameterType="long" resultType="int">
         SELECT COUNT(*)
         FROM USER_ACCOUNT
-        WHERE user_id = #{userId}
+        WHERE user_seq = #{userSeq}
     </select>
 
     <insert id="insertAccount" parameterType="com.tickerbell.jujuclub.auth.dto.AccountDTO">
         INSERT INTO USER_ACCOUNT (
-            user_id,
+            user_seq,
             account_no,
             cash_balance,
             created_at,
             updated_at
         ) VALUES (
-                     #{userId},
+                     #{userSeq},
                      #{accountNo},
                      #{cashBalance},
                      NOW(),  NOW()   )

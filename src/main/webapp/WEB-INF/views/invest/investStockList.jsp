@@ -1,0 +1,414 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Stock List Component</title>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
+
+    <style>
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Pretendard', sans-serif; background-color: transparent; color: #191919; }
+        .num-font { font-feature-settings: "tnum"; letter-spacing: 0; font-weight: 600; }
+
+        .stock-app-container {
+            width: 360px; height: 600px;
+            background-color: #ffffff; border: 1px solid #E5E7EB; border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            display: flex; flex-direction: column; padding: 16px; overflow: hidden;
+        }
+
+        .search-wrapper { position: relative; flex-shrink: 0; }
+        .search-icon { position: absolute; left: 10px; top: 10px; width: 16px; height: 16px; color: #9CA3AF; }
+        .search-input {
+            width: 100%; background-color: transparent; border: none; border-bottom: 1px solid #E5E7EB;
+            padding: 8px 8px 8px 40px; font-size: 14px; font-weight: 800; color: #111827; outline: none; transition: border-color 0.2s;
+        }
+        .search-input::placeholder { color: #D1D5DB; }
+        .search-input:focus { border-bottom-color: #5E45EB; }
+
+        .tab-wrapper { margin-top: 16px; position: relative; border-bottom: 1px solid #E5E7EB; flex-shrink: 0; }
+        .tab-list { display: flex; gap: 24px; align-items: center; }
+        .tab-btn {
+            background: none; border: none; padding-bottom: 10px; font-weight: 900; font-size: 12px; color: #9CA3AF;
+            cursor: pointer; position: relative;
+        }
+        .tab-btn.active { color: #111827; }
+
+        #left-tab-slider {
+            height: 2px; background-color: #5E45EB; position: absolute; bottom: 0; left: 0; transition: all 0.25s ease;
+        }
+
+        .stock-list-container { margin-top: 12px; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+        .stock-scroll-area { flex: 1; overflow-y: auto; }
+        .stock-scroll-area::-webkit-scrollbar { width: 6px; }
+        .stock-scroll-area::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        .stock-scroll-area::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+
+        .stock-item {
+            display: flex; justify-content: space-between; align-items: center; padding: 12px;
+            border-bottom: 1px solid #F9FAFB; cursor: pointer; transition: background-color 0.15s;
+        }
+        .stock-item:hover { background-color: #F9FAFB; }
+        .text-col { display: flex; flex-direction: column; }
+        .items-end { align-items: flex-end; }
+        .txt-name { font-size: 14px; font-weight: 800; color: #111827; }
+        .txt-code { font-size: 10px; font-weight: 700; color: #9CA3AF; margin-top: 2px; }
+        .txt-price { font-size: 14px; font-weight: 800; }
+        .txt-rate { font-size: 10px; font-weight: 800; margin-top: 2px; }
+
+        .color-red { color: #DC2626; }
+        .color-blue { color: #2563EB; }
+        .color-gray { color: #111827; }
+
+        /* 랭크 스타일 (필요시 추가) */
+        .rank { font-size: 10px; color: #5E45EB; font-weight: bold; margin-bottom: 2px;}
+
+
+        /* 검색창 감싸는 wrapper */
+        .search-wrapper{
+            position: relative;
+            width: 300px;
+        }
+
+        /* 자동완성 결과 박스 */
+        .search-result{
+            position: absolute; /* 바로 아래 배치 */
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            border: 1px solid #ccc;
+            z-index: 1000; /* 다른 요소보다 위에 오도록 */
+            display: none; /* 평소엔 숨김 */
+            max-height: 200px; /* 너무 길면 스크롤 */
+            overflow-y: auto;
+        }
+
+        /* 리스트 아이템 스타일 */
+        .result-item{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+        }
+        .result-item:hover{
+            background-color: #f0f0f0;
+        }
+
+        .sub-text{
+            font-size: 12px;
+            color: #9CA3AF;
+            font-weight: 500;
+        }
+
+        .stock-item.selected{
+            background-color: #F5F3FF;
+            box-shadow: inset 0 0 0 2px #5E45EB;
+        }
+
+
+    </style>
+</head>
+<body>
+
+<div class="stock-app-container">
+
+    <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" placeholder="종목명/코드 검색" class="search-input">
+        <div class="search-result"></div>
+    </div>
+
+    <div class="tab-wrapper">
+        <div class="tab-list">
+            <button class="tab-btn active" data-sort="interest">관심종목</button>
+            <button class="tab-btn" data-sort="volume">거래량</button>
+            <button class="tab-btn" data-sort="rising">상승률</button>
+            <button class="tab-btn" data-sort="falling">하락률</button>
+            <button class="tab-btn" data-sort="marketCap">시가총액</button>
+        </div>
+        <div id="left-tab-slider"></div>
+    </div>
+
+    <div class="stock-list-container">
+        <div class="stock-scroll-area" id="stockList">
+            <c:if test="${empty stockDTOList}">
+                <div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>
+            </c:if>
+            <c:if test="${not empty stockDTOList}">
+                <c:forEach items="${stockDTOList}" var="stock">
+                    <div class="stock-item" data-code="${stock.stockCode}" data-name="${stock.stockName}">
+                        <div class="text-col">
+                            <c:catch var="e">
+                                <c:if test="${not empty stock.rank}">
+                                    <span class="rank">${stock.rank}</span>
+                                </c:if>
+                            </c:catch>
+                            <span class="txt-name">${stock.stockName}</span>
+                            <span class="txt-code num-font">${stock.stockCode}</span>
+                        </div>
+                        <div class="text-col items-end">
+                            <span class="txt-price color-red num-font">000000</span>
+                            <span class="txt-rate color-red num-font">+0.00%</span>
+                        </div>
+                    </div>
+                </c:forEach>
+            </c:if>
+        </div>
+    </div>
+</div>
+
+<script>
+    const contextPath = "${pageContext.request.contextPath}";
+
+    // 검색창
+    $(document).ready(function (){
+
+        let debounceTimer; // 디바운싱을 위한 타이머
+
+        $('.search-input').on('keyup',function (){
+            let keyword = $(this).val();
+            let $resultBox = $('.search-result'); //선택자 캐싱
+
+            // 입력값이 없으면 리스트 숨기기
+            if (keyword.length === 0){
+                clearTimeout(debounceTimer);  // 대기 중이던 요청 취소
+                $resultBox.hide();
+                return;
+            }
+
+            // 이전에 예약된 요청이 있다면 취소 (타이머 초기화)
+            clearTimeout(debounceTimer);
+
+            // 0.3초 뒤에 실행하도록 예약
+            debounceTimer = setTimeout(function (){
+                $.ajax({
+                    url: contextPath + "/invest/search/autocomplete",
+                    type: 'POST',
+                    data: {keyword: keyword},
+                    success: function (data){
+                        // 데이터가 있으면 리스트 보여주기
+                        if (data.length > 0) {
+                            let html = '';
+                            $.each(data, function (index, item){
+                                // 정규식 생성: keyword를 찾되, g(전체 찾기), i(대소문자 무시) 옵션 적용
+                                let regex = new RegExp(keyword, "gi");
+
+                                // 검색어(종목명) 강조 효과
+                                let highlightName = item.stockName.replace(regex, function (match){
+                                    return '<span style="color:#5E45EB; font-weight:bold;">' + match + '</span>';
+                                });
+
+                                // 검색어(종목코드) 강조 효과
+                                let highlightCode = item.stockCode.replace(regex, function (match){
+                                    return '<span style="color:#5E45EB; font-weight:bold;">' + match + '</span>';
+                                });
+
+                                // 화면에 보여줄 HTML 생성
+                                html += '<div class="result-item" data-code="' + item.stockCode + '" data-name="' + item.stockName + '">';
+                                html += '<span>' + highlightName + '</span>';
+                                html += '<span class="sub-text">' + highlightCode + '</span>';
+                                html += '</div>';
+                            });
+
+                            $resultBox.html(html).show();
+                        } else{
+                            $resultBox.hide();
+                        }
+                    },
+                    error: function (){
+                        console.log('에러 발생');
+                    }
+                });
+
+            }, 300); // 0.3초 대기 시간
+        });
+
+        // 리스트 항목 클릭시 검색창에 값 넣기
+        $(document).on('click', '.result-item', function(){
+            let selectedName = $(this).data('name');
+            let selectedCode = $(this).data('code');
+
+            // 검색창에 이름 넣고 결과창 숨기기
+            $('.search-input').val(selectedName);
+            $('.search-result').hide();
+
+            // 탭 UI 초기화 (슬라이더 숨기기)
+            $('#left-tab-slider').hide();
+            $('.tab-btn').removeClass('active');
+
+            // 메인 리스트에 선택한 항목 1개만 출력하기
+            let singleItemHtml = `
+                <div class="stock-item selected" data-code="\${selectedCode}" data-name="\${selectedName}">
+                    <div class="text-col">
+                        <span class="txt-name">\${selectedName}</span>
+                        <span class="txt-code num-font">\${selectedCode}</span>
+                    </div>
+                    <div class="text-col items-end">
+                        <span class="txt-price color-red num-font">000000</span>
+                        <span class="txt-rate color-red num-font">+0.00%</span>
+                    </div>
+                </div>
+            `;
+
+            $('#stockList').html(singleItemHtml);
+        });
+
+        // 검색 결과 외 클릭 시 닫기
+        $(document).on('click', function (e){
+            if (!$(e.target).closest('.search-wrapper').length){
+                $('.search-result').hide();
+            }
+        });
+    });
+
+    // 종목 리스트 중 하나를 선택했을때 차트, 기업 정보 출력하는 url에 종목코드 보내기
+    $(document).on("click", ".stock-item", function () {
+
+        $(".stock-item").removeClass("selected");  // 다른 모든 항목의 선택 효과 제거
+        $(this).addClass("selected");  // 현재 클릭한 항목에만 효과 추가
+
+        const code = $(this).data("code");
+        const name = $(this).data("name");
+
+        // 차트에 전달
+        $.ajax({
+            url: contextPath + "/invest/chart/selectedStockInfo",
+            type: "GET",
+            data: {
+                stockCode: code,
+                stockName: name
+            },
+            success: function (res){
+                $("#chartStockCode").text(res.stockCode);
+                $("#chartStockName").text(res.stockName);
+            }
+        })
+
+        // 기업정보에 전달
+        $.ajax({
+            url: contextPath + "/invest/corpoInfo/selectedStockInfo",
+            type: "GET",
+            data: {stockCode: code},
+            success: function (res){
+                $("#infoStockCode").text(res.stockCode);
+            }
+        })
+    })
+
+
+    // jQuery Ready Function
+    $(document).ready(function() {
+        // 1. 아이콘 초기화
+        if(window.lucide) lucide.createIcons();
+
+        // 2. 초기 탭 슬라이더 위치 잡기 (첫 번째 탭 기준)
+        updateTabSlider($('.tab-btn.active'));
+
+        // 3. 탭 클릭 이벤트 바인딩
+        $('.tab-btn').on('click', function() {
+            const $this = $(this);
+            const sortType = $this.data('sort'); // data-sort 값 가져오기
+
+            // 슬라이더 다시 보이기 (검색으로 숨겨졌을 수 있으므로)
+            $('#left-tab-slider').show();
+
+            // 탭 활성화 UI 변경
+            $('.tab-btn').removeClass('active');
+            $this.addClass('active');
+            updateTabSlider($this);
+
+            // AJAX 데이터 요청
+            fetchStockList(sortType);
+        });
+    });
+
+    // 탭 슬라이더 UI 업데이트 함수
+    function updateTabSlider($targetBtn) {
+        const $slider = $('#left-tab-slider');
+        if ($targetBtn.length && $slider.length) {
+            $slider.css({
+                'width': $targetBtn.outerWidth() + 'px',
+                'left': $targetBtn.position().left + 'px'
+            });
+        }
+    }
+
+    // AJAX 데이터 요청 함수 (jQuery $.ajax 사용)
+    function fetchStockList(sortType) {
+        // URL 생성
+        const url = contextPath + '/invest/main/stock/list';
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: { sortType: sortType }, // 파라미터 전달
+            dataType: 'json', // 응답을 JSON으로 기대함
+            success: function(data) {
+                renderStockList(data, sortType);
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error:", error);
+                $('#stockList').html('<div style="padding:20px; text-align:center;">데이터를 불러오지 못했습니다.</div>');
+            }
+        });
+    }
+
+    // 리스트 렌더링 함수
+    function renderStockList(data, sortType) {
+        const $container = $('#stockList');
+
+        if (!data || data.length === 0) {
+            if(sortType === 'interest'){
+                $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
+            }else{
+                $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+            }
+            return;
+        }
+
+        let html = '';
+
+        $.each(data, function(index, item) {
+            // [중요 수정] JSP 태그(c:if)는 JS 문자열 안에서 작동 안 함 -> 자바스크립트 변수로 처리
+            let rankHtml = '';
+            if (item.rank) {
+                rankHtml = `<span class="rank">\${item.rank}</span>`;
+            }
+
+            // 가격, 등락률 등 데이터 포맷팅 필요 시 여기서 처리
+            // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
+
+            html += `
+                <div class="stock-item data-code="\${item.stockCode}" data-name="\${item.stockName}">
+                    <div class="text-col">
+                        \${rankHtml}
+                        <span class="txt-name">\${item.stockName}</span>
+                        <span class="txt-code num-font">\${item.stockCode}</span>
+                    </div>
+                    <div class="text-col items-end">
+                        <span class="txt-price color-red num-font">000000</span>
+                        <span class="txt-rate color-red num-font">+0.00%</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        // DOM 업데이트
+        $container.html(html);
+    }
+</script>
+</body>
+</html>

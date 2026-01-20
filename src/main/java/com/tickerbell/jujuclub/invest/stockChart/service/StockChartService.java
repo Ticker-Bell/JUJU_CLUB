@@ -22,7 +22,7 @@ import java.util.List;
 public class StockChartService {
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartParser stockChartParser;
-    private final String APPROVAL_KEY = "062fab1b-3a3c-48da-b666-d3a57042db77             ";
+    private final String APPROVAL_KEY = "5622cc60-8a75-4bbb-845a-9f70babcc1bd";
 
     public void connectToStockChartApi(String stockCode) {
         WebSocketClient client = new StandardWebSocketClient();

@@ -42,4 +42,8 @@ public class AccountService {
         // [핵심] 숫자를 String으로 변환하여 반환
         return String.valueOf(randomNumber);
     }
+
+    public AccountDTO getMyAccount(Long userSeq) {
+        return accountMapper.selectAccountByUserSeq(userSeq);
+    }
 }

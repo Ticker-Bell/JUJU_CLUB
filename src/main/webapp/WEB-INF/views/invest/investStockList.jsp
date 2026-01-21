@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -162,8 +164,20 @@
                             <span class="txt-code num-font">${stock.stockCode}</span>
                         </div>
                         <div class="text-col items-end">
-                            <span class="txt-price color-red num-font">000000</span>
-                            <span class="txt-rate color-red num-font">+0.00%</span>
+                            <c:choose>
+                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '+')}">
+                                    <span class="txt-price color-red num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-red num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:when>
+                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '-')}">
+                                    <span class="txt-price color-blue num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-blue num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="txt-price color-gray num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-gray num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </c:forEach>
@@ -182,39 +196,36 @@
 
         if(!stockCodes || stockCodes.length === 0) return;
 
-        if(StockSocket.stompClient && StockSocket.stompClient.connected){
-            StockSocket.stompClient.disconnect();
-        }
-
         // StockSocket 연결 시작
         StockSocket.connect(
             contextPath,      // 서버 주소
             stockCodes,       // 구독할 종목 코드들
             function (stockData){  // 3초마다 실행될 데이터 처리 함수
                 // 1. 데이터가 도착한 종목의 HTML 박스 찾기
-                const $item = $('.stock-item[data-code="\${stockData.stockCode}"]');
+                const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
 
                 // 해당 종목이 화면에 있다면
                 if($item.length > 0){
                     // 2.가격 업데이트 (콤마 찍기)
-                    const formattedPrice = stockData.currentPrice;
+                    const formattedPrice = stockData.displayPrice;
                     $item.find('.txt-price').text(formattedPrice);
 
                     // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
-                    let rate = parseFloat(stockData.changeRate);
-                    let rateText = rate > 0 ? "+" + rate + "%" : rate + "%";
-                    $item.find('.txt-rate').text(rateText);
+                    let rate = stockData.displayRate;
+                    $item.find('.txt-rate').text(rate);
 
                     // 4. 색상 변경 (빨강/파랑/검정)
                     // 기존 색상 클래스 다 지우고 새로 입히기
                     const $priceTexts = $item.find('.txt-price, .txt-rate');
-                    $priceTexts.removeClass('color-red color-blue color-gray');
 
-                    if(rate > 0){
+                    if(rate && rate.startsWith("+")){
+                        $priceTexts.removeClass('color-red color-blue color-gray');
                         $priceTexts.addClass('color-red');
-                    } else if(rate < 0){
+                    } else if(rate && rate.startsWith("-")){
+                        $priceTexts.removeClass('color-red color-blue color-gray');
                         $priceTexts.addClass('color-blue');
                     } else{
+                        $priceTexts.removeClass('color-red color-blue color-gray');
                         $priceTexts.addClass('color-gray');
                     }
                 }
@@ -313,25 +324,35 @@
             $('#left-tab-slider').hide();
             $('.tab-btn').removeClass('active');
 
-            // 메인 리스트에 선택한 항목 1개만 출력하기
-            let singleItemHtml = `
-                <div class="stock-item selected" data-code="\${selectedCode}" data-name="\${selectedName}">
-                    <div class="text-col">
-                        <span class="txt-name">\${selectedName}</span>
-                        <span class="txt-code num-font">\${selectedCode}</span>
-                    </div>
-                    <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">000000</span>
-                        <span class="txt-rate color-red num-font">+0.00%</span>
-                    </div>
-                </div>
-            `;
+            $.ajax({
+                url: contextPath + "/invest/stock/selected",
+                type: 'POST',
+                data: {
+                    stockCode: selectedCode,
+                    stockName: selectedName
+                },
+                success: function (stock){
+                    // 메인 리스트에 선택한 항목 1개만 출력하기
+                    let singleItemHtml = `
+                        <div class="stock-item selected" data-code="\${stock.stockCode}" data-name="\${stock.stockName}">
+                            <div class="text-col">
+                                <span class="txt-name">\${stock.stockName}</span>
+                                <span class="txt-code num-font">\${stock.stockCode}</span>
+                            </div>
+                            <div class="text-col items-end">
+                                <span class="txt-price color-red num-font">\${stock.currentPrice}</span>
+                                <span class="txt-rate color-red num-font">\${stock.changePct}%</span>
+                            </div>
+                        </div>
+                    `;
 
-            $('#stockList').html(singleItemHtml);
+                    $('#stockList').html(singleItemHtml);
 
-            // 리스트에 그려진 종목을 클릭한 것으로 트리거 발동
-            // 아래에 정의된 .stock-item 클릭 이벤트가 실행되면서 차트/기업정보 AJAX가 나감
-            $('#stockList .stock-item').trigger('click');
+                    // 리스트에 그려진 종목을 클릭한 것으로 트리거 발동
+                    // 아래에 정의된 .stock-item 클릭 이벤트가 실행되면서 차트/기업정보 AJAX가 나감
+                    $('#stockList .stock-item').trigger('click');
+                }
+            })
         });
 
         // 검색 결과 외 클릭 시 닫기
@@ -469,9 +490,6 @@
                 rankHtml = `<span class="rank">\${item.rank}</span>`;
             }
 
-            // 가격, 등락률 등 데이터 포맷팅 필요 시 여기서 처리
-            // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
-
             html += `
                 <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
@@ -480,8 +498,8 @@
                         <span class="txt-code num-font">\${item.stockCode}</span>
                     </div>
                     <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">000000</span>
-                        <span class="txt-rate color-red num-font">+0.00%</span>
+                        <span class="txt-price color-red num-font">\${item.currentPrice}</span>
+                        <span class="txt-rate color-red num-font">\${item.changePct}%</span>
                     </div>
                 </div>
             `;

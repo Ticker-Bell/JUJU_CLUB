@@ -2,6 +2,8 @@ package com.tickerbell.jujuclub.invest.stockList.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
+import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +33,13 @@ public class RankingApiService {
     @Value("${kis.baseurl}")
     private String baseurl;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjVhZGUwNGNlLWViZjItNGY2MS1iNjExLTEyOWY4OGEzYTZhOCIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODk2NDgyNiwiaWF0IjoxNzY4ODc4NDI2LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.AVHoIcQCUXRzAhF_P2v75C_XEpmJOlNjPjNEdOnKlnkp1X7dsf3utSfoRBmlUyp6FCtVohH_vwfqa9nJHYIcKg";
+    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjY5MGVhZGM0LTlhZGUtNDViMi04NDU2LTAyNzUxN2QxOTAzNyIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTA0OTEwMiwiaWF0IjoxNzY4OTYyNzAyLCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.RYD4chNEcsbRPGzmbKbJ9kCWeczcl27imlnzYzNJrU_BUCb2VnyUAuOBqzLPPPSLQwcdpjEgA2fED2BQl1e--A";
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private KISApiService kisApiService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -355,6 +360,37 @@ public class RankingApiService {
             rankingDTOList.add(rankingDTO);
         }
 
+        return rankingDTOList;
+    }
+
+    public List<RankingDTO> addKisDataDtoToRankingDto(List<RankingDTO> rankingDTOList){
+        int batchSize = 15;
+        int count = 0;
+
+        for(int i=0; i<rankingDTOList.size(); i++){
+            RankingDTO rankingDTO = rankingDTOList.get(i);
+
+            KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
+            // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+            if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+            }
+            rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
+            rankingDTO.setChangePct(kisDataDTO.getChangePct());
+
+            count++;
+
+            // API호출 최대 1초당 20번이기 때문에
+            // 15개마다 1초 쉬기 (마지막은 제외해도 됨)
+            if(count % batchSize == 0 && i < rankingDTOList.size()-1){
+                try{
+                    Thread.sleep(500);
+                }catch(InterruptedException e){
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("API 호출 대기 중 인터럽트 발생",e);
+                }
+            }
+        }
         return rankingDTOList;
     }
 

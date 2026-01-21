@@ -19,7 +19,8 @@ public class RoadMapApiController {
 
     @GetMapping("/chapters")
     public List<ChapterDTO> getChapter(@RequestParam("levelId") Integer levelId) {
-        System.out.println("요청 받은 levelId: " + levelId); // 로그 확인용
+        // 로그 확인용
+        // System.out.println("요청 받은 levelId: " + levelId);
         return roadMapService.chapterList(levelId);
     }
 }

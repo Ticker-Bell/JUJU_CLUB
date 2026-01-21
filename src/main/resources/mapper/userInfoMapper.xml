@@ -3,14 +3,14 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <!-- 사용자 정보 조회 -->
 <mapper namespace="com.tickerbell.jujuclub.common.mapper.UserInfoMapper">
-  <select id="userInfo" parameterType="string" resultType="com.tickerbell.jujuclub.common.dto.UserInfoDTO">
+  <select id="userInfo" resultType="com.tickerbell.jujuclub.common.dto.UserInfoDTO">
     SELECT
-      u.user_id      AS userId,
+      u.user_seq      AS userSeq,
       u.user_name    AS userName,
       u.user_level   AS userLevel,
       a.cash_balance AS cashBalance
     FROM users AS u
-           JOIN user_account AS a ON u.user_id = a.user_id
-    WHERE u.user_id = #{userId}
+           JOIN user_account AS a ON u.user_seq = a.user_seq
+    WHERE u.user_seq = #{user_seq}
   </select>
 </mapper>

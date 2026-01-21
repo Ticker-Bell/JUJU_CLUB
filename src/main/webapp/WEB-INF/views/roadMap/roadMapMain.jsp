@@ -17,8 +17,7 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
 <style>
-    /* 기본 폰트 설정 */
-    /*body { font-family: 'Pretendard', sans-serif; }*/
+
 
     /* Scroll Snap 및 컨테이너 설정 */
     .snap-container {
@@ -86,6 +85,7 @@
         transition: transform .18s ease, box-shadow .18s ease;
         user-select: none;
         cursor: pointer;
+        pointer-events: auto !important;
     }
 
     .orb:hover {
@@ -143,6 +143,7 @@
         transition: opacity 0.2s, visibility 0.2s;
         pointer-events: none;
     }
+
     .tip::before,
     .tip::after {
         display: none !important;
@@ -158,7 +159,7 @@
     }
 </style>
 
-<div class="flex flex-col w-full h-full min-h-0 bg-gray-50 relative">
+<div class="flex flex-col w-full h-full min-h-0 bg-gray-50 relative p-0 m-0 border-0">
 
     <div class="absolute top-4 left-4 z-40 gap-2">
         <%@ include file="dropDown.jsp" %>
@@ -178,7 +179,7 @@
                 <path id="roadPathActive" d=""/>
             </svg>
 
-            <div id="nodesLayer" class="absolute top-0 left-0 w-full h-full" style="z-index: 20;">
+            <div id="nodesLayer" class="absolute inset-0 pointer-events-none p-0 m-0" style="z-index: 20;">
             </div>
 
             <div id="tooltip" class="tip">
@@ -209,12 +210,15 @@
 </div>
 
 <script>
-    { // 블록 스코프 시작 (HTMX 재호출 시 const 중복 에러 방지)
+    { // 블록 스코프 시작
 
         /* --- 1. 데이터 구성 (JSTL -> JS) --- */
         const nodesData = [];
         const chapterMap = {};
         let globalChapterSeq = 0;
+
+        // JSP Context Path 미리 저장 (백틱 에러 방지)
+        const CPATH = '${pageContext.request.contextPath}';
 
         <c:forEach items="${allLearningList}" var="item" varStatus="status">
         var chId = '${item.chapterId}';
@@ -252,24 +256,85 @@
         </c:if>
         </c:forEach>
 
-        /* --- 2. 로드맵 로직 함수 정의 --- */
+        /* --- 2. 툴팁 함수 (전역 등록: HTMX 대응 핵심) --- */
+        window.openTooltip = (pos, el) => {
+            const tooltip = document.getElementById('tooltip');
+            const inner = document.getElementById('innerContent');
+            if (!tooltip || !inner) return;
+
+            const data = pos.data;
+            const isChapter = data.type === 'chapter';
+
+            // 제목 및 숫자 추출
+            let title;
+            try {
+                const rawId = isChapter ? data.chapterId : data.id;
+                const num = rawId.replace(/[^0-9]/g, '').slice(-3);
+                title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
+            } catch (e) { title = isChapter ? "Chapter Test" : "Lesson"; }
+
+            document.getElementById('tip-title').innerText = title;
+            document.getElementById('tip-desc').innerText = isChapter
+                ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
+                : (data.lessonName || "레슨 설명이 없습니다.");
+
+            const status = data.status || 'locked';
+            const badge = document.getElementById('tip-badge');
+            badge.innerHTML = status === 'completed'
+                ? '<span class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-extrabold border border-indigo-100">완료</span>'
+                : (status === 'current' ? '<span class="px-2 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-extrabold border border-orange-100">진행중</span>' : '');
+
+            const infoDiv = document.getElementById('tip-info');
+            if (isChapter) {
+                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
+                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
+            } else {
+                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.lessonType === 'THEORY' ? '이론' : '실습') + '</div></div>' +
+                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
+            }
+
+            let startBtn = document.getElementById('startBtn');
+            const newBtn = startBtn.cloneNode(true);
+            startBtn.parentNode.replaceChild(newBtn, startBtn);
+
+            newBtn.innerText = status === 'completed' ? "다시하기" : (isChapter ? "시험 응시하기" : "시작하기");
+            // CPATH 변수 사용 (백틱 제거)
+            newBtn.setAttribute('hx-post', CPATH + '/lesson/lessonInfo');
+            newBtn.setAttribute('hx-target', '#main');
+            newBtn.setAttribute('hx-vals', JSON.stringify({targetId: data.id}));
+            htmx.process(newBtn);
+
+            const TIP_WIDTH = 300;
+            let left = pos.x - 150;
+            let top = pos.y + 70;
+            if (left < 10) left = 10;
+            if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
+            if (top + 250 > inner.offsetHeight) top = pos.y - 280;
+
+            tooltip.style.left = left + "px";
+            tooltip.style.top = top + "px";
+            tooltip.classList.add('visible');
+        };
+
+        /* --- 3. 로드맵 그리기 및 자동 스크롤 --- */
         const initRoadmap = () => {
             const inner = document.getElementById('innerContent');
             const nodesLayer = document.getElementById('nodesLayer');
-            if (!inner || !nodesLayer) return;
+            const scrollContainer = document.getElementById('roadmapScroll');
+            if (!inner || !nodesLayer || !scrollContainer) return;
 
             const vw = window.innerWidth - 220;
             const vh = window.innerHeight - 80;
             const NODES_PER_CHAPTER = 6;
             const totalChapters = Math.ceil(nodesData.length / NODES_PER_CHAPTER);
 
-            inner.style.width = `\${Math.max(1, totalChapters) * vw}px`;
+            inner.style.width = (Math.max(1, totalChapters) * vw) + "px";
             nodesLayer.innerHTML = '';
             const nodePositions = [];
 
             // 1) 위치 계산
             nodesData.forEach((node) => {
-                const marginX = vw * 0.1;
+                const marginX = 40; // 왼쪽 여백 고정값 (사이드바 밀착)
                 const availableW = vw - (marginX * 2);
                 const stepX = availableW / (NODES_PER_CHAPTER - 1);
                 const x = (node.chapterIdx * vw) + marginX + (node.inChapterIdx * stepX);
@@ -288,11 +353,8 @@
                 const isChapter = data.type === 'chapter';
                 const status = data.status || 'locked';
 
-                el.className = `orb \${status}`;
-                if (isChapter) {
-                    el.style.width = '80px';
-                    el.style.height = '80px';
-                }
+                el.className = 'orb ' + status;
+                if (isChapter) { el.style.width = '80px'; el.style.height = '80px'; }
 
                 if (isChapter) {
                     if (status === 'completed') el.innerHTML = '<i data-lucide="award" class="w-9 h-9 text-indigo-600"></i>';
@@ -301,16 +363,16 @@
                 } else {
                     if (status === 'completed') el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
                     else if (status === 'current') el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                    else el.innerHTML = `<span class="text-xl font-bold font-mono text-gray-300">\${data.inChapterIdx + 1}</span>`;
+                    else el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
                 }
 
-                el.style.left = `\${pos.x - (isChapter ? 40 : 36)}px`;
-                el.style.top = `\${pos.y - (isChapter ? 40 : 36)}px`;
+                el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
+                el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
 
-                // 클릭 이벤트 연결
+                // 클릭 이벤트 (전역 함수 호출)
                 el.onclick = (e) => {
                     e.stopPropagation();
-                    if (status !== 'locked') openTooltip(pos, el);
+                    if (status !== 'locked') window.openTooltip(pos, el);
                     else alert("이전 단계를 먼저 완료해주세요!");
                 };
                 nodesLayer.appendChild(el);
@@ -318,6 +380,18 @@
 
             drawContinuousPath(nodePositions);
             if (window.lucide) window.lucide.createIcons();
+
+            /* --- [추가] 현재 진행 중인 위치로 자동 스크롤 --- */
+            const currentNode = nodePositions.find(p => p.data.status === 'current');
+            if (currentNode) {
+                const screenCenter = (window.innerWidth - 220) / 2;
+                let targetScroll = currentNode.x - screenCenter;
+                if (targetScroll < 0) targetScroll = 0;
+
+                setTimeout(() => {
+                    scrollContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
+                }, 100);
+            }
         };
 
         const drawContinuousPath = (nodePositions) => {
@@ -326,104 +400,143 @@
             const pathDashed = document.getElementById('roadDashed');
             if (!pathMain || nodePositions.length === 0) return;
 
-            let d = `M \${nodePositions[0].x} \${nodePositions[0].y}`;
+            let d = "M " + nodePositions[0].x + " " + nodePositions[0].y;
             for (let i = 0; i < nodePositions.length - 1; i++) {
                 const curr = nodePositions[i];
                 const next = nodePositions[i + 1];
                 const cp1 = {x: curr.x + ((next.x - curr.x) * 0.5), y: curr.y};
                 const cp2 = {x: next.x - ((next.x - curr.x) * 0.5), y: next.y};
-                d += ` C \${cp1.x} \${cp1.y}, \${cp2.x} \${cp2.y}, \${next.x} \${next.y}`;
+                d += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
             }
             pathBorder.setAttribute('d', d);
             pathMain.setAttribute('d', d);
             pathDashed.setAttribute('d', d);
         };
 
-        /* --- 3. 툴팁 로직 --- */
-        const openTooltip = (pos, el) => {
-            const tooltip = document.getElementById('tooltip');
-            const inner = document.getElementById('innerContent');
-            if (!tooltip || !inner) return;
+        /* --- 4. 드롭다운 및 이동 버튼 로직 --- */
+        function initRoadMapDropdowns() {
+            const wrappers = document.querySelectorAll('.select-wrapper');
 
-            const data = pos.data;
-            const isChapter = data.type === 'chapter';
+            wrappers.forEach(wrapper => {
+                const button = wrapper.querySelector('button.control-item');
+                const list = wrapper.querySelector('.optionList');
+                const items = list.querySelectorAll('.optionItem');
+                const textSpan = button.querySelector('.btn-text');
 
-            // 제목 및 숫자 추출
-            let title;
-            try {
-                const num = (isChapter ? data.chapterId : data.id).replace(/[^0-9]/g, '').slice(-3);
-                title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
-            } catch(e) { title = isChapter ? "Chapter Test" : "Lesson"; }
+                button.onclick = (e) => {
+                    e.stopPropagation();
+                    closeAllDropdowns(button);
+                    button.classList.toggle('active');
+                    list.classList.toggle('show');
+                };
 
-            document.getElementById('tip-title').innerText = title;
-            document.getElementById('tip-desc').innerText = isChapter
-                ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
-                : (data.lessonName || "레슨 설명이 없습니다.");
+                items.forEach(item => {
+                    setupOptionItem(item, button, list, textSpan);
+                });
+            });
 
-            // 배지 및 정보 영역 설정
-            const status = data.status || 'locked';
-            const badge = document.getElementById('tip-badge');
-            badge.innerHTML = status === 'completed'
-                ? '<span class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-extrabold border border-indigo-100">완료</span>'
-                : (status === 'current' ? '<span class="px-2 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-extrabold border border-orange-100">진행중</span>' : '');
+            function setupOptionItem(item, button, list, textSpan) {
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    textSpan.textContent = item.textContent;
+                    const value = item.getAttribute('data-value');
 
-            const infoDiv = document.getElementById('tip-info');
-            if (isChapter) {
-                infoDiv.innerHTML = `<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">\${data.testReward || 0}원</div></div>
-                                 <div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">\${data.testPay || 0}원</div></div>`;
-            } else {
-                infoDiv.innerHTML = `<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">\${data.lessonType === 'THEORY' ? '이론' : '실습'}</div></div>
-                                 <div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>`;
+                    // [핵심] 값 저장
+                    button.dataset.value = value;
+
+                    const siblings = list.querySelectorAll('.optionItem');
+                    siblings.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+
+                    button.classList.remove('active');
+                    list.classList.remove('show');
+
+                    if (button.id === 'levelSelect') {
+                        const chapterBtn = document.getElementById('chapterSelect');
+                        chapterBtn.querySelector('.btn-text').textContent = "챕터 선택";
+                        chapterBtn.dataset.value = "";
+                        fetchChapters(value);
+                    }
+                };
             }
 
-            // 버튼 재생성 및 HTMX 설정
-            let startBtn = document.getElementById('startBtn');
-            const newBtn = startBtn.cloneNode(true);
-            startBtn.parentNode.replaceChild(newBtn, startBtn);
-            startBtn = newBtn;
+            // [핵심] 이동 버튼 스크롤 로직
+            const moveBtn = document.getElementById('moveBtn');
+            if (moveBtn) {
+                moveBtn.onclick = () => {
+                    const chapterBtn = document.getElementById('chapterSelect');
+                    const selectedChId = chapterBtn.dataset.value;
 
-            startBtn.innerText = status === 'completed' ? "다시하기" : (isChapter ? "시험 응시하기" : "시작하기");
-            startBtn.setAttribute('hx-post', '${cpath}/lesson/lessonInfo');
-            startBtn.setAttribute('hx-target', '#main');
-            startBtn.setAttribute('hx-vals', JSON.stringify({ targetId: data.id }));
-            htmx.process(startBtn);
+                    if (!selectedChId) { alert("이동할 챕터를 선택해주세요."); return; }
 
-            // 위치 보정
-            const TIP_WIDTH = 300;
-            let left = pos.x - 150;
-            let top = pos.y + 70;
-            if (left < 10) left = 10;
-            if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
-            if (top + 250 > inner.offsetHeight) top = pos.y - 280;
+                    const targetNode = nodesData.find(n => n.chapterId === selectedChId);
 
-            tooltip.style.left = left + "px";
-            tooltip.style.top = top + "px";
-            tooltip.classList.add('visible');
-        };
+                    if (targetNode) {
+                        const vw = window.innerWidth - 220;
+                        const targetX = targetNode.chapterIdx * vw;
+                        const scrollContainer = document.getElementById('roadmapScroll');
+                        scrollContainer.scrollTo({ left: targetX, behavior: 'smooth' });
+                    } else {
+                        alert("해당 챕터를 찾을 수 없습니다.");
+                    }
+                };
+            }
 
-        /* --- 4. 이벤트 위임 (HTMX 대응) --- */
-        document.addEventListener('click', function(e) {
+            function fetchChapters(levelId) {
+                const chapterBtn = document.getElementById('chapterSelect');
+                const chapterSpan = chapterBtn.querySelector('.btn-text');
+                const chapterListUl = document.getElementById('chapterListContainer');
+
+                fetch(CPATH + '/roadMapApi/chapters?levelId=' + levelId)
+                    .then(response => { if (!response.ok) throw new Error('Network response'); return response.json(); })
+                    .then(data => {
+                        chapterListUl.innerHTML = '';
+                        if (!data || data.length === 0) { chapterSpan.textContent = "챕터 없음"; return; }
+                        chapterSpan.textContent = "챕터 선택";
+
+                        data.forEach(chapter => {
+                            const li = document.createElement('li');
+                            li.className = 'optionItem';
+                            li.textContent = chapter.chapterName;
+                            li.setAttribute('data-value', chapter.chapterId);
+                            setupOptionItem(li, chapterBtn, chapterListUl, chapterSpan);
+                            chapterListUl.appendChild(li);
+                        });
+                    })
+                    .catch(error => { console.error('Error:', error); chapterSpan.textContent = "로드 실패"; });
+            }
+
+            document.removeEventListener('click', closeAllDropdowns);
+            document.addEventListener('click', closeAllDropdowns);
+
+            function closeAllDropdowns(e) {
+                const target = e ? e.target : null;
+                document.querySelectorAll('.select-wrapper').forEach(wrapper => {
+                    const btn = wrapper.querySelector('button.control-item');
+                    const list = wrapper.querySelector('.optionList');
+                    if (btn && btn !== target && !btn.contains(target)) {
+                        btn.classList.remove('active');
+                        list.classList.remove('show');
+                    }
+                });
+            }
+        }
+
+        /* --- 5. 이벤트 리스너 등록 --- */
+        document.addEventListener('click', function (e) {
             const tooltip = document.getElementById('tooltip');
             if (!tooltip) return;
-
-            // 닫기 버튼 클릭 (closest 사용하여 아이콘 클릭 대응)
-            if (e.target.closest('#tipCloseBtn')) {
-                tooltip.classList.remove('visible');
-            }
-
-            // 바탕 클릭 시 닫기
-            // if (e.target.id === 'roadmapScroll' || e.target.id === 'innerContent') {
-            //     tooltip.classList.remove('visible');
-            // }
+            if (e.target.closest('#tipCloseBtn')) tooltip.classList.remove('visible');
         });
 
         window.addEventListener('resize', initRoadmap);
 
         // 초기 실행
         initRoadmap();
+        initRoadMapDropdowns();
 
-        // HTMX 페이지 전환 대응
-        document.body.addEventListener('htmx:afterSettle', function(evt) {
+        // HTMX 리로드 대응
+        document.body.addEventListener('htmx:afterSettle', function (evt) {
             if (document.getElementById('roadmapScroll')) {
                 initRoadmap();
             }

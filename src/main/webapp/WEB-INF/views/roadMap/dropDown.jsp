@@ -10,7 +10,7 @@
 
 <div class="stage-controls-left">
     <div class="select-wrapper">
-        <button id="levelSelect" class="control-item w-[110px]" type="button" aria-label="레벨 선택">
+        <button id="levelSelect" class="control-item w-[100px]" type="button" aria-label="레벨 선택">
             <span class="btn-text">${userLesson.get(0).getLevelName()}</span>
         </button>
         <ul class="optionList">
@@ -27,7 +27,7 @@
         </button>
         <ul class="optionList custom-scroll" id="chapterListContainer"></ul>
     </div>
-    <button id="moveBtn" type="submit" class="control-item w-[70px] btn-move">이동</button>
+    <button id="moveBtn" type="submit" class="control-item btn-move">이동</button>
 </div>
 
-<script src="${pageContext.request.contextPath}/resources/js/roadMap/dropDown.js"></script>
+<%--<script src="${pageContext.request.contextPath}/resources/js/roadMap/dropDown.js"></script>--%>

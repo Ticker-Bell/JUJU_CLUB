@@ -35,6 +35,7 @@
     <!-- Main -->
     <main id="main" class="flex-1 overflow-y-auto p-8 flex flex-col bg-gray-50">
         <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
+
     </main>
 </div>
 

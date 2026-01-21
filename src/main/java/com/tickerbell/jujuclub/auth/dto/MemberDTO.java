@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberDTO {
-    private Long userSeq;
+    private Integer userSeq;
     private String userId;
     private String userPw;
     private String userName;

@@ -13,7 +13,7 @@ public class UserInfoService {
         this.userInfoMapper = userInfoMapper;
     }
 
-    public UserInfoDTO getUserInfo(int userSeq){
+    public UserInfoDTO getUserInfo(Integer userSeq){
      return userInfoMapper.userInfo(userSeq);
     }
 }

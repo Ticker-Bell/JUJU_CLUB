@@ -10,7 +10,9 @@ public interface TradeMapper {
 
     void updateBalance(@Param("userSeq") int userSeq, @Param("amount") int amount);
 
-    void upsertHoldings(TradeDTO tradeDTO);
+   int selectHoldings(@Param("stockSeq") int stockSeq);
+
+    void upsertHoldings(@Param("9") TradeDTO tradeDTO, @Param("updateQuantity") int updateQuantity);
 
     void insertTradeHistory(TradeDTO tradeDTO);
 }

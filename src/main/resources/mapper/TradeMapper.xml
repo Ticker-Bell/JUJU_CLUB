@@ -17,13 +17,20 @@
         WHERE user_seq = #{userSeq}
     </update>
 
+    <!--보유주식의 수량 select-->
+    <select id="selectHoldings" resultType="int">
+        SELECT quantity
+        FROM  mock_portfolio
+        WHERE stock_seq = #{stockSeq}
+    </select>
+
     <!--보유주식 insert and update-->
     <insert id="upsertHoldings">
         INSERT INTO mock_portfolio(user_seq, stock_seq, quantity, avg_price)
-        VALUES (#{userSeq}, #{stockSeq}, #{tradeQuantity}, #{tradePrice}) ON DUPLICATE KEY
+        VALUES (#{tradeDTO.userSeq}, #{tradeDTO.stockSeq}, #{tradeDTO.tradeQuantity}, #{tradeDTO.tradePrice}) ON DUPLICATE KEY
         UPDATE
-            avg_price = (avg_price * quantity + #{tradePrice} * #{tradeQuantity}) / (quantity + #{tradeQuantity}),
-            quantity = quantity + #{tradeQuantity}
+            avg_price = (avg_price * quantity + #{tradeDTO.tradePrice} * #{tradeDTO.tradeQuantity}) / (quantity + #{tradeDTO.tradeQuantity}),
+            quantity = quantity + #{updateQuantity}
     </insert>
 
     <!--거래 내역 insert-->

@@ -4,35 +4,31 @@ import com.tickerbell.jujuclub.invest.trade.dto.TradeDTO;
 import com.tickerbell.jujuclub.invest.trade.service.TradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping("/trade")
+@Controller
+@RequestMapping("/invest")
 
 public class TradeController {
     @Autowired
     TradeService tradeService;
 
-    @PostMapping("/BuySell")
-    public ResponseEntity<Map<String, Object>> buySellTrade(@RequestBody TradeDTO tradeDTO, HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        Integer userSeq = (Integer) session.getAttribute("userSeq") == null? 4: (Integer) session.getAttribute("userSeq");
+    @GetMapping("/investBuySell.do")
+    public String TradePage(HttpSession session, Model model){
+        Integer userSeq = (Integer) session.getAttribute("userSeq") == null ? 4 : (Integer)session.getAttribute("userSeq");
+        TradeDTO tradeDTO = new TradeDTO();
+        tradeDTO.setUserSeq(userSeq);
+        tradeDTO.setStockSeq(1);
+        int hasStockQuantity = tradeService.getStockQuantity(tradeDTO);
+        model.addAttribute("hasStockQuantity", hasStockQuantity);
 
-        try {
-            tradeDTO.setUserSeq(userSeq);
-            tradeService.processTrade(tradeDTO);
+        return "invest/investBuySell";
 
-            response.put("success", true);
-            response.put("message", "거래가 성공적으로 완료되었습니다.");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
     }
 }

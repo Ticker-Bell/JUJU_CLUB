@@ -17,19 +17,19 @@ public class TradeService {
         int userSeq = tradeDTO.getUserSeq();
         int tradeQuantity = tradeDTO.getTradeQuantity();
 
-        int currentbalance = tradeMapper.selectBalance(userSeq);
         int totalAmount = tradeDTO.getTradePrice() * tradeQuantity;
-
+        int updateQuantity = "Y".equals(tradeDTO.getTradeType()) ? tradeQuantity : -tradeQuantity;
         int amountChange = "Y".equals(tradeDTO.getTradeType()) ? -totalAmount : totalAmount;
+
         tradeMapper.updateBalance(userSeq, amountChange);
 
-
-        tradeMapper.upsertHoldings(tradeDTO);
-
-        tradeDTO.setTradeQuantity(tradeQuantity);
-
+        tradeMapper.upsertHoldings(tradeDTO, updateQuantity);
         tradeMapper.insertTradeHistory(tradeDTO);
 
         return "트랜지션이 처리되었습니다.";
+    }
+
+    public int getStockQuantity(TradeDTO tradeDTO){
+        return  tradeMapper.selectHoldings(tradeDTO.getStockSeq());
     }
 }

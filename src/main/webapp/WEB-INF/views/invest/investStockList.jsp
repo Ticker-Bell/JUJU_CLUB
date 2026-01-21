@@ -223,15 +223,16 @@
                     // 4. 색상 변경 (빨강/파랑/검정)
                     const $priceTexts = $item.find('.txt-price, .txt-rate');
 
-                    if(rate && rate.startsWith("+")){
+                    if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                        // 이때만 기존 색 지우고 다시 입힘
                         $priceTexts.removeClass('color-red color-blue color-gray');
-                        $priceTexts.addClass('color-red');
-                    } else if(rate && rate.startsWith("-")){
-                        $priceTexts.removeClass('color-red color-blue color-gray');
-                        $priceTexts.addClass('color-blue');
-                    } else{
-                        $priceTexts.removeClass('color-red color-blue color-gray');
-                        $priceTexts.addClass('color-gray');
+
+                        if(rate.startsWith("+")){
+                            $priceTexts.addClass('color-red');
+                        } else{
+                            $priceTexts.addClass('color-blue');
+                        }
                     }
                 }
             }
@@ -277,8 +278,9 @@
                 if (!$resultBox.is(':visible') || $items.length === 0) return;
 
                 if($active.length === 0){
+                    let $first = $items.first();
                     // 선택된 게 없으면 첫 번째 선택
-                    $items.first().addClass('active');
+                    $first.addClass('active');
                     // 스크롤 이동
                     $first[0].scrollIntoView({block: 'nearest'});
                 } else {
@@ -430,6 +432,12 @@
                     // 리스트에 그려진 종목을 클릭한 것으로 트리거 발동
                     // 아래에 정의된 .stock-item 클릭 이벤트가 실행되면서 차트/기업정보 AJAX가 나감
                     $('#stockList .stock-item').trigger('click');
+
+                    // 기존 subscribe 모두 unsubscribe
+                    const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
+                    StockSocket.unsubscribe(currentSubscribedCodes);
+
+                    StockSocket.subscribeStock(stock.stockCode);
                 }
             })
         });
@@ -597,12 +605,16 @@
         // DOM 업데이트
         $container.html(html);
 
+        // 기존 subscribe 모두 unsubscribe
+        const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
+        StockSocket.unsubscribe(currentSubscribedCodes);
+
         // 화면에 뿌린 종목들의 코드 긁어오기
         // map을 사용해 data 배열에서 stockCode만 뽑아서 새 배열로 만들기
         const codes = data.map(item => item.stockCode);
-
-        // 소켓 연결 함수 호출
-        initListSocket(codes);
+        codes.forEach(code=>{
+            StockSocket.subscribeStock(code);
+        });
     }
 </script>
 </body>

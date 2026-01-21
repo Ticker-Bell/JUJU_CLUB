@@ -42,8 +42,10 @@ public class StockChartController {
         List<String> stockCodes = new ArrayList<>();
 
         Object codes = message.get("stockCodes");
-        if (codes instanceof List) {
-            stockCodes = (List<String>) codes;
+        if (codes instanceof List<?>) {
+            for( Object code : (List<?>) codes) {
+                stockCodes.add(String.valueOf(code));
+            }
         } else if (codes instanceof String) {
             stockCodes.add((String) codes);
         }

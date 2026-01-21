@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.invest.stockChart.controller;
 
+import com.tickerbell.jujuclub.invest.stockChart.dto.SelectedStockDTO;
 import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
 import com.tickerbell.jujuclub.invest.stockChart.service.StockChartRestService;
 import com.tickerbell.jujuclub.invest.stockChart.service.StockChartService;
@@ -32,6 +33,13 @@ public class StockChartController {
             @RequestParam(value = "periodCode", defaultValue = "D") String periodCode,
             @RequestParam(value = "stockCode") String stockCode) {
         return stockChartRestService.getStockRestData(periodCode, stockCode);
+    }
+
+    @GetMapping("/invest/chart/selectedStockInfo")
+    @ResponseBody
+    public SelectedStockDTO selectedStockInfo(@RequestParam String stockCode, @RequestParam String stockName){
+       //선택된 주식 정보
+        return new SelectedStockDTO(stockCode, stockName);
     }
 
     @MessageMapping("/invest/request/chartData")

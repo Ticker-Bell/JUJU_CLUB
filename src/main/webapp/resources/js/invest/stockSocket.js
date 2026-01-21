@@ -6,7 +6,7 @@ const StockSocket = {
     lastestData: {},
     //연결 상태
     isConnected: false,
-    //구독한 주식 코드 , 구독 해지를 위해 객체를 저장할 Map 형태 (종목코드:구독객체)ㄴ
+    //구독한 주식 코드 , 구독 해지를 위해 객체를 저장할 Map 형태 (종목코드:구독객체)
     subscribeCodes: new Map(),
     updateTimer: null,
 

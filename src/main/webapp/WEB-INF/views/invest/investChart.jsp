@@ -95,16 +95,13 @@
         document.getElementById('header-stock').innerText = stockCode;
 
         const url = `${pageContext.request.contextPath}/invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
-
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function () {
-                updateButtonUI('D');
-                loadChartData('D', selectedStockState.stockCode);
-
-            }
-        });
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('header-stock').innerText = data.stockCode;
+                document.getElementById('header-stockName'). innerText = data.stockName;
+                loadChartData('D', data.stockCode);
+            });
 
     }
 
@@ -129,7 +126,7 @@
                 myChartInstance = renderStockChart('myChart', formattedData, periodCode);
 
                 if (periodCode === 'D') {
-                    initSocket(myChartInstance, [stockCode]); //배열 형태의 stockCode가 들어가야함
+                    initSocket(myChartInstance, stockCode); //배열 형태의 stockCode가 들어가야함
                 }
                 updateButtonUI(periodCode);
             })
@@ -147,13 +144,11 @@
         }
     }
 
-
-    function updateHeaderInfo(stock) {
+    function updateHeaderStock(stock) {
         if (!stock) return;
+        const stockNameEl = document.getElementById('header-stock');
         const priceEl = document.getElementById('header-price');
         const changeEl = document.getElementById('header-change');
-
-
         if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
         if (stock.displayChange) changeEl.innerText = stock.displayChange;
 

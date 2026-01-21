@@ -196,7 +196,7 @@ public class RankingApiService {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
-                    .path("//uapi/domestic-stock/v1/ranking/fluctuation")
+                    .path("/uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
                     .queryParam("fid_cond_scr_div_code", "20170")  //조건 화면 분류 코드 - Unique key( 20170 )
@@ -260,7 +260,7 @@ public class RankingApiService {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
-                    .path("//uapi/domestic-stock/v1/ranking/fluctuation")
+                    .path("/uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
                     .queryParam("fid_cond_scr_div_code", "20170")  //조건 화면 분류 코드 - Unique key( 20170 )

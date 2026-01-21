@@ -192,12 +192,12 @@
             stockCodes,       // 구독할 종목 코드들
             function (stockData){  // 3초마다 실행될 데이터 처리 함수
                 // 1. 데이터가 도착한 종목의 HTML 박스 찾기
-                const $item = $('.stock-item[data-code="\${data.stockCode}"]');
+                const $item = $('.stock-item[data-code="\${stockData.stockCode}"]');
 
                 // 해당 종목이 화면에 있다면
                 if($item.length > 0){
                     // 2.가격 업데이트 (콤마 찍기)
-                    const formattedPrice = stockData.currentPrice
+                    const formattedPrice = stockData.currentPrice;
                     $item.find('.txt-price').text(formattedPrice);
 
                     // 3.등락률 업데이트 (+- 기호 및 % 붙이기)

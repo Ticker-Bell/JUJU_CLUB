@@ -12,7 +12,7 @@ public class AccountService {
     private final AccountMapper accountMapper;
 
     // [수정] void -> Long (생성된 계좌번호 반환)
-    public String createAccount(Long userSeq) {
+    public String createAccount(Integer userSeq) {
         // 1. 중복 계좌 확인
         if (accountMapper.checkAccountExist(userSeq) > 0) {
             return null; // 이미 존재하면 null 반환 (혹은 예외 처리)
@@ -43,7 +43,7 @@ public class AccountService {
         return String.valueOf(randomNumber);
     }
 
-    public AccountDTO getMyAccount(Long userSeq) {
+    public AccountDTO getMyAccount(Integer userSeq) {
         return accountMapper.selectAccountByUserSeq(userSeq);
     }
 }

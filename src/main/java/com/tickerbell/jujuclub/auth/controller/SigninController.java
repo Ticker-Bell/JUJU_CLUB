@@ -34,6 +34,7 @@ public class SigninController {
 
             // 세션 생성 (키: loginUser)
             session.setAttribute("loginUser", user);
+            session.setAttribute("userSeq", user.getUserSeq());
 
             // 응답 데이터 구성
             res.put("ok", true);

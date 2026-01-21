@@ -9,5 +9,5 @@ import org.apache.ibatis.annotations.Param;
 public interface SigninMapper {
   MemberDTO selectUserById(String userId);
 
-  void updateUserLevel(@Param("userSeq") Long userSeq, @Param("level") int level);
+  void updateUserLevel(@Param("userSeq") Integer userSeq, @Param("level") Integer level);
 }

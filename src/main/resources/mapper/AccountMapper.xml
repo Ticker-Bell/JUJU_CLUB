@@ -24,4 +24,15 @@
                      NOW(),  NOW()   )
     </insert>
 
+    <select id="selectAccountByUserSeq" parameterType="long" resultType="com.tickerbell.jujuclub.auth.dto.AccountDTO">
+        SELECT
+            account_seq as accountSeq,
+            user_seq as userSeq,
+            account_no as accountNo,
+            cash_balance as cashBalance,
+            created_at as createdAt,
+            updated_at as updatedAt
+        FROM USER_ACCOUNT
+        WHERE user_seq = #{userSeq}
+    </select>
 </mapper>

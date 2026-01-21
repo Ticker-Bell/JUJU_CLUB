@@ -14,30 +14,42 @@ import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class StockChartService {
+    private WebSocketSession externalSession = null; //
+    private final Set<String> subscribedCodes = Collections.synchronizedSet(new HashSet<>());
+
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartParser stockChartParser;
-    private final String APPROVAL_KEY = "062fab1b-3a3c-48da-b666-d3a57042db77             ";
+    private final String APPROVAL_KEY = "5622cc60-8a75-4bbb-845a-9f70babcc1bd";
 
-    public void connectToStockChartApi(String stockCode) {
+    public synchronized void connectToStockChartApi(List<String> stockCodeList) {
+        if (externalSession == null || !externalSession.isOpen()) {
+            initConnection(stockCodeList);
+        } else {
+            for (String stockCode : stockCodeList) {
+                if (!subscribedCodes.contains(stockCode)) {
+                    sendSubscribeMessage(externalSession, stockCode);
+                }
+            }
+        }
+    }
+
+    private void initConnection(List<String> stockCodeList) {
         WebSocketClient client = new StandardWebSocketClient();
         String externalUrl = "ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0";
 
         client.doHandshake(new TextWebSocketHandler() {
             @Override
             public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-                String subscribeMessage = String.format(
-                        "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"utf-8\"}," +
-                                "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", APPROVAL_KEY, stockCode);
-
-
-                session.sendMessage(new TextMessage(subscribeMessage));
-                log.info("외부 API에 종목 구독 요청전송: {}", stockCode);
+                externalSession = session;
+                for (String stockCode : stockCodeList) {
+                    sendSubscribeMessage(session, stockCode);
+                }
             }
 
             @Override
@@ -49,6 +61,7 @@ public class StockChartService {
                     log.info("수신된 설정 메시지: {}", chartData);
                     return;
                 }
+
                 log.info("실시간 데이터 수신: {}", chartData);
                 try {
                     List<StockChartDTO> chartDTOList = stockChartParser.parseStockChart(chartData);
@@ -74,4 +87,20 @@ public class StockChartService {
         }, externalUrl);
 
     }
+
+    private void sendSubscribeMessage(WebSocketSession session, String stockCode) {
+        try {
+            String subscribeMessage = String.format(
+                    "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"utf-8\"}," +
+                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", APPROVAL_KEY, stockCode);
+
+
+            session.sendMessage(new TextMessage(subscribeMessage));
+            subscribedCodes.add(stockCode);
+            log.info("종목 구독: {}", stockCode);
+        } catch (Exception e) {
+            log.error("구독 전송 에러 ({}) : {}", stockCode, e.getMessage());
+        }
+    }
+
 }

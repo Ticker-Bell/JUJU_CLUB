@@ -384,7 +384,7 @@ public class RankingApiService {
             // 15개마다 1초 쉬기 (마지막은 제외해도 됨)
             if(count % batchSize == 0 && i < rankingDTOList.size()-1){
                 try{
-                    Thread.sleep(500);
+                    Thread.sleep(900);
                 }catch(InterruptedException e){
                     Thread.currentThread().interrupt();
                     throw new RuntimeException("API 호출 대기 중 인터럽트 발생",e);

@@ -122,6 +122,12 @@
             box-shadow: inset 0 0 0 2px #5E45EB;
         }
 
+        /* 키보드로 선택된 항목 강조 스타일 */
+        .result-item.active{
+            background-color: #F5F3FF;
+            box-shadow: inset 3px 0 0 0 #5E45EB;
+        }
+
 
     </style>
 </head>
@@ -215,7 +221,6 @@
                     $item.find('.txt-rate').text(rate);
 
                     // 4. 색상 변경 (빨강/파랑/검정)
-                    // 기존 색상 클래스 다 지우고 새로 입히기
                     const $priceTexts = $item.find('.txt-price, .txt-rate');
 
                     if(rate && rate.startsWith("+")){
@@ -238,9 +243,79 @@
 
         let debounceTimer; // 디바운싱을 위한 타이머
 
+        $('.search-input').on('keydown', function (e){
+            const $resultBox = $('.search-result');
+            const $items = $resultBox.find('.result-item');
+            const $active = $resultBox.find('.result-item.active');
+
+            // 1. 엔터키 (Enter)
+            if(e.keyCode === 13){
+                e.preventDefault(); // 폼 전송 등 막기
+                let keyword = $(this).val().trim();
+
+                // (1) 입력값이 비어있으면 -> 관심종목 탭 이동
+                if(keyword.length === 0){
+                    $('.tab-btn[data-sort="interest"]').trigger('click');
+                    $resultBox.hide();
+                    $(this).blur();
+                    return;
+                }
+
+                // (2) 입력값이 있고, 활성화된(강조된) 항목이 있으면 클릭 트리거
+                if($active.length > 0 && $resultBox.is(':visible')){
+                    $active.trigger('click');
+                    $(this).blur();
+                }
+                return;
+            }
+
+            // 2. 방향키 아래 (Down Arrow)
+            if(e.keyCode === 40){
+                e.preventDefault(); // 커서가 맨 뒤나 앞으로 튀는 것 방지
+
+                // 리스트가 없거나 안 보이면 무시
+                if (!$resultBox.is(':visible') || $items.length === 0) return;
+
+                if($active.length === 0){
+                    // 선택된 게 없으면 첫 번째 선택
+                    $items.first().addClass('active');
+                    // 스크롤 이동
+                    $first[0].scrollIntoView({block: 'nearest'});
+                } else {
+                    // 다음 항목으로 이동
+                    let $next = $active.next('.result-item');
+                    if($next.length > 0){
+                        $active.removeClass('active');
+                        $next.addClass('active');
+
+                        // 스크롤이 생겼을 때 따라가게
+                        $next[0].scrollIntoView({block: 'nearest'});
+                    }
+                }
+            }
+
+            // 3. 방향키 위 (Up Arrow)
+            if(e.keyCode === 38){
+                e.preventDefault();
+
+                if (!$resultBox.is(':visible') || $items.length === 0) return;
+
+                if($active.length > 0){
+                    let $prev = $active.prev('.result-item');
+                    if($prev.length > 0){
+                        $active.removeClass('active');
+                        $prev.addClass('active');
+
+                        // 이전 항목이 보이도록 스크롤 자동 조정
+                        $prev[0].scrollIntoView({block: 'nearest'});
+                    }
+                }
+            }
+        })
+
         $('.search-input').on('keyup',function (e){
-            // 엔터키(13)이나 방향키 등은 keyup에서 처리하지 않고 keydown이나 별도 로직으로 넘김
-            if(e.keyCode === 13) return;
+            // 방향키(37~40)와 엔터(13)는 keyup에서 무시 (keydown에서 처리했으므로)
+            if(e.keyCode === 13 || (e.keyCode >= 37 && e.keyCode <= 40)) return;
 
             let keyword = $(this).val();
             let $resultBox = $('.search-result'); //선택자 캐싱
@@ -299,17 +374,11 @@
             }, 300); // 0.3초 대기 시간
         });
 
-        // 엔터키 입력 시 첫 번째 결과 자동 선택
-        $('.search-input').on('keydown', function (e){
-            if(e.keyCode === 13){  //Enter key
-                // 검색 결과창이 열려있고, 결과 아이템이 하나라도 있다면
-                let $firstItem = $('.search-result .result-item').first();
-                if($firstItem.length > 0){
-                    $firstItem.trigger('click');  // 첫 번째 항목을 클릭한 것처럼 처리
-                    $(this).blur();
-                }
-            }
-        })
+        // 마우스 오버 시 active 클래스 이동 (마우스랑 키보드 충돌 방지)
+        $(document).on('mouseenter', '.result-item', function(){
+            $('.result-item').removeClass('active');
+            $(this).addClass('active');
+        });
 
         // 리스트 항목 클릭시 검색창에 값 넣기
         $(document).on('click', '.result-item', function(){
@@ -332,6 +401,16 @@
                     stockName: selectedName
                 },
                 success: function (stock){
+                    let colorClass = "color-gray";
+                    if(stock.changePct && stock.changePct.startsWith("+")){
+                        colorClass = "color-red";
+                    } else if(stock.changePct && stock.changePct.startsWith("-")){
+                        colorClass = "color-blue";
+                    }
+
+                    // 숫자 콤마
+                    let formattedPrice = Number(stock.currentPrice).toLocaleString();
+
                     // 메인 리스트에 선택한 항목 1개만 출력하기
                     let singleItemHtml = `
                         <div class="stock-item selected" data-code="\${stock.stockCode}" data-name="\${stock.stockName}">
@@ -340,8 +419,8 @@
                                 <span class="txt-code num-font">\${stock.stockCode}</span>
                             </div>
                             <div class="text-col items-end">
-                                <span class="txt-price color-red num-font">\${stock.currentPrice}</span>
-                                <span class="txt-rate color-red num-font">\${stock.changePct}%</span>
+                                <span class="txt-price \${colorClass} num-font">\${formattedPrice}</span>
+                                <span class="txt-rate \${colorClass} num-font">\${stock.changePct}%</span>
                             </div>
                         </div>
                     `;
@@ -490,6 +569,16 @@
                 rankHtml = `<span class="rank">\${item.rank}</span>`;
             }
 
+            let colorClass = "color-gray";
+            if(item.changePct && item.changePct.startsWith("+")){
+                colorClass = "color-red";
+            } else if(item.changePct && item.changePct.startsWith("-")){
+                colorClass = "color-blue";
+            }
+
+            // 숫자 콤마
+            let formattedPrice = Number(item.currentPrice).toLocaleString();
+
             html += `
                 <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
@@ -498,8 +587,8 @@
                         <span class="txt-code num-font">\${item.stockCode}</span>
                     </div>
                     <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">\${item.currentPrice}</span>
-                        <span class="txt-rate color-red num-font">\${item.changePct}%</span>
+                        <span class="txt-price \${colorClass} num-font">\${formattedPrice}</span>
+                        <span class="txt-rate \${colorClass} num-font">\${item.changePct}%</span>
                     </div>
                 </div>
             `;

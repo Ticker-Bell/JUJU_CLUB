@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.ranking.mapper.RankingMapper">
+
+  <select id="getUserRankingInfo" parameterType="int"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingResponse">
+    WITH USER_TOTAL AS (SELECT U.USER_SEQ,
+                               U.USER_ID,
+                               U.USER_NAME,
+                               UC.CASH_BALANCE,
+                               COALESCE(M.buySum, 0)                            AS buySum,
+                               COALESCE(M.sellSum, 0)                           AS sellSum,
+                               (COALESCE(M.sellSum, 0) - COALESCE(M.buySum, 0)) AS totalRevenue,
+                               CASE
+                                 WHEN COALESCE(M.buySum, 0) = 0 THEN 0
+                                 ELSE ROUND(
+                                       (COALESCE(M.sellSum, 0) - COALESCE(M.buySum, 0))
+                                       / COALESCE(M.buySum, 0) * 100, 2
+                                      )
+                                 END                                          AS totalRevenueRate
+                        FROM USERS U
+                               LEFT OUTER JOIN USER_ACCOUNT UC
+                                               ON U.USER_SEQ = UC.USER_SEQ
+                               LEFT OUTER JOIN (SELECT USER_SEQ,
+                                                       SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                                       SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                                FROM MOCK_TRADE
+                                                GROUP BY USER_SEQ) M ON U.USER_SEQ = M.USER_SEQ),
+         RANKED AS (SELECT UT.*,
+                           (UT.CASH_BALANCE + UT.totalRevenue) AS totalAsset,
+                           ROW_NUMBER() OVER (ORDER BY (UT.CASH_BALANCE + UT.totalRevenue) DESC)               AS userAssetRank,
+                           ROW_NUMBER() OVER (ORDER BY  UT.totalRevenueRate DESC ,UT.totalRevenue DESC)        AS userRevenueRank
+                    FROM USER_TOTAL UT)
+    SELECT *
+    FROM RANKED
+    WHERE USER_SEQ = #{userSeq};
+  </select>
+  <select id="getRankingBoardListOBA"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingListOBA">
+    SELECT *
+         , ROW_NUMBER() OVER (ORDER BY DD.totalAsset DESC) AS userAssetRank
+    FROM (SELECT *
+               , (CC.cash_balance + CC.totalRevenue) AS totalAsset
+          FROM (SELECT UC.USER_SEQ
+                     , U.USER_ID
+                     , U.USER_NAME
+                     , UC.CASH_BALANCE
+                     , BB.totalRevenueRate AS totalRevenueRate
+                     , BB.totalAsset       AS totalRevenue
+                FROM USER_ACCOUNT UC
+                       LEFT OUTER JOIN (SELECT AA.USER_SEQ
+                                             , AA.buySum          AS totalBuy
+                                             , AA.sellSum         AS totalSell
+                                             , CASE
+                                                 WHEN buySum = 0 THEN 0
+                                                 ELSE ROUND(((sellSum - buySum) / buySum) * 100, 2)
+                    END                                         AS totalRevenueRate
+                                             , (sellSum - buySum) AS totalAsset
+                                        FROM (SELECT USER_SEQ,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                              FROM MOCK_TRADE
+                                              GROUP BY USER_SEQ) AA) BB
+                                       ON UC.USER_SEQ = BB.USER_SEQ
+
+                       LEFT OUTER JOIN USERS U
+                                       ON UC.USER_SEQ = U.USER_SEQ
+               )CC
+         ) DD
+  </select>
+  <select id="getRankingBoardListOBR"
+    resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingListOBR">
+    SELECT *
+    FROM (SELECT *
+               , (CC.cash_balance + CC.totalRevenue) AS totalAsset
+               ,ROW_NUMBER() over (ORDER BY CC.totalRevenueRate DESC, CC.totalRevenue DESC) AS userRevenueRank
+          FROM (SELECT UC.USER_SEQ
+                     , U.USER_ID
+                     , U.USER_NAME
+                     , UC.CASH_BALANCE
+                     , BB.totalRevenueRate AS totalRevenueRate
+                     , BB.totalAsset       AS totalRevenue
+                FROM USER_ACCOUNT UC
+                       LEFT OUTER JOIN (SELECT AA.USER_SEQ
+                                             , AA.buySum          AS totalBuy
+                                             , AA.sellSum         AS totalSell
+                                             , CASE
+                                                 WHEN buySum = 0 THEN 0
+                                                 ELSE ROUND(((sellSum - buySum) / buySum) * 100, 2)
+                    END                                         AS totalRevenueRate
+                                             , (sellSum - buySum) AS totalAsset
+                                        FROM (SELECT USER_SEQ,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'Y' THEN TRADE_PRICE ELSE 0 END) AS buySum,
+                                                     SUM(CASE WHEN TRADE_TYPE = 'N' THEN TRADE_PRICE ELSE 0 END) AS sellSum
+                                              FROM MOCK_TRADE
+                                              GROUP BY USER_SEQ) AA) BB
+                                       ON UC.USER_SEQ = BB.USER_SEQ
+
+                       LEFT OUTER JOIN USERS U
+                                       ON UC.USER_SEQ = U.USER_SEQ
+               )CC
+         ) DD
+  </select>
+  <select id="getTotalUserCount" resultType="java.lang.Integer">
+    SELECT COUNT(USER_SEQ) AS totUserCnt
+    FROM USERS;
+  </select>
+</mapper>

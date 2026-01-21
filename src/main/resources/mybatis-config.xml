@@ -11,8 +11,8 @@
     <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
 
-  <!-- typeAliases -->
+<!--  &lt;!&ndash; typeAliases &ndash;&gt;
   <typeAliases>
     <package name="com.tickerbell.jujuclub"/>
-  </typeAliases>
+  </typeAliases>-->
 </configuration>

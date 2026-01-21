@@ -13,7 +13,7 @@
         order by mp.updated_at DESC
     </select>
 
-    <select id = "selectPortfolioItem" parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
+    <select id = "selectPortfolioItem" resultType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
         select portfolio_seq, user_seq, stock_seq, quantity, avg_price
         from mock_portfolio
         where user_seq = #{user_seq}
@@ -27,7 +27,7 @@
 
     <update id = "updatePortfolioItem" parameterType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">
         update mock_portfolio
-        set quantity = #{quentity},
+        set quantity = #{quantity},
             avg_price = #{avg_price},
             updated_at = now()
         where portfolio_seq = #{portfolio_seq}

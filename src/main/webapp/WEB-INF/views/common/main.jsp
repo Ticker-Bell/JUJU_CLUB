@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 퍼스트존 아카데미02
-  Date: 2026-01-13
-  Time: 오후 12:11
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <c:set var="cpath" value="${pageContext.request.contextPath}" scope="request"/>
@@ -15,11 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-
-    <%--(div 동적 생성후 css 후적용이라 main.jsp에 있어야함, 삭제 노노--%>
-    <%---레슨 공통 css---%>
+    <%--개념형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
-    <%---개념형 문제 css---%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
     <%--문항 버튼, 모달 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
@@ -27,7 +17,11 @@
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonDrag.css">
     <%--연결형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonMatch.css">
+    <%--랭킹 메인 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/ranking/rankingMain.css">
 
+    <%--선택형 문제 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
 </head>
 
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
@@ -39,18 +33,19 @@
     <jsp:include page="sidebar.jsp"/>
 
     <!-- Main -->
-    <main id="main" class="flex-1 overflow-hidden p-8 flex flex-col bg-gray-50">
+    <main id="main" class="flex-1 overflow-y-auto p-8 flex flex-col bg-gray-50">
         <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
+
     </main>
 </div>
 
 <%--htmx 사용할때는 동적으로 처리하는거라 화면 교체후에 다시 생성해야 한다고하네요--%>
 <script>
-  document.body.addEventListener('htmx:afterSwap', (evt) => {
-    if (evt.detail.target.id === 'main' && window.lucide) {
-      lucide.createIcons(evt.detail.target); // main 안에 있는 SVG만 다시 생성
-    }
-  });
+    document.body.addEventListener('htmx:afterSwap', (evt) => {
+        if (evt.detail.target.id === 'main' && window.lucide) {
+            lucide.createIcons(evt.detail.target); // main 안에 있는 SVG만 다시 생성
+        }
+    });
 </script>
 
 <script src="${cpath}/resources/js/main/main.js"></script>

@@ -70,7 +70,7 @@
 <div class="p-4 h-[400px]">
     <canvas id="myChart"></canvas>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/invest/stockLineChart.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
@@ -94,7 +94,7 @@
         document.getElementById('header-stockName').innerText = stockName;
         document.getElementById('header-stock').innerText = stockCode;
 
-        const url = `invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
+        const url = `${pageContext.request.contextPath}/invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
 
         $.ajax({
             url: url,
@@ -172,6 +172,7 @@
             "${pageContext.request.contextPath}",
             stockCodes,
             function (stockData) {
+                console.log("실시간 업데이트 수신:", stockData.stockCode, stockData.currentPrice);
                 const dataArray = targetChart.data.datasets[0].data;
                 const lastIdx = dataArray.length - 1;
 

@@ -6,8 +6,8 @@ const StockSocket = {
     lastestData: {},
     //연결 상태
     isConnected: false,
-    //구독한 주식 코드
-    subscribeCodes: new Set(),
+    //구독한 주식 코드 , 구독 해지를 위해 객체를 저장할 Map 형태 (종목코드:구독객체)ㄴ
+    subscribeCodes: new Map(),
     updateTimer: null,
 
     connect: function (contextPath, stockCodes, onMessageCallback) {
@@ -47,6 +47,7 @@ const StockSocket = {
             const payload = {
                 stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes]
             }; //stockCodes로 메시지 보냄
+
             self.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
         }, function (error) {
             console.error("websocket error: ", error);
@@ -58,15 +59,37 @@ const StockSocket = {
     subscribeStock: function (stockCode) {
         if (this.subscribeCodes.has(stockCode)) return;
 
-        this.stompClient.subscribe(`/topic/stock/${stockCode}`, (response) => {
+        const subscription = this.stompClient.subscribe(`/topic/stock/${stockCode}`, (response) => {
             const stockData = JSON.parse(response.body);
             console.log("웹소켓 원본 데이터 수신:", stockData);
             this.lastestData[stockData.stockCode] = stockData;
         });
 
-        this.subscribeCodes.add(stockCode);
+        //구독 객체를 저장
+        this.subscribeCodes.set(stockCode, subscription);
         console.log(`${stockCode} 구독 완료`);
     },
+
+    //구독 해제
+    unsubscribe: function (stockCodeList) {
+        if (!this.stompClient || !this.isConnected) return;
+
+        const codesToUnsubscribe = Array.isArray(stockCodeList) ? stockCodeList : [stockCodeList];
+
+        codesToUnsubscribe.forEach(stockCode => {
+            const subscription = this.subscribeCodes.get(stockCode);
+
+            if (subscription) {
+                subscription.unsubscribe(); //클라이언트 콜백 함수에서 제거
+
+                this.subscribeCodes.delete(stockCode); //구독 리스트에서 제거
+                delete this.lastestData[stockCode]; //화면에 업데이트할 대상에서 제거
+
+                console.log(`${stockCode} 구독 해제 및 데이터 삭제 완료`);
+            }
+        });
+    },
+
 
     //웹소켓 연결 중지
     disconnect: function () {

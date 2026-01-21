@@ -2,13 +2,13 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tickerbell.jujuclub.invest.trade.mapper.TradeMapper">
-
-    <!--유저 계좌 잔고 가져오기-->
-    <select id="selectBalance" resultType="int">
+<!--유저 계좌 잔고 select -->
+    <select id="selectBalance" resultType="int" parameterType="int">
         SELECT cash_balance
         FROM user_account
         WHERE user_seq = #{userSeq}
     </select>
+
 
     <!--유저 계좌 잔고 업데이트-->
     <update id="updateBalance">
@@ -18,23 +18,42 @@
     </update>
 
     <!--보유주식의 수량 select-->
-    <select id="selectHoldings" resultType="int">
+    <select id="selectHoldings" resultType="Integer" parameterType="int">
         SELECT quantity
         FROM  mock_portfolio
         WHERE stock_seq = #{stockSeq}
     </select>
 
     <!--보유주식 insert and update-->
-    <insert id="upsertHoldings">
+    <insert id="upsertHoldings" parameterType="com.tickerbell.jujuclub.invest.trade.dto.TradeDTO">
         INSERT INTO mock_portfolio(user_seq, stock_seq, quantity, avg_price)
-        VALUES (#{tradeDTO.userSeq}, #{tradeDTO.stockSeq}, #{tradeDTO.tradeQuantity}, #{tradeDTO.tradePrice}) ON DUPLICATE KEY
+        VALUES (#{userSeq}, #{stockSeq}, #{tradeQuantity}, #{tradePrice}) ON DUPLICATE KEY
         UPDATE
-            avg_price = (avg_price * quantity + #{tradeDTO.tradePrice} * #{tradeDTO.tradeQuantity}) / (quantity + #{tradeDTO.tradeQuantity}),
-            quantity = quantity + #{updateQuantity}
+        <choose>
+            <when test='tradeType == "Y"'>
+                avg_price = (avg_price * quantity + #{tradePrice} * #{tradeQuantity}) / (quantity + #{tradeQuantity}),
+                quantity = quantity + #{tradeQuantity}
+            </when>
+            <when test='tradeType == "N"'>
+                avg_price = avg_price,
+                quantity = quantity - #{tradeQuantity}
+            </when>
+            <otherwise>
+               avg_price = 0,
+                quantity = quantity
+            </otherwise>
+        </choose>
     </insert>
 
+    <!--보유주식 delete-->
+    <delete id="deleteHoldings">
+    DELETE
+    FROM mock_portfolio
+    WHERE quantity = 0
+    </delete>
+
     <!--거래 내역 insert-->
-    <insert id="insertTradeHistory">
+    <insert id="insertTradeHistory" parameterType="com.tickerbell.jujuclub.invest.trade.dto.TradeDTO">
         INSERT INTO mock_trade(user_seq, stock_seq, trade_type, trade_price, trade_quantity)
         VALUES (#{userSeq}, #{stockSeq}, #{tradeType}, #{tradePrice}, #{tradeQuantity})
     </insert>

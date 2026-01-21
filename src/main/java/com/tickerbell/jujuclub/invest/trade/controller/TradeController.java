@@ -22,10 +22,16 @@ public class TradeController {
     @GetMapping("/investBuySell.do")
     public String TradePage(HttpSession session, Model model){
         Integer userSeq = (Integer) session.getAttribute("userSeq") == null ? 4 : (Integer)session.getAttribute("userSeq");
+        Integer hasStockQuantity;
         TradeDTO tradeDTO = new TradeDTO();
         tradeDTO.setUserSeq(userSeq);
-        tradeDTO.setStockSeq(1);
-        int hasStockQuantity = tradeService.getStockQuantity(tradeDTO);
+        tradeDTO.setStockSeq(2);
+        if(tradeService.getStockQuantity(tradeDTO) == null){
+            hasStockQuantity =  0;
+        }else{
+            hasStockQuantity = tradeService.getStockQuantity(tradeDTO);
+        }
+
         model.addAttribute("hasStockQuantity", hasStockQuantity);
 
         return "invest/investBuySell";

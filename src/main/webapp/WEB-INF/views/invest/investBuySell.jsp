@@ -45,7 +45,7 @@
                     <p class="text-[#666666]">원</p>
                 </div>
             </div>
-            <p id="warningMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
+            <p id="buyErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
             <button id="buyButton" onclick="trade()"
                     class="mt-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매수하기
@@ -86,7 +86,9 @@
                     <p class="text-[#666666]">원</p>
                 </div>
             </div>
-            <p id="warningMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
+
+            <p id="sellErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
+
             <button id="sellButton" onclick="trade()"
                     class="mt-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매도하기
@@ -158,12 +160,8 @@
             amount = Number(document.getElementById('sellAmountInput').value);
         }
 
-        if (price <= 0 || amount <= 0) {
-            document.getElementById('warningMessage').innerText = "가격과 수량을 정확히 입력해주세요!";
-        }
-
         const data = {
-            stockSeq: 1,
+            stockSeq: 2,
             tradeType: tradeType,
             tradePrice: price,
             tradeQuantity: amount
@@ -177,11 +175,14 @@
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-
                     alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
                     location.reload();
                 } else {
-                    document.getElementById('warningMessage').innerText = result.message;
+                    if(tradeType === 'Y') {
+                        document.getElementById('buyErrorMessage').innerText = result.message;
+                    } else {
+                        document.getElementById('sellErrorMessage').innerText = result.message;
+                    }
                 }
             })
             .catch(error => console.log('Error: ' + error));

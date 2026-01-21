@@ -1,12 +1,13 @@
 package com.tickerbell.jujuclub.invest.trade.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.apache.ibatis.type.Alias;
 
-@Getter
-@Setter
-@ToString
+@Alias("TradeDTO")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TradeDTO {
     private int userSeq;
     private int stockSeq;

@@ -157,6 +157,57 @@
         visibility: visible;
         pointer-events: auto;
     }
+
+    /* 챕터 이동 버튼 전용 스타일 */
+    /* 이동 버튼 전용 스타일 (.control-item 기반 수정) */
+    .btn-nav {
+        /* 1. 크기 및 모양 (원형) */
+        width: 52px;
+        height: 52px;
+        border-radius: 50%; /* 99px 대신 50%로 완벽한 원형 유지 */
+        padding: 0; /* 텍스트용 패딩 제거 */
+
+        /* 2. 배경 및 테두리 (드롭다운과 동일) */
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(229, 231, 235, 1); /* 기본은 은은한 회색 */
+        box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+        backdrop-filter: blur(8px);
+
+        /* 3. 아이콘 중앙 정렬 (핵심) */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        /* 4. 기타 설정 */
+        cursor: pointer;
+        user-select: none;
+        transition: all .2s ease;
+        z-index: 50;
+    }
+
+    /* Hover 효과: 살짝 떠오르면서 테두리가 보라색으로 변경 (드롭다운 active 느낌 차용) */
+    .btn-nav:hover {
+        background: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 16px 36px rgba(17, 24, 39, 0.12);
+        border-color: #5E45EB; /* 호버 시 강조색 */
+    }
+
+    /* Click(Active) 효과: 눌리는 느낌 */
+    .btn-nav:active {
+        transform: translateY(0);
+        box-shadow: 0 0 0 3px rgba(94, 69, 235, 0.1);
+    }
+
+    /* 내부 SVG 아이콘 색상 관리 */
+    .btn-nav svg path {
+        fill: #666666; /* 기본 회색 */
+        transition: fill 0.2s ease;
+    }
+
+    .btn-nav:hover svg path {
+        fill: #5E45EB; /* 호버 시 아이콘도 보라색으로 변경 */
+    }
 </style>
 
 <div class="flex flex-col w-full h-full min-h-0 bg-gray-50 relative p-0 m-0 border-0">
@@ -167,7 +218,24 @@
     <div class="absolute top-4 right-4 z-40 gap-2">
         <%@ include file="missionButton.jsp" %>
     </div>
-
+    <div class="absolute bottom-20 left-4 z-40 gap-2">
+        <div>
+            <button id="preBtn" type="button" class="btn-nav">
+                <svg xmlns="http://www.w3.org/2000/svg" width=24 height="24" viewBox="0 0 30 30" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M14.4508 29.3724C13.7186 30.2092 12.5314 30.2092 11.7992 29.3724L0.549175 16.5152C-0.183059 15.6784 -0.183059 14.3216 0.549176 13.4848L11.7992 0.627629C12.5314 -0.20921 13.7186 -0.20921 14.4508 0.627629C15.1831 1.46447 15.1831 2.82125 14.4508 3.65809L6.40165 12.8571H28.125C29.1605 12.8571 30 13.8165 30 15C30 16.1835 29.1605 17.1429 28.125 17.1429L6.40165 17.1429L14.4508 26.3419C15.1831 27.1788 15.1831 28.5355 14.4508 29.3724Z" fill="#666666"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="absolute bottom-20 right-4 z-40 gap-2">
+        <div>
+            <button id="nextBtn" type="button" class="btn-nav">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 30 30" fill="none">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M15.5492 0.627626C16.2814 -0.209211 17.4686 -0.209211 18.2008 0.627626L29.4508 13.4848C30.1831 14.3216 30.1831 15.6784 29.4508 16.5152L18.2008 29.3724C17.4686 30.2092 16.2814 30.2092 15.5492 29.3724C14.8169 28.5355 14.8169 27.1788 15.5492 26.3419L23.5983 17.1429H1.875C0.839468 17.1429 0 16.1835 0 15C0 13.8165 0.839468 12.8571 1.875 12.8571L23.5983 12.8571L15.5492 3.65808C14.8169 2.82125 14.8169 1.46446 15.5492 0.627626Z" fill="#666666"/>
+                </svg>
+            </button>
+        </div>
+    </div>
     <div id="roadmapScroll"
          class="w-full h-full overflow-x-auto overflow-y-hidden snap-container scroll-smooth relative">
         <div id="innerContent" class="h-full relative">
@@ -207,252 +275,70 @@
 
         </div>
     </div>
-<%--<%@ include file="../common/common.jsp"%>--%>
 <div>
-    <h1>로드맵</h1>
-    <span>${test}</span>
-    <button type="button"
-            class="bg-blue-500 text-white p-2 rounded"
-            hx-post="${cpath}/lesson/lessonInfo"
-            hx-vals='{"lessonId": "LV1_CH001_LSN001"}'
-            hx-target="#main"
-            hx-swap="innerHTML"
-            hx-push-url="true"> 이동버튼 </button>
-</div>
 
-<script>
-    { // 블록 스코프 시작
+    <script>
+        { // 블록 스코프 시작
 
-        /* --- 1. 데이터 구성 (JSTL -> JS) --- */
-        const nodesData = [];
-        const chapterMap = {};
-        let globalChapterSeq = 0;
+            /* --- 1. 데이터 구성 (JSTL -> JS) --- */
+            const nodesData = [];
+            const chapterMap = {};
+            let globalChapterSeq = 0;
 
-        // JSP Context Path 미리 저장 (백틱 에러 방지)
-        const CPATH = '${pageContext.request.contextPath}';
+            const CPATH = '${pageContext.request.contextPath}';
 
-        <c:forEach items="${allLearningList}" var="item" varStatus="status">
-        var chId = '${item.chapterId}';
-        if (chapterMap[chId] === undefined) {
-            chapterMap[chId] = globalChapterSeq++;
-        }
-        var currentChapterIdx = chapterMap[chId];
-
-        <c:if test="${not empty item.lessonId}">
-        nodesData.push({
-            type: 'lesson',
-            id: '${item.lessonId}',
-            chapterIdx: currentChapterIdx,
-            inChapterIdx: nodesData.filter(n => n.chapterIdx === currentChapterIdx).length,
-            lessonName: '${item.lessonName}',
-            lessonType: '${item.lessonType}',
-            status: '${item.lessonStatus}',
-            chapterId: '${item.chapterId}',
-            chapterName: '${item.chapterName}'
-        });
-        </c:if>
-
-        <c:if test="${status.index % 5 == 4}">
-        nodesData.push({
-            type: 'chapter',
-            id: '${item.chapterId}',
-            chapterIdx: currentChapterIdx,
-            inChapterIdx: 5,
-            chapterId: '${item.chapterId}',
-            chapterName: '${item.chapterName}',
-            testReward: '${item.testReward}',
-            testPay: '${item.testPay}',
-            status: '${item.chapterPass}'
-        });
-        </c:if>
-        </c:forEach>
-
-        /* --- 2. 툴팁 함수 (전역 등록: HTMX 대응 핵심) --- */
-        window.openTooltip = (pos, el) => {
-            const tooltip = document.getElementById('tooltip');
-            const inner = document.getElementById('innerContent');
-            if (!tooltip || !inner) return;
-
-            const data = pos.data;
-            const isChapter = data.type === 'chapter';
-
-            // 제목 및 숫자 추출
-            let title;
-            try {
-                const rawId = isChapter ? data.chapterId : data.id;
-                const num = rawId.replace(/[^0-9]/g, '').slice(-3);
-                title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
-            } catch (e) { title = isChapter ? "Chapter Test" : "Lesson"; }
-
-            document.getElementById('tip-title').innerText = title;
-            document.getElementById('tip-desc').innerText = isChapter
-                ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
-                : (data.lessonName || "레슨 설명이 없습니다.");
-
-            const status = data.status || 'locked';
-            const badge = document.getElementById('tip-badge');
-            badge.innerHTML = status === 'completed'
-                ? '<span class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-extrabold border border-indigo-100">완료</span>'
-                : (status === 'current' ? '<span class="px-2 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-extrabold border border-orange-100">진행중</span>' : '');
-
-            const infoDiv = document.getElementById('tip-info');
-            if (isChapter) {
-                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
-                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
-            } else {
-                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.lessonType === 'THEORY' ? '이론' : '실습') + '</div></div>' +
-                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
+            <c:forEach items="${allLearningList}" var="item" varStatus="status">
+            var chId = '${item.chapterId}';
+            if (chapterMap[chId] === undefined) {
+                chapterMap[chId] = globalChapterSeq++;
             }
+            var currentChapterIdx = chapterMap[chId];
 
-            let startBtn = document.getElementById('startBtn');
-            const newBtn = startBtn.cloneNode(true);
-            startBtn.parentNode.replaceChild(newBtn, startBtn);
-
-            newBtn.innerText = status === 'completed' ? "다시하기" : (isChapter ? "시험 응시하기" : "시작하기");
-            // CPATH 변수 사용 (백틱 제거)
-            newBtn.setAttribute('hx-post', CPATH + '/lesson/lessonInfo');
-            newBtn.setAttribute('hx-target', '#main');
-            newBtn.setAttribute('hx-vals', JSON.stringify({targetId: data.id}));
-            htmx.process(newBtn);
-
-            const TIP_WIDTH = 300;
-            let left = pos.x - 150;
-            let top = pos.y + 70;
-            if (left < 10) left = 10;
-            if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
-            if (top + 250 > inner.offsetHeight) top = pos.y - 280;
-
-            tooltip.style.left = left + "px";
-            tooltip.style.top = top + "px";
-            tooltip.classList.add('visible');
-        };
-
-        /* --- 3. 로드맵 그리기 및 자동 스크롤 --- */
-        const initRoadmap = () => {
-            const inner = document.getElementById('innerContent');
-            const nodesLayer = document.getElementById('nodesLayer');
-            const scrollContainer = document.getElementById('roadmapScroll');
-            if (!inner || !nodesLayer || !scrollContainer) return;
-
-            const vw = window.innerWidth - 220;
-            const vh = window.innerHeight - 80;
-            const NODES_PER_CHAPTER = 6;
-            const totalChapters = Math.ceil(nodesData.length / NODES_PER_CHAPTER);
-
-            inner.style.width = (Math.max(1, totalChapters) * vw) + "px";
-            nodesLayer.innerHTML = '';
-            const nodePositions = [];
-
-            // 1) 위치 계산
-            nodesData.forEach((node) => {
-                const marginX = 40; // 왼쪽 여백 고정값 (사이드바 밀착)
-                const availableW = vw - (marginX * 2);
-                const stepX = availableW / (NODES_PER_CHAPTER - 1);
-                const x = (node.chapterIdx * vw) + marginX + (node.inChapterIdx * stepX);
-                const progress = node.inChapterIdx / (NODES_PER_CHAPTER - 1);
-                const amplitude = vh * 0.3;
-                const centerY = vh / 2;
-                const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
-
-                nodePositions.push({x, y, data: node});
+            <c:if test="${not empty item.lessonId}">
+            nodesData.push({
+                type: 'lesson',
+                id: '${item.lessonId}',
+                chapterIdx: currentChapterIdx,
+                inChapterIdx: nodesData.filter(n => n.chapterIdx === currentChapterIdx).length,
+                lessonName: '${item.lessonName}',
+                lessonType: '${item.lessonType}',
+                status: '${item.lessonStatus}',
+                chapterId: '${item.chapterId}',
+                chapterName: '${item.chapterName}',
+                levelId: '${item.levelId}',
+                levelName: '${item.levelName}'
             });
+            </c:if>
 
-            // 2) 노드 그리기
-            nodePositions.forEach(pos => {
-                const el = document.createElement('div');
-                const data = pos.data;
-                const isChapter = data.type === 'chapter';
-                const status = data.status || 'locked';
-
-                el.className = 'orb ' + status;
-                if (isChapter) { el.style.width = '80px'; el.style.height = '80px'; }
-
-                if (isChapter) {
-                    if (status === 'completed') el.innerHTML = '<i data-lucide="award" class="w-9 h-9 text-indigo-600"></i>';
-                    else if (status === 'current') el.innerHTML = '<i data-lucide="award" class="w-9 h-9 text-white"></i>';
-                    else el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
-                } else {
-                    if (status === 'completed') el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
-                    else if (status === 'current') el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                    else el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
-                }
-
-                el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
-                el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
-
-                // 클릭 이벤트 (전역 함수 호출)
-                el.onclick = (e) => {
-                    e.stopPropagation();
-                    if (status !== 'locked') window.openTooltip(pos, el);
-                    else alert("이전 단계를 먼저 완료해주세요!");
-                };
-                nodesLayer.appendChild(el);
+            <c:if test="${status.index % 5 == 4}">
+            nodesData.push({
+                type: 'chapter',
+                id: '${item.chapterId}',
+                chapterIdx: currentChapterIdx,
+                inChapterIdx: 5,
+                chapterId: '${item.chapterId}',
+                chapterName: '${item.chapterName}',
+                levelId: '${item.levelId}',
+                levelName: '${item.levelName}',
+                testReward: '${item.testReward}',
+                testPay: '${item.testPay}',
+                status: '${item.chapterPass}'
             });
+            </c:if>
+            </c:forEach>
 
-            drawContinuousPath(nodePositions);
-            if (window.lucide) window.lucide.createIcons();
+            // 전역 변수로 nodePositions 관리
+            let nodePositions = [];
 
-            /* --- [추가] 현재 진행 중인 위치로 자동 스크롤 --- */
-            const currentNode = nodePositions.find(p => p.data.status === 'current');
-            if (currentNode) {
-                const screenCenter = (window.innerWidth - 220) / 2;
-                let targetScroll = currentNode.x - screenCenter;
-                if (targetScroll < 0) targetScroll = 0;
-
-                setTimeout(() => {
-                    scrollContainer.scrollTo({ left: targetScroll, behavior: 'smooth' });
-                }, 100);
-            }
-        };
-
-        const drawContinuousPath = (nodePositions) => {
-            const pathBorder = document.getElementById('roadBorder');
-            const pathMain = document.getElementById('roadPath');
-            const pathDashed = document.getElementById('roadDashed');
-            if (!pathMain || nodePositions.length === 0) return;
-
-            let d = "M " + nodePositions[0].x + " " + nodePositions[0].y;
-            for (let i = 0; i < nodePositions.length - 1; i++) {
-                const curr = nodePositions[i];
-                const next = nodePositions[i + 1];
-                const cp1 = {x: curr.x + ((next.x - curr.x) * 0.5), y: curr.y};
-                const cp2 = {x: next.x - ((next.x - curr.x) * 0.5), y: next.y};
-                d += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
-            }
-            pathBorder.setAttribute('d', d);
-            pathMain.setAttribute('d', d);
-            pathDashed.setAttribute('d', d);
-        };
-
-        /* --- 4. 드롭다운 및 이동 버튼 로직 --- */
-        function initRoadMapDropdowns() {
-            const wrappers = document.querySelectorAll('.select-wrapper');
-
-            wrappers.forEach(wrapper => {
-                const button = wrapper.querySelector('button.control-item');
-                const list = wrapper.querySelector('.optionList');
-                const items = list.querySelectorAll('.optionItem');
-                const textSpan = button.querySelector('.btn-text');
-
-                button.onclick = (e) => {
-                    e.stopPropagation();
-                    closeAllDropdowns(button);
-                    button.classList.toggle('active');
-                    list.classList.toggle('show');
-                };
-
-                items.forEach(item => {
-                    setupOptionItem(item, button, list, textSpan);
-                });
-            });
-
+            /* =========================================
+               [공통 함수] 드롭다운 제어 및 데이터 페칭
+               ========================================= */
             function setupOptionItem(item, button, list, textSpan) {
                 item.onclick = (e) => {
                     e.stopPropagation();
                     textSpan.textContent = item.textContent;
                     const value = item.getAttribute('data-value');
 
-                    // [핵심] 값 저장
                     button.dataset.value = value;
 
                     const siblings = list.querySelectorAll('.optionItem');
@@ -471,40 +357,19 @@
                 };
             }
 
-            // [핵심] 이동 버튼 스크롤 로직
-            const moveBtn = document.getElementById('moveBtn');
-            if (moveBtn) {
-                moveBtn.onclick = () => {
-                    const chapterBtn = document.getElementById('chapterSelect');
-                    const selectedChId = chapterBtn.dataset.value;
-
-                    if (!selectedChId) { alert("이동할 챕터를 선택해주세요."); return; }
-
-                    const targetNode = nodesData.find(n => n.chapterId === selectedChId);
-
-                    if (targetNode) {
-                        const vw = window.innerWidth - 220;
-                        const targetX = targetNode.chapterIdx * vw;
-                        const scrollContainer = document.getElementById('roadmapScroll');
-                        scrollContainer.scrollTo({ left: targetX, behavior: 'smooth' });
-                    } else {
-                        alert("해당 챕터를 찾을 수 없습니다.");
-                    }
-                };
-            }
-
             function fetchChapters(levelId) {
                 const chapterBtn = document.getElementById('chapterSelect');
                 const chapterSpan = chapterBtn.querySelector('.btn-text');
                 const chapterListUl = document.getElementById('chapterListContainer');
 
-                fetch(CPATH + '/roadMapApi/chapters?levelId=' + levelId)
+                return fetch(CPATH + '/roadMapApi/chapters?levelId=' + levelId)
                     .then(response => { if (!response.ok) throw new Error('Network response'); return response.json(); })
                     .then(data => {
                         chapterListUl.innerHTML = '';
-                        if (!data || data.length === 0) { chapterSpan.textContent = "챕터 없음"; return; }
-                        chapterSpan.textContent = "챕터 선택";
-
+                        if (!data || data.length === 0) {
+                            chapterSpan.textContent = "챕터 없음";
+                            return;
+                        }
                         data.forEach(chapter => {
                             const li = document.createElement('li');
                             li.className = 'optionItem';
@@ -517,40 +382,405 @@
                     .catch(error => { console.error('Error:', error); chapterSpan.textContent = "로드 실패"; });
             }
 
-            document.removeEventListener('click', closeAllDropdowns);
-            document.addEventListener('click', closeAllDropdowns);
-
-            function closeAllDropdowns(e) {
-                const target = e ? e.target : null;
-                document.querySelectorAll('.select-wrapper').forEach(wrapper => {
-                    const btn = wrapper.querySelector('button.control-item');
-                    const list = wrapper.querySelector('.optionList');
-                    if (btn && btn !== target && !btn.contains(target)) {
-                        btn.classList.remove('active');
-                        list.classList.remove('show');
+            function highlightOption(listContainer, value) {
+                if (!listContainer) return;
+                const items = listContainer.querySelectorAll('.optionItem');
+                items.forEach(item => {
+                    if (item.getAttribute('data-value') === value) {
+                        item.classList.add('selected');
+                    } else {
+                        item.classList.remove('selected');
                     }
                 });
             }
-        }
 
-        /* --- 5. 이벤트 리스너 등록 --- */
-        document.addEventListener('click', function (e) {
-            const tooltip = document.getElementById('tooltip');
-            if (!tooltip) return;
-            if (e.target.closest('#tipCloseBtn')) tooltip.classList.remove('visible');
-        });
 
-        window.addEventListener('resize', initRoadmap);
+            /* --- 2. 툴팁 함수 --- */
+            window.openTooltip = (pos, el) => {
+                const tooltip = document.getElementById('tooltip');
+                const inner = document.getElementById('innerContent');
+                if (!tooltip || !inner) return;
 
-        // 초기 실행
-        initRoadmap();
-        initRoadMapDropdowns();
+                const data = pos.data;
+                const isChapter = data.type === 'chapter';
 
-        // HTMX 리로드 대응
-        document.body.addEventListener('htmx:afterSettle', function (evt) {
-            if (document.getElementById('roadmapScroll')) {
-                initRoadmap();
+                let title;
+                try {
+                    const rawId = isChapter ? data.chapterId : data.id;
+                    const num = rawId.replace(/[^0-9]/g, '').slice(-3);
+                    title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
+                } catch (e) { title = isChapter ? "Chapter Test" : "Lesson"; }
+
+                document.getElementById('tip-title').innerText = title;
+                document.getElementById('tip-desc').innerText = isChapter
+                    ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
+                    : (data.lessonName || "레슨 설명이 없습니다.");
+
+                const status = data.status || 'locked';
+                const badge = document.getElementById('tip-badge');
+                badge.innerHTML = status === 'completed'
+                    ? '<span class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-extrabold border border-indigo-100">완료</span>'
+                    : (status === 'current' ? '<span class="px-2 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-extrabold border border-orange-100">진행중</span>' : '');
+
+                const infoDiv = document.getElementById('tip-info');
+                if (isChapter) {
+                    infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
+                        '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
+                } else {
+                    infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.lessonType === 'THEORY' ? '이론' : '실습') + '</div></div>' +
+                        '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
+                }
+
+                let startBtn = document.getElementById('startBtn');
+                const newBtn = startBtn.cloneNode(true);
+                startBtn.parentNode.replaceChild(newBtn, startBtn);
+
+                newBtn.innerText = status === 'completed' ? "다시하기" : (isChapter ? "시험 응시하기" : "시작하기");
+                newBtn.setAttribute('hx-post', CPATH + '/lesson/lessonInfo');
+                newBtn.setAttribute('hx-target', '#main');
+                newBtn.setAttribute('hx-vals', JSON.stringify({targetId: data.id}));
+                htmx.process(newBtn);
+
+                const TIP_WIDTH = 300;
+                let left = pos.x - 150;
+                let top = pos.y + 70;
+                if (left < 10) left = 10;
+                if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
+                if (top + 250 > inner.offsetHeight) top = pos.y - 280;
+
+                tooltip.style.left = left + "px";
+                tooltip.style.top = top + "px";
+                tooltip.classList.add('visible');
+            };
+
+            /* --- [수정됨] 3. 로드맵 그리기 (초기화 플래그 파라미터 추가) --- */
+            // isFirstLoad: true면 현재 진행 위치로 강제 스크롤, false(resize 등)면 위치 유지
+            const initRoadmap = (isFirstLoad = false) => {
+                const inner = document.getElementById('innerContent');
+                const nodesLayer = document.getElementById('nodesLayer');
+                const scrollContainer = document.getElementById('roadmapScroll');
+                if (!inner || !nodesLayer || !scrollContainer) return;
+
+                const vw = window.innerWidth - 220;
+                const vh = window.innerHeight - 80;
+                const NODES_PER_CHAPTER = 6;
+                const maxChapterIdx = nodesData.length > 0 ? nodesData[nodesData.length-1].chapterIdx : 0;
+                const TOTAL_CHAPTERS = maxChapterIdx + 1;
+
+                inner.style.width = (TOTAL_CHAPTERS * vw) + "px";
+
+                nodesLayer.innerHTML = '';
+                nodePositions = [];
+
+                nodesData.forEach((node, i) => {
+                    const marginX = vw * 0.1;
+                    const availableW = vw - (marginX * 2);
+                    const stepX = availableW / (NODES_PER_CHAPTER - 1);
+                    const x = (node.chapterIdx * vw) + marginX + (node.inChapterIdx * stepX);
+                    const progress = node.inChapterIdx / (NODES_PER_CHAPTER - 1);
+                    const amplitude = vh * 0.3;
+                    const centerY = vh / 2;
+                    const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
+
+                    nodePositions.push({x, y, data: node});
+                });
+
+                nodePositions.forEach(pos => {
+                    const el = document.createElement('div');
+                    const data = pos.data;
+                    const isChapter = data.type === 'chapter';
+                    const status = data.status || 'locked';
+
+                    el.className = 'orb ' + status;
+                    if (isChapter) { el.style.width = '80px'; el.style.height = '80px'; }
+
+                    if (isChapter) {
+                        if (status === 'completed') el.innerHTML = '<i data-lucide="award" class="w-9 h-9 text-indigo-600"></i>';
+                        else if (status === 'current') el.innerHTML = '<i data-lucide="award" class="w-9 h-9 text-white"></i>';
+                        else el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
+                    } else {
+                        if (status === 'completed') el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
+                        else if (status === 'current') el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
+                        else el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
+                    }
+
+                    el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
+                    el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
+
+                    const label = document.createElement('div');
+                    const labelText = isChapter ? data.chapterName : data.lessonName;
+                    label.className = 'absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-extrabold tracking-wide ' + (status === 'locked' ? 'text-gray-300' : 'text-gray-600');
+                    label.innerText = labelText;
+
+                    if(pos.y > (vh/2)) {
+                        label.className = label.className.replace('-bottom-8', '-top-8');
+                    }
+                    el.appendChild(label);
+
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        if (status !== 'locked') window.openTooltip(pos, el);
+                        else alert("이전 단계를 먼저 완료해주세요!");
+                    };
+                    nodesLayer.appendChild(el);
+                });
+
+                drawContinuousPath();
+                if (window.lucide) window.lucide.createIcons();
+
+                // [핵심 수정] 초기 로딩일 때만 현재 위치로 스크롤 & 드롭다운 동기화
+                if(isFirstLoad) {
+                    const currentNode = nodePositions.find(p => p.data.status === 'current');
+
+                    // 만약 'current'가 없으면(다 깼거나 오류) 가장 마지막 완료된 곳이라도 찾음
+                    // const targetNode = currentNode || nodePositions[nodePositions.length - 1];
+
+                    if (currentNode) {
+                        const screenCenter = (window.innerWidth - 220) / 2;
+                        let targetScroll = currentNode.x - screenCenter;
+                        if (targetScroll < 0) targetScroll = 0;
+
+                        // 약간의 지연을 주어 렌더링 후 스크롤 보장
+                        setTimeout(() => {
+                            scrollContainer.scrollTo({ left: targetScroll, behavior: 'auto' }); // auto로 즉시 이동
+
+                            // [추가] 들어오자마자 드롭다운도 현재 진행 챕터로 세팅
+                            // initChapterNavigation 내부의 updateDropdownUI를 호출하기 위해
+                            // 여기서 직접 유사한 로직을 수행하거나, 전역 함수로 분리할 수 있음.
+                            // 여기서는 간단하게 이벤트 발생 트리거를 활용하거나, 아래 동기화 로직 사용
+                            syncDropdownWithNode(currentNode.data);
+
+                        }, 50);
+                    }
+                }
+            };
+
+            // 초기 로딩 시 드롭다운 동기화용 헬퍼 함수
+            function syncDropdownWithNode(nodeData) {
+                const levelBtn = document.getElementById('levelSelect');
+                if (levelBtn) {
+                    const levelSpan = levelBtn.querySelector('.btn-text');
+                    if (levelSpan) levelSpan.textContent = nodeData.levelName;
+                    levelBtn.dataset.value = nodeData.levelId;
+                }
+
+                const chapterBtn = document.getElementById('chapterSelect');
+                if (chapterBtn) {
+                    const chapterSpan = chapterBtn.querySelector('.btn-text');
+                    if (chapterSpan) chapterSpan.textContent = nodeData.chapterName;
+                    chapterBtn.dataset.value = nodeData.chapterId;
+
+                    // 필요하다면 여기서 fetchChapters 호출하여 목록 미리 로드 가능
+                    // fetchChapters(nodeData.levelId);
+                }
             }
-        });
-    }
-</script>
+
+            const drawContinuousPath = () => {
+                const pathBorder = document.getElementById('roadBorder');
+                const pathMain = document.getElementById('roadPath');
+                const pathDashed = document.getElementById('roadDashed');
+                const pathActive = document.getElementById('roadActive');
+
+                if (!pathMain || nodePositions.length === 0) return;
+
+                let d = "M " + nodePositions[0].x + " " + nodePositions[0].y;
+                for (let i = 0; i < nodePositions.length - 1; i++) {
+                    const curr = nodePositions[i];
+                    const next = nodePositions[i + 1];
+                    const dist = next.x - curr.x;
+                    const cp1 = { x: curr.x + (dist * 0.5), y: curr.y };
+                    const cp2 = { x: next.x - (dist * 0.5), y: next.y };
+                    d += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
+                }
+
+                if(pathBorder) pathBorder.setAttribute('d', d);
+                if(pathMain) pathMain.setAttribute('d', d);
+                if(pathDashed) pathDashed.setAttribute('d', d);
+
+                if (pathActive) {
+                    const currentPosIdx = nodePositions.findIndex(p => p.data.status === 'current');
+                    if (currentPosIdx <= 0) {
+                        pathActive.setAttribute('d', '');
+                    } else {
+                        let activeD = "M " + nodePositions[0].x + " " + nodePositions[0].y;
+                        for (let i = 0; i < currentPosIdx; i++) {
+                            const curr = nodePositions[i];
+                            const next = nodePositions[i + 1];
+                            const dist = next.x - curr.x;
+                            const cp1 = { x: curr.x + (dist * 0.5), y: curr.y };
+                            const cp2 = { x: next.x - (dist * 0.5), y: next.y };
+                            activeD += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
+                        }
+                        pathActive.setAttribute('d', activeD);
+                    }
+                }
+            };
+
+            /* --- 4. 드롭다운 초기화 --- */
+            function initRoadMapDropdowns() {
+                const wrappers = document.querySelectorAll('.select-wrapper');
+
+                wrappers.forEach(wrapper => {
+                    const button = wrapper.querySelector('button.control-item');
+                    const list = wrapper.querySelector('.optionList');
+                    const items = list.querySelectorAll('.optionItem');
+                    const textSpan = button.querySelector('.btn-text');
+
+                    button.onclick = (e) => {
+                        e.stopPropagation();
+                        closeAllDropdowns(button);
+                        button.classList.toggle('active');
+                        list.classList.toggle('show');
+                    };
+
+                    items.forEach(item => {
+                        setupOptionItem(item, button, list, textSpan);
+                    });
+                });
+
+                // 이동 버튼 (드롭다운 내의 이동버튼이 있다면)
+                const moveBtn = document.getElementById('moveBtn');
+                if (moveBtn) {
+                    moveBtn.onclick = () => {
+                        const chapterBtn = document.getElementById('chapterSelect');
+                        const selectedChId = chapterBtn.dataset.value;
+
+                        if (!selectedChId) { alert("이동할 챕터를 선택해주세요."); return; }
+
+                        const targetNode = nodesData.find(n => n.chapterId === selectedChId);
+                        if (targetNode) {
+                            const vw = window.innerWidth - 220;
+                            const targetX = targetNode.chapterIdx * vw;
+                            const scrollContainer = document.getElementById('roadmapScroll');
+                            scrollContainer.scrollTo({ left: targetX, behavior: 'smooth' });
+                        } else {
+                            alert("해당 챕터를 찾을 수 없습니다.");
+                        }
+                    };
+                }
+
+                document.removeEventListener('click', closeAllDropdowns);
+                document.addEventListener('click', closeAllDropdowns);
+
+                function closeAllDropdowns(e) {
+                    const target = e ? e.target : null;
+                    document.querySelectorAll('.select-wrapper').forEach(wrapper => {
+                        const btn = wrapper.querySelector('button.control-item');
+                        const list = wrapper.querySelector('.optionList');
+                        if (btn && btn !== target && !btn.contains(target)) {
+                            btn.classList.remove('active');
+                            list.classList.remove('show');
+                        }
+                    });
+                }
+            }
+
+            /* --- 5. 챕터 이동 버튼 로직 --- */
+            function initChapterNavigation() {
+                const preBtn = document.getElementById('preBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const scrollContainer = document.getElementById('roadmapScroll');
+
+                if (!preBtn || !nextBtn || !scrollContainer) return;
+
+                const maxChapterIdx = nodesData.length > 0 ? nodesData[nodesData.length - 1].chapterIdx : 0;
+
+                const updateDropdownUI = (targetChapterIdx) => {
+                    const targetNode = nodesData.find(n => n.chapterIdx === targetChapterIdx);
+                    if (targetNode) {
+                        const levelBtn = document.getElementById('levelSelect');
+                        if (levelBtn) {
+                            const levelSpan = levelBtn.querySelector('.btn-text');
+                            if (levelSpan) levelSpan.textContent = targetNode.levelName;
+                            const oldLevelId = levelBtn.dataset.value;
+                            const newLevelId = targetNode.levelId;
+                            levelBtn.dataset.value = newLevelId;
+
+                            const levelList = levelBtn.nextElementSibling;
+                            highlightOption(levelList, newLevelId);
+
+                            const chapterBtn = document.getElementById('chapterSelect');
+                            if (chapterBtn) {
+                                const chapterSpan = chapterBtn.querySelector('.btn-text');
+                                if (chapterSpan) chapterSpan.textContent = targetNode.chapterName;
+                                chapterBtn.dataset.value = targetNode.chapterId;
+
+                                const chapterListUl = document.getElementById('chapterListContainer');
+                                if (oldLevelId !== newLevelId) {
+                                    fetchChapters(newLevelId).then(() => {
+                                        highlightOption(chapterListUl, targetNode.chapterId);
+                                    });
+                                } else {
+                                    highlightOption(chapterListUl, targetNode.chapterId);
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const updateButtons = () => {
+                    const vw = window.innerWidth - 220;
+                    const currentScroll = scrollContainer.scrollLeft;
+                    const currentChapter = Math.round(currentScroll / vw);
+
+                    if (currentChapter <= 0) preBtn.style.display = 'none';
+                    else preBtn.style.display = 'block';
+
+                    if (currentChapter >= maxChapterIdx) nextBtn.style.display = 'none';
+                    else nextBtn.style.display = 'block';
+                };
+
+                updateButtons();
+                scrollContainer.addEventListener('scroll', updateButtons);
+                window.addEventListener('resize', updateButtons);
+
+                preBtn.onclick = () => {
+                    const vw = window.innerWidth - 220;
+                    const currentScroll = scrollContainer.scrollLeft;
+                    const currentChapter = Math.round(currentScroll / vw);
+                    if (currentChapter > 0) {
+                        const targetIdx = currentChapter - 1;
+                        const targetX = targetIdx * vw;
+                        scrollContainer.scrollTo({ left: targetX, behavior: 'smooth' });
+                        updateDropdownUI(targetIdx);
+                    }
+                };
+
+                nextBtn.onclick = () => {
+                    const vw = window.innerWidth - 220;
+                    const currentScroll = scrollContainer.scrollLeft;
+                    const currentChapter = Math.round(currentScroll / vw);
+                    if (currentChapter < maxChapterIdx) {
+                        const targetIdx = currentChapter + 1;
+                        const targetX = targetIdx * vw;
+                        scrollContainer.scrollTo({ left: targetX, behavior: 'smooth' });
+                        updateDropdownUI(targetIdx);
+                    }
+                };
+            }
+
+            /* --- 6. 실행 및 리스너 --- */
+            document.addEventListener('click', function (e) {
+                const tooltip = document.getElementById('tooltip');
+                if (!tooltip) return;
+                if (e.target.closest('#tipCloseBtn')) tooltip.classList.remove('visible');
+            });
+
+            // 리사이즈 시에는 위치만 다시 계산 (스크롤 이동 X)
+            window.addEventListener('resize', () => initRoadmap(false));
+
+            // 초기 실행: 처음 로딩이므로 true 전달
+            initRoadmap(true);
+            initRoadMapDropdowns();
+            initChapterNavigation();
+
+            document.body.addEventListener('htmx:afterSettle', function (evt) {
+                if (document.getElementById('roadmapScroll')) {
+                    // HTMX로 다시 로드되었을 때도 강제 스크롤 적용
+                    initRoadmap(true);
+                    initRoadMapDropdowns();
+                    initChapterNavigation();
+                }
+            });
+        }
+    </script>

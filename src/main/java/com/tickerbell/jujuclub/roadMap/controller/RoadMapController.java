@@ -80,7 +80,7 @@ public class RoadMapController {
         model.addAttribute("userLesson", userLessonList); // 현재 유저 레슨 정보
         model.addAttribute("isMissionClear", 4 > successCount); // 미션 클리어 확인
         model.addAttribute("allLearningList", allLearningList); // 전체 레슨 + 유저 진행상황
-        model.addAttribute("chapterResultList", chapterResultList); // 전체 레슨 + 유저 진행상황
+        model.addAttribute("chapterResultList", chapterResultList); // 유저 전체 챕터 결과 조회
 
         return "roadMap/roadMapMain";
     }

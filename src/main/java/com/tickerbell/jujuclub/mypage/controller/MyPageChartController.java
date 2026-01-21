@@ -93,7 +93,7 @@ public class MyPageChartController {
             if(userAsset == null) userAsset = new UserInvestSummeryDTO();
 
             // (2) [추가] DB에서 실제 예수금(cash_balance) 조회
-            AccountDTO myAccount = accountService.getMyAccount(Long.valueOf(userSeq));
+            AccountDTO myAccount = accountService.getMyAccount(userSeq);
 
             if (myAccount != null) {
                 // DB에 계좌가 있으면 그 잔액을 사용

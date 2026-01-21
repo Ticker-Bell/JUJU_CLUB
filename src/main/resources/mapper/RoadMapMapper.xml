@@ -9,7 +9,7 @@
             lv.level_name AS levelName,
             ch.chapter_id AS chapterId,
             ch.chapter_name AS chapterName,
-            ch.test_reward AS testReward,
+            ch.reward_cash AS testReward,
             ch.test_pay AS testPay,
             ls.lesson_id AS lessonId,
             ls.lesson_name AS lessonName,
@@ -26,7 +26,7 @@
             lv.level_name AS levelName,
             ch.chapter_id AS chapterId,
             ch.chapter_name AS chapterName,
-            ch.test_reward AS testReward,
+            ch.reward_cash AS testReward,
             ch.test_pay AS testPay,
             ls.lesson_id AS lessonId,
             ls.lesson_name AS lessonName,
@@ -43,7 +43,7 @@
             lv.level_name AS levelName,
             ch.chapter_id AS chapterId,
             ch.chapter_name AS chapterName,
-            ch.test_reward AS testReward,
+            ch.reward_cash AS testReward,
             ch.test_pay AS testPay
         FROM learning_level AS lv
                  JOIN learning_chapter AS ch ON lv.level_seq = ch.level_seq
@@ -60,7 +60,7 @@
         select lv.level_seq AS levelSeq,
                ch.chapter_id AS chapterId,
                ch.chapter_name AS chapterName,
-               ch.test_reward AS testReward,
+               ch.reward_cash AS testReward,
                ch.test_pay AS testPay
         from learning_level as lv left join learning_chapter as ch
         on lv.level_seq = ch.level_seq
@@ -132,7 +132,6 @@
                user_seq as userSeq,
                chapter_id as chapterId,
                score,
-               attempt_no as tryCount,
                is_pass as isPass,
                tested_at as testDate
         from user_test_result

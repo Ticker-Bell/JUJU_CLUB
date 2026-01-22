@@ -1,8 +1,10 @@
 package com.tickerbell.jujuclub.invest.stockChart.service;
 
 import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.utils.RequestNewAccessToken;
 import com.tickerbell.jujuclub.utils.StockChartParser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -14,18 +16,28 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class StockChartRestService {
-    private final String ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjVhZGUwNGNlLWViZjItNGY2MS1iNjExLTEyOWY4OGEzYTZhOCIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODk2NDgyNiwiaWF0IjoxNzY4ODc4NDI2LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.AVHoIcQCUXRzAhF_P2v75C_XEpmJOlNjPjNEdOnKlnkp1X7dsf3utSfoRBmlUyp6FCtVohH_vwfqa9nJHYIcKg";
-    private final String APPKEY = "PSEwye9EwwaHCT6TlEJBejuGmtuDmsZRLsTP";
-    private final String APPSECRET = "1Zxqr/7cOzLRg7nEsU2BJM8rSekIxQPnvCcUcxoPVGexTHQyDSiMXaYlGmGAkJYi/s7bWUdWI9H4gETBWiNyl4j5gfuiz7NuVEKi6vTTNL3ptWfBXQFe5cesH35tmEnPuSKWZ8U8++HM0LF+GQxQ9nZtRWZX0MR1CDQuUStqIHd4ase/mhQ=";
+    @Value("${kis.appkey}")
+    private String APPKEY;
+
+    @Value("${kis.appsecret}")
+    private String APPSECRET;
+
+    @Value("${kis.baseurl}")
+    private String BASEURL;
+
+    private final RequestNewAccessToken requestNewAccessToken;
+
+    private String ACCESSTOKEN;
     private final StockChartParser stockChartParser;
 
 
-    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode) {
+    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        String url = "https://openapi.koreainvestment.com:9443/uapi/domestic-stock/v1/quotations/inquire-daily-price";
+        ACCESSTOKEN = requestNewAccessToken.getAccessToken();
+        String url = BASEURL + "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
         HttpHeaders headers = new HttpHeaders();
         headers.set("content_type", "application/json;charset=utf-8");
-        headers.set("authorization", "Bearer " + ACCESS_TOKEN);
+        headers.set("authorization", "Bearer " + ACCESSTOKEN);
         headers.set("appkey", APPKEY);
         headers.set("appsecret", APPSECRET);
         headers.set("tr_id", "FHKST01010400");

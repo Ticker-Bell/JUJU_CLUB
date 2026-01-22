@@ -42,7 +42,7 @@ const StockSocket = {
             if (!self.updateTimer) {
                 self.updateTimer = setInterval(() => {
                     Object.values(self.lastestData).forEach(data => {
-                        onMessageCallback?.(data);
+                        onMessageCallback?.(data); //callback 함수에 data 삽입
                     });
                 }, 3000); //화면 업데이트 시간
             }

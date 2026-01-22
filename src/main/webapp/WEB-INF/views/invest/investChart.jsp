@@ -92,6 +92,7 @@
     };
 
     window.onload = function () {
+        getSelectedChart();
         updateButtonUI('D');
     };
 
@@ -196,7 +197,6 @@
 
     function updateHeaderStock(stock) {
         if (!stock) return;
-        const stockNameEl = document.getElementById('header-stock');
         const priceEl = document.getElementById('header-price');
         const changeEl = document.getElementById('header-change');
         if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
@@ -222,7 +222,7 @@
                 const lastIdx = dataArray.length - 1;
 
                 dataArray[lastIdx] = stockData.currentPrice;
-                updateHeaderInfo(stockData);
+                updateHeaderStock(stockData);
                 targetChart.update('none');
 
             }

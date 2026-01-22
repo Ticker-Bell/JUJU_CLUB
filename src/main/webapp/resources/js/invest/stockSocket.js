@@ -22,7 +22,7 @@ const StockSocket = {
             //새로 구독하는 게 있으면 데이터 요청
             if (newCodes.length > 0) {
                 const payload = {stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes], tr_type: "1"}
-                self.stompClient.send("app/invest/request/chartData", {}, JSON.stringify(payload));
+                self.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
             }
             return;
         }

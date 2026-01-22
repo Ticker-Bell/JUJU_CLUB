@@ -99,7 +99,7 @@
         </div>
         <h2 class="text-3xl font-extrabold text-gray-900 mb-2">챕터 테스트 통과!</h2>
         <p class="text-gray-500 font-medium mb-8">
-            축하합니다! 테스트를 훌륭하게 완수하셨네요.<br>지원금이 계좌로 입금되었습니다.
+            축하합니다! 테스트를 훌륭하게 완수하셨네요.<br>챕터 보상이 계좌로 입금되었습니다.
         </p>
 
         <div class="flex items-center justify-center gap-4 md:gap-8 mb-8 bg-gray-50 rounded-2xl p-6 border border-gray-100">
@@ -159,7 +159,7 @@
                     class="w-full py-3.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-all">
                 다시 도전하기
             </button>--%>
-            <button onclick="location.href='${cpath}/roadMap/main.do'"
+            <button onclick="handleFailExit()"
                     class="w-full py-3.5 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black transition-all">
                 로드맵으로 돌아가기
             </button>
@@ -226,7 +226,8 @@
 
   /* ---------------- 초기화 ---------------- */
   function initQuiz() {
-    shuffledQuiz = shuffleQuiz([...quizData]);
+    //DB에서 가져오는 문항들 중에서 10문제
+    shuffledQuiz = shuffleQuiz([...quizData]).slice(0, 10);
     renderProgress();
     renderQuestion();
   }
@@ -286,7 +287,7 @@
     if (data.questionType === 'SELECT') {
       guideText = "보기 중 정답을 하나 선택해주세요.";
       guideIcon = "list-checks";
-    } else if (data.type === 'MATCH') {
+    } else if (data.questionType === 'MATCH') {
       guideText = "단어를 클릭하여 빈칸을 채워보세요.";
       guideIcon = "text-cursor-input";
     } else if (data.questionType === 'DRAG') {
@@ -597,8 +598,7 @@
         // 순서와 값 모두 일치해야 정답
         isCorrect = user.every((val, idx) => val === correct[idx]);
       }
-      console.log(user)
-      console.log(correct)
+
     } else if (data.questionType === 'LINK') {
       const user = userAnswers[currentIndex] || {};   // 유저 선택
       const correct = data.matchAnswer || {}; // 정답
@@ -611,8 +611,6 @@
       document.querySelectorAll('.connection-line').forEach(line => {
         line.classList.add(isCorrect ? 'correct' : 'wrong');
       });
-      console.log(user)
-      console.log(correct)
     }
 
     // --- 결과 저장 ---
@@ -628,8 +626,14 @@
 
     // --- 탈락 조건 확인 ---
     if (wrongCount >= 3) {
-      submitQuizResults(chapterId, false); // isFinal=false
+      submitQuizResults(chapterId, true); // isFinal=false
       document.getElementById('failModal').classList.add('active');
+      return;
+    }
+
+    // 마지막 문제면 바로 최종 제출
+    if (currentIndex === shuffledQuiz.length - 1) {
+      finalizeQuiz();
       return;
     }
 
@@ -643,18 +647,6 @@
 
     currentIndex++;
     renderProgress();
-
-    const checkBtn = document.getElementById('checkBtn');
-    if (currentIndex >= shuffledQuiz.length - 1) {
-      // 마지막 문제 버튼 설정
-      checkBtn.textContent = '최종 제출 ✓';
-      checkBtn.classList.add('final-submit');
-      checkBtn.onclick = finalizeQuiz;
-    } else {
-      checkBtn.textContent = '다음 문제 →';
-      checkBtn.classList.remove('final-submit');
-      checkBtn.onclick = checkAnswer; // 답 확인 후 nextQuestion 호출
-    }
 
     if (currentIndex < shuffledQuiz.length) {
       renderQuestion();
@@ -696,12 +688,10 @@
     }
   }
 
-
-
   /* ---------------- 서버 저장 ---------------- */
   function submitQuizResults(chapterId, isFinal = true) {
-    const totalScore = score;
-    const isPass = totalScore >= 3 ? 'Y' : 'N';
+    const totalScore = score*10;
+    const isPass = totalScore >= 30 ? 'Y' : 'N';
 
     fetch('/jujuclub/lesson/update-chapter', {
       method: 'POST',
@@ -718,7 +708,7 @@
 
 
 
-  /* ---------------- 헬퍼 함수 ---------------- */
+  /* ---------------- 퀴즈 셔플 ---------------- */
   function shuffleQuiz(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -751,6 +741,9 @@
     lucide.createIcons();
   }
   // 나가기 모달 열기/닫기
+  function handleFailExit() {
+    location.href = '${cpath}/roadMap/main.do';
+  }
   function openExitModal() { document.getElementById('exitModal').classList.add('active'); }
   function closeExitModal() { document.getElementById('exitModal').classList.remove('active'); }
 

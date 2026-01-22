@@ -126,9 +126,10 @@ public class LessonController {
   public String getChapterTest(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String chapterId,
-      String lessonId,
+      @RequestParam String lessonId,
+
       Model model) throws Exception {
-// 세션 연결예쩡
+    // 세션 연결예쩡
     Integer userSeq = 1;
 
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();

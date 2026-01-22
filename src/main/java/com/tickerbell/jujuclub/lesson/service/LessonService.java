@@ -183,7 +183,7 @@ public class LessonService {
    */
   public void updateChapterInfo(LessonDTO.LessonRequest lessonRequest){
 
-    lessonMapper.updateLssnInfo(lessonRequest);
+    lessonMapper.updateChapterRslt(lessonRequest);
 
   }
 }

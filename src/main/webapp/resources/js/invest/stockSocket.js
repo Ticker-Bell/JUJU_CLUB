@@ -12,15 +12,18 @@ const StockSocket = {
 
     connect: function (contextPath, stockCodes, onMessageCallback) {
         //stockCodes: 데이터를 받을 종목 코드 배열, onMessageCallback: 웹소켓을 연결하고 실행할 함수
+        const self = this;
 
         //이미 연결되어있으면 구독만 처리하는 로직
         if (this.isConnected && this.stompClient) {
-            console.log("Already Connected");
+            const newCodes = stockCodes.filter(stockCode => !self.subscribeCodes.has(stockCode));
+            newCodes.forEach(newCode => self.subscribeStock(newCode));
 
-            stockCodes.forEach(stockCode => {
-                if (this.subscribeCodes.has(stockCode)) return;
-                this.subscribeStock(stockCode);
-            });
+            //새로 구독하는 게 있으면 데이터 요청
+            if (newCodes.length > 0) {
+                const payload = {stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes], tr_type: "1"}
+                self.stompClient.send("app/invest/request/chartData", {}, JSON.stringify(payload));
+            }
             return;
         }
 
@@ -28,7 +31,6 @@ const StockSocket = {
         const socket = new SockJS(`${contextPath}/ws-jujuclub`);
         this.stompClient = Stomp.over(socket);
 
-        const self = this;
         this.stompClient.connect({}, function (frame) {
             console.log("connected: " + frame);
             self.isConnected = true;
@@ -44,11 +46,13 @@ const StockSocket = {
                     });
                 }, 3000); //화면 업데이트 시간
             }
+
             const payload = {
-                stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes]
+                stockCodes: Array.isArray(stockCodes) ? stockCodes : [stockCodes], tr_type: "1"
             }; //stockCodes로 메시지 보냄
 
             self.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
+
         }, function (error) {
             console.error("websocket error: ", error);
             self.isConnected = false;
@@ -72,6 +76,7 @@ const StockSocket = {
 
     //구독 해제
     unsubscribe: function (stockCodeList) {
+        //웹소켓이 연결되어있지 않으면 종료
         if (!this.stompClient || !this.isConnected) return;
 
         const codesToUnsubscribe = Array.isArray(stockCodeList) ? stockCodeList : [stockCodeList];
@@ -84,6 +89,10 @@ const StockSocket = {
 
                 this.subscribeCodes.delete(stockCode); //구독 리스트에서 제거
                 delete this.lastestData[stockCode]; //화면에 업데이트할 대상에서 제거
+
+                //구독 해제 요청
+                const payload = {stockCodes: [stockCode], tr_type: "2"};
+                this.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
 
                 console.log(`${stockCode} 구독 해제 및 데이터 삭제 완료`);
             }

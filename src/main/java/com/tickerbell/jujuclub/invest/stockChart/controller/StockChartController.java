@@ -2,6 +2,7 @@ package com.tickerbell.jujuclub.invest.stockChart.controller;
 
 import com.tickerbell.jujuclub.invest.stockChart.dto.SelectedStockDTO;
 import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.invest.stockChart.service.StockChartDataService;
 import com.tickerbell.jujuclub.invest.stockChart.service.StockChartRestService;
 import com.tickerbell.jujuclub.invest.stockChart.service.StockChartService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class StockChartController {
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartService stockChartService;
     private final StockChartRestService stockChartRestService;
+    private final StockChartDataService stockChartDataService;
 
     @GetMapping("invest/investChart.do")
     public String stockChartPage() {
@@ -40,6 +42,12 @@ public class StockChartController {
     public SelectedStockDTO selectedStockInfo(@RequestParam String stockCode, @RequestParam String stockName){
        //선택된 주식 정보
         return new SelectedStockDTO(stockCode, stockName);
+    }
+
+    @GetMapping("/invest/chart/marketType")
+    @ResponseBody
+    public String getMarketType(@RequestParam String stockCode) {
+        return stockChartDataService.selectMarketType(stockCode);
     }
 
     @MessageMapping("/invest/request/chartData")

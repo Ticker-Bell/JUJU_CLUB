@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tickerbell.jujuclub.invest.stockChart.mapper.StockChartDataMapper">
+
+    <!--시장 타입 select-->
+    <select id="selectMarketType" resultType="String" parameterType="String">
+        SELECT market_type
+        FROM stock_master
+        WHERE stock_code = #{stockCode}
+    </select>
+
+    <!--관심종목 insert-->
+    <insert id="insertWatchList" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+        INSERT INTO user_watchlist (user_seq, stock_seq)
+        VALUES (
+                   #{userSeq},
+                   (
+                       SELECT stock_seq
+                       FROM stock_master
+                       WHERE stock_code = #{stockCode}
+                   )
+               )
+    </insert>
+
+    <delete id="deleteWatchList" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+        DELETE FROM user_watchlist
+        WHERE user_seq = #{userSeq}
+          AND stock_seq = (
+            SELECT stock_seq
+            FROM stock_master
+            WHERE stock_code = #{stockCode}
+        )
+    </delete>
+</mapper>

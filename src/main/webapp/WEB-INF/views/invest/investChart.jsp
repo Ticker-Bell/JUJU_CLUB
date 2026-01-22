@@ -96,41 +96,64 @@
     };
 
     function toggleLike(likeEl) {
-        //
         const isLiked = likeEl.dataset.liked === "true";
 
-        likeEl.dataset.liked = (!isLiked).toString();
-        likeEl.src = isLiked
-            ? `${cpath}/resources/images/stockIcons/heart.svg`
-            : `${cpath}/resources/images/stockIcons/filled-heart.svg`;
+        const url = `${cpath}/stock/watchlist`;
+        const method = isLiked ? "DELETE" : "POST";
 
-        console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+        fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                stockCode: selectedStockState.stockCode
+            })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("서버 오류");
+                return res;
+            })
+            .then(() => {
+                likeEl.dataset.liked = (!isLiked).toString();
+                likeEl.src = isLiked
+                    ? `${cpath}/resources/images/stockIcons/heart.svg`
+                    : `${cpath}/resources/images/stockIcons/filled-heart.svg`;
+
+                console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+            })
+            .catch(err => {
+                console.error(err);
+            });
     }
 
-    document
-        .getElementById("header-stockLike")
+    document .getElementById("header-stockLike")
         .addEventListener("click", function () {
             toggleLike(this);
         });
 
 
-    function getSelectedChart(stockCode, stockName) {
-        selectedStockState.stockName = stockName;
-        selectedStockState.stockCode = stockCode;
-
-        document.getElementById('header-stockName').innerText = stockName;
-        document.getElementById('header-stock').innerText = stockCode;
-
+    function getSelectedChart() {
+        //선택된 주식 리스트
         const url = `${pageContext.request.contextPath}/invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
         fetch(url)
             .then(res => res.json())
             .then(data => {
+                selectedStockState.stockName = data.stockName;
+                selectedStockState.stockCode = data.stockCode;
                 document.getElementById('header-stock').innerText = data.stockCode;
                 document.getElementById('header-stockName').innerText = data.stockName;
                 loadChartData('D', data.stockCode);
             });
 
+        //시장 타입 가져오기
+        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=${stockCode}`)
+            .then(res => res.text())
+            .then(marketType => {
+                document.getElementById('header-marketType').innerText = marketType;
+            });
     }
+
 
 
     function loadChartData(periodCode, stockCode) {

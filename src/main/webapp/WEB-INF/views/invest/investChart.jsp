@@ -33,8 +33,8 @@
 </head>
 <body>
 <div class="flex flex-col gap-4">
-        <div class="p-6 border-bottom border-gray-100 stock-info-header">
-            <div class="flex flex-row justify-between">
+    <div class="p-6 border-bottom border-gray-100 stock-info-header">
+        <div class="flex flex-row justify-between">
 
             <div class="flex items-center gap-4">
                 <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">기업이름</h2>
@@ -44,39 +44,39 @@
                 <img id="header-stockLike" data-liked="false"
                      class="w-5 h-5 cursor-pointer" src="${cpath}/resources/images/stockIcons/heart.svg" alt="하트아이콘">
             </div>
-                <div id="button-group" class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
-                    <button id="btn-D" onclick="loadChartData('D')"
-                            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-                        일별
-                    </button>
+            <div id="button-group"
+                 class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
+                <button id="btn-D" onclick="loadChartData('D')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    일별
+                </button>
 
-                    <button id="btn-W" onclick="loadChartData('W')"
-                            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-                        주별
-                    </button>
+                <button id="btn-W" onclick="loadChartData('W')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    주별
+                </button>
 
-                    <button id="btn-M" onclick="loadChartData('M')"
-                            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-                        월별
-                    </button>
-
-                </div>
+                <button id="btn-M" onclick="loadChartData('M')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    월별
+                </button>
 
             </div>
 
-                <div class="flex items-baseline gap-4 mt-4">
-                <h2 id="header-price" class="text-2xl font-extrabold tracking-tight text-gray-900">0원</h2>
-                <div class="change-info">
-                    <span id="header-change" class="text-sm font-semibold">0</span>
-                </div>
+        </div>
+
+        <div class="flex items-baseline gap-4 mt-4">
+            <h2 id="header-price" class="text-2xl font-extrabold tracking-tight text-gray-900">0원</h2>
+            <div class="change-info">
+                <span id="header-change" class="text-sm font-semibold">0</span>
             </div>
         </div>
+    </div>
 
     <div class="p-4 h-[400px]">
         <canvas id="myChart"></canvas>
     </div>
-    </div>
-
+</div>
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -128,24 +128,21 @@
             });
     }
 
-    document .getElementById("header-stockLike")
+    document.getElementById("header-stockLike")
         .addEventListener("click", function () {
             toggleLike(this);
         });
 
 
-    function getSelectedChart() {
+    function getSelectedChart(stockCode, stockName) {
         //선택된 주식 리스트
-        const url = `${pageContext.request.contextPath}/invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
-        fetch(url)
-            .then(res => res.json())
-            .then(data => {
-                selectedStockState.stockName = data.stockName;
-                selectedStockState.stockCode = data.stockCode;
-                document.getElementById('header-stock').innerText = data.stockCode;
-                document.getElementById('header-stockName').innerText = data.stockName;
-                loadChartData('D', data.stockCode);
-            });
+        selectedStockState.stockName =stockName;
+        selectedStockState.stockCode =stockCode;
+
+        document.getElementById('header-stock').innerText = selectedStockState.stockCode;
+        document.getElementById('header-stockName').innerText = selectedStockState.stockName;
+        console.log("받아온 차트 데이터: " + selectedStockState.stockCode + selectedStockState.stockName);
+        loadChartData('D', selectedStockState.stockCode);
 
         //시장 타입 가져오기
         fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=${stockCode}`)
@@ -154,7 +151,6 @@
                 document.getElementById('header-marketType').innerText = marketType;
             });
     }
-
 
 
     function loadChartData(periodCode, stockCode) {

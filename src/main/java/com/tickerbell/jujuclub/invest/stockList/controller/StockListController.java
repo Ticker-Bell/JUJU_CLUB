@@ -137,26 +137,4 @@ public class StockListController {
                 .changePct(kisDataDTO.getChangePct())
                 .build();
     }
-
-    // 테스트용  나중에 제거하기
-//    @GetMapping("/chart/selectedStockInfo")
-//    @ResponseBody
-//    public StockDTO paramTest(@RequestParam String stockCode, @RequestParam String stockName) {
-//
-//        return StockDTO.builder()
-//                .stockCode(stockCode)
-//                .stockName(stockName)
-//                .build();
-//    }
-
-    // 테스트용  나중에 제거하기
-    @GetMapping("/corpoInfo/selectedStockInfo")
-    @ResponseBody
-    public StockDTO paramTest2(Model model, @RequestParam String stockCode) {
-
-        return StockDTO.builder()
-                .stockCode(stockCode)
-                .build();
-    }
-
 }

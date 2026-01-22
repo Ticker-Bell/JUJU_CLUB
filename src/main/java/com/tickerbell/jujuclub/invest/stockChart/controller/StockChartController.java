@@ -9,16 +9,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import java.util.*;
 
 @Controller
 @RequiredArgsConstructor
+
 public class StockChartController {
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartService stockChartService;
@@ -34,13 +33,6 @@ public class StockChartController {
     @ResponseBody
     public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode, @RequestParam(value = "stockCode") String stockCode) {
         return stockChartRestService.getStockRestData(periodCode, stockCode);
-    }
-
-    @GetMapping("/invest/chart/selectedStockInfo")
-    @ResponseBody
-    public SelectedStockDTO selectedStockInfo(@RequestParam String stockCode, @RequestParam String stockName) {
-        //선택된 주식 정보
-        return new SelectedStockDTO(stockCode, stockName);
     }
 
     @GetMapping("/invest/chart/marketType")

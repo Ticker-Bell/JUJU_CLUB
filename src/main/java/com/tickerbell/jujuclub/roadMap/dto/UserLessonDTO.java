@@ -11,7 +11,7 @@ public class UserLessonDTO {
     private String levelName; // level_name
     private String chapterId; // chapter_id
     private String chapterName; // chapter_name
-    private String lessonId; // lesson_id\
+    private String lessonId; // lesson_id
     private Date startDate; // started_at
     private Date endDate; // finished_at
 }

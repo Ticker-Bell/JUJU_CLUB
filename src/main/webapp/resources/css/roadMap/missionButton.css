@@ -8,9 +8,8 @@
 
 /* 2. 미션 버튼 전용 스타일 (독립시킴) */
 .btn-mission {
-    /* [기존 control-item 스타일을 여기로 가져옴] */
-    height: 52px;
-    width: 52px; /* 정사각형 */
+    height: 60px;
+    width: 60px; /* 정사각형 */
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid rgba(229, 231, 235, 1);
     box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);

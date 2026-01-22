@@ -13,7 +13,7 @@ public class LevelChapterLessonDTO {
     private String chapterName; // chapter_name
     private String testReward; // test_reward
     private String testPay; // test_pay
-    private Boolean chapterPass; // 유저가 테스트를 완료했는지 확인
+    private String chapterPass; // 유저가 테스트를 완료했는지 확인
 
     private String lessonId; // lesson_id
     private String lessonName; // lesson_name

@@ -612,9 +612,41 @@
         // 화면에 뿌린 종목들의 코드 긁어오기
         // map을 사용해 data 배열에서 stockCode만 뽑아서 새 배열로 만들기
         const codes = data.map(item => item.stockCode);
-        codes.forEach(code=>{
-            StockSocket.subscribeStock(code);
-        });
+        console.log("구독해야 할 종목들: " ,codes);
+        StockSocket.connect(
+            contextPath,      // 서버 주소
+            codes,       // 구독할 종목 코드들
+            function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
+
+                // 해당 종목이 화면에 있다면
+                if($item.length > 0){
+                    // 2.가격 업데이트 (콤마 찍기)
+                    const formattedPrice = stockData.displayPrice;
+                    $item.find('.txt-price').text(formattedPrice);
+
+                    // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                    let rate = stockData.displayRate;
+                    $item.find('.txt-rate').text(rate);
+
+                    // 4. 색상 변경 (빨강/파랑/검정)
+                    const $priceTexts = $item.find('.txt-price, .txt-rate');
+
+                    if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                        // 이때만 기존 색 지우고 다시 입힘
+                        $priceTexts.removeClass('color-red color-blue color-gray');
+
+                        if(rate.startsWith("+")){
+                            $priceTexts.addClass('color-red');
+                        } else{
+                            $priceTexts.addClass('color-blue');
+                        }
+                    }
+                }
+            }
+        )
     }
 </script>
 </body>

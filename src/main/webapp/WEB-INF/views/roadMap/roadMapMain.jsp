@@ -17,4 +17,13 @@
             hx-target="#main"
             hx-swap="innerHTML"
             hx-push-url="true"> 이동버튼 </button>
+
+    <span>챕터테스트</span>
+    <button type="button"
+            class="bg-blue-500 text-white p-2 rounded"
+            hx-post="${cpath}/lesson/chapter-test"
+            hx-vals='{"chapterId":"LV1_CH001" ,"lessonId": "LV1_CH001_LSN006"}'
+            hx-target="#main"
+            hx-swap="innerHTML"
+            hx-push-url="true"> 이동버튼 </button>
 </div>

@@ -21,4 +21,11 @@ public interface LessonMapper {
   int countUsrLssnRslt(LessonRequest lessonRequest);
 
   List<LessonDTO.LessonResponse> selectUsrLssnRslt(LessonRequest lessonRequest);
+
+  List<LessonDTO.LessonQst> getChapterTestQst(LessonDTO.LessonRequest lessonRequest);
+
+  int insertChapterRslt(LessonDTO.LessonRequest lessonRequest);
+
+  int countUserChapterRslt(LessonRequest lessonRequest);
+  int updateChapterRslt(LessonRequest lessonRequest);
 }

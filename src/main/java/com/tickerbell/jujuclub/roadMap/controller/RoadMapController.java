@@ -5,11 +5,11 @@ import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/roadMap")
@@ -28,71 +28,83 @@ public class RoadMapController {
 
         List<LevelDTO> levelList = roadMapService.levelList();
         List<ChapterDTO> chptList = roadMapService.chapterList(levelSeq);
-        List<RoadMapLessonDTO> lessonList = roadMapService.lessonList(chapterId);
+        //List<RoadMapLessonDTO> lessonList = roadMapService.lessonList(chapterId);
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
-        List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelSeq, chapterId);
+        //List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelSeq, chapterId);
         List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
 
         // 미션 확인용
         List<MissionDTO> missionList = roadMapService.missionList();
-        int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
+        int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= (mission.getProgress() == null ? 0 : mission.getProgress())).count();
 
-        // 전체 레슨 및 유저 진행 상황 저장
-        int count = userLessonList.size() - 1;
-
-        for (int i = 0; i < allLearningList.size(); i++) {
-            LevelChapterLessonDTO lesson = allLearningList.get(i);
-            if (count >= 0) {
-                UserLessonDTO user = userLessonList.get(count--);
-
-                if (lesson.getLessonId().equals(user.getLessonId())) {
-                    if (!user.getLessonId().isEmpty() && user.getEndDate() != null && !user.getEndDate().toString().isEmpty()) {
-                        lesson.setLessonStatus("completed");
-                    } else if (user.getLessonId() != null && !user.getLessonId().isEmpty() &&
-                            (user.getEndDate() == null || (user.getEndDate().toString()).isEmpty())) {
-                        lesson.setLessonStatus("current");
-                    }
-                }
-            } else {
-                lesson.setLessonStatus("locked");
-            }
+        // 유저 레슨 진행 상황 저장
+        Map<String, UserLessonDTO> userMap = new HashMap<>();
+        for (UserLessonDTO user : userLessonList) {
+            userMap.put(user.getLessonId(), user);
         }
-        int idx = 0;
-        for (int i = 0; i < allLearningList.size(); i++) {
-            LevelChapterLessonDTO lesson = allLearningList.get(i);
-            ChapterResultDTO testResult = chapterResultList.get(idx);
-            // chpaterId가 같으면
-            if (lesson.getChapterId().equals(testResult.getChapterId())) {
-                lesson.setChapterPass(Objects.equals(testResult.getIsPass(), "Y"));
+
+        // 유저 챕터 테스트 진행상황 저장
+        Map<String, ChapterResultDTO> resultMap = new HashMap<>();
+        for (ChapterResultDTO result : chapterResultList) {
+            resultMap.put(result.getChapterId(), result);
+        }
+
+        Map<String, Integer> chptClearCount = new HashMap<>();
+
+        // 완료된 레슨 수 카운트
+        for (LevelChapterLessonDTO lesson : allLearningList) {
+            UserLessonDTO user = userMap.get(lesson.getLessonId());
+            if (user != null && user.getEndDate() != null) {
+                chptClearCount.put(lesson.getChapterId(),
+                        chptClearCount.getOrDefault(lesson.getChapterId(), 0) + 1);
             }
         }
 
-        levelList.forEach(System.out::println);
-        chptList.forEach(System.out::println);
-        lessonList.forEach(System.out::println);
-        System.out.println(userLessonList.stream().findFirst());
+        // 유저 레슨, 테스트 진행상황 저장
+        final boolean[] isUnlocked = {true};
+        allLearningList.forEach(lesson -> {
+            UserLessonDTO user = userMap.get(lesson.getLessonId());
+            ChapterResultDTO result = resultMap.get(lesson.getChapterId());
+
+            boolean testFinished = result != null && result.getIsPass().equals("Y");
+
+            lesson.setLessonStatus(lessonStatus(user));
+            lesson.setChapterPass(chapterStatus(result, lesson, chptClearCount));
+        });
 
         model.addAttribute("levelList", levelList);
-        model.addAttribute("chptList", chptList); // 레벨 선택하면 챕터리스트 조회
-        model.addAttribute("lessonList", lessonList);
-        model.addAttribute("selectLearningList", selectLearningList); // 레벨/챕터에 맞는 레슨 전체 조회
-        model.addAttribute("userLesson", userLessonList); // 현재 유저 레슨 정보
+        //model.addAttribute("chptList", chptList); // 레벨 선택하면 챕터리스트 조회
+        //model.addAttribute("lessonList", lessonList);
+        //model.addAttribute("selectLearningList", selectLearningList); // 레벨/챕터에 맞는 레슨 전체 조회
+        //model.addAttribute("userLesson", userLessonList); // 현재 유저 레슨 정보
         model.addAttribute("isMissionClear", 4 > successCount); // 미션 클리어 확인
         model.addAttribute("allLearningList", allLearningList); // 전체 레슨 + 유저 진행상황
-        model.addAttribute("chapterResultList", chapterResultList); // 유저 전체 챕터 결과 조회
 
         return "roadMap/roadMapMain";
     }
 
+    private String lessonStatus(UserLessonDTO user) {
+        if (user == null) {
+            return "locked";
+        }
+        if (user.getEndDate() != null && !user.getEndDate().toString().isEmpty()) {
+            return "completed";
+        }
+        return "current";
+    }
 
-    @PostMapping("/main.do")
-    public String postRoadMap(Model model,
-                              @RequestParam("levelId") Integer levelId,
-                              @RequestParam("chapterId") String chapterId) {
+    private String chapterStatus(ChapterResultDTO result, LevelChapterLessonDTO lesson, Map<String, Integer> chptClearCount) {
+        if (result != null && "Y".equals(result.getIsPass())) {
+            return "completed";
+        }
+        else {
+            // 총 레슨 수 챕터당 5개 고정이라서 5로 비교
+            int clearedCount = chptClearCount.getOrDefault(lesson.getChapterId(), 0);
+            int totalLessonsInChapter = 5;
 
-        List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelId, chapterId);
-        return null;
+            return (clearedCount >= totalLessonsInChapter) ? "current" : "locked";
+        }
     }
 
     @GetMapping("/mission.do")

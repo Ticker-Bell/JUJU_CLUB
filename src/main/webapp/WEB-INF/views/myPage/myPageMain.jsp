@@ -5,7 +5,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <%
-    // 가입일 D-Day 계산
     MemberDTO user = (MemberDTO) session.getAttribute("loginUser");
     long dayCount = 1;
     if (user != null && user.getCreatedAt() != null) {
@@ -23,6 +22,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
 
     <script>
@@ -30,10 +31,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Pretendard', 'sans-serif'] },
-                    colors: {
-                        primary: '#5E45EB',
-                        secondary: '#F8FAFC'
-                    }
+                    colors: { primary: '#5E45EB', secondary: '#F8FAFC' }
                 }
             }
         }
@@ -48,19 +46,10 @@
             display: flex;
             flex-direction: column;
         }
-
-        .dashboard-card {
-            background: #FFFFFF;
-            border-radius: 24px;
-            border: 1px solid #E2E8F0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
-            padding: 24px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .progress-bar-fill { transition: width 1.5s ease-in-out; }
+        /* 스크롤바 커스텀 */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 4px; }
     </style>
 </head>
 
@@ -68,38 +57,27 @@
 
 <div class="w-full max-w-[1600px] mx-auto h-full flex flex-col p-5">
 
-    <div class="flex items-center justify-between mb-4 shrink-0">
-        <button onclick="history.back()" class="flex items-center gap-2 group">
-            <div class="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center shadow-sm group-hover:bg-gray-50 transition-colors">
-                <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600 group-hover:text-gray-900"></i>
-            </div>
-            <span class="text-sm font-bold text-gray-500 group-hover:text-gray-900 transition-colors">뒤로가기</span>
-        </button>
-
-        <a href="/" class="flex items-center gap-1.5 text-sm font-bold text-gray-400 hover:text-primary transition-colors">
-            <i data-lucide="home" class="w-4 h-4"></i>
-            메인으로
-        </a>
-    </div>
-
     <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-5 min-h-0">
 
-        <div class="dashboard-card relative justify-center">
-
-            <div class="flex flex-col items-center justify-center relative z-10">
+        <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative justify-center">
+            <div class="flex-1 flex flex-col items-center justify-center relative z-10">
                 <div class="w-24 h-24 rounded-full bg-white border-4 border-slate-50 flex items-center justify-center text-white shadow-xl mb-4 relative group cursor-pointer">
                     <div class="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 opacity-90"></div>
                     <i data-lucide="user" class="w-10 h-10 relative z-10"></i>
 
-                    <a href="${pageContext.request.contextPath}/myPage/profile" class="absolute bottom-0 right-0 bg-gray-900 p-1.5 rounded-full border-2 border-white hover:bg-primary transition-colors">
+                    <%-- 모달 호출용 HTMX 버튼 --%>
+                    <div class="absolute bottom-0 right-0 bg-gray-900 p-1.5 rounded-full border-2 border-white hover:bg-primary transition-colors cursor-pointer"
+                         hx-get="${pageContext.request.contextPath}/myPage/profile"
+                         hx-target="body"
+                         hx-swap="beforeend">
                         <i data-lucide="settings-2" class="w-4 h-4 text-white"></i>
-                    </a>
+                    </div>
                 </div>
 
                 <h2 class="text-2xl font-extrabold text-gray-900 mb-1">${loginUser.userName}</h2>
                 <p class="text-sm text-gray-400 font-medium mb-3">${loginUser.userId}</p>
 
-                <div class="flex items-center gap-2 mb-8">
+                <div class="flex items-center gap-2 mb-6">
                     <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
                         Lv. ${not empty loginUser.userLevel ? loginUser.userLevel : 'Beginner'} Investor
                     </span>
@@ -110,7 +88,7 @@
                 </div>
             </div>
 
-            <div class="flex w-full border-t border-slate-100 pt-8">
+            <div class="flex w-full border-t border-slate-100 py-6">
                 <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-100">
                     <span class="text-sm font-bold text-gray-400 mb-1">총 자산</span>
                     <p class="text-2xl font-black text-slate-800 tracking-tight">
@@ -139,7 +117,6 @@
                         </c:choose>
                     </div>
                 </div>
-
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-sm font-bold text-gray-400 mb-1">예수금</span>
                     <p class="text-2xl font-black text-primary tracking-tight">
@@ -155,63 +132,22 @@
             </div>
         </div>
 
-        <div class="dashboard-card">
+        <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-lg font-extrabold text-gray-900">내 포트폴리오</h3>
                 <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>
             </div>
-
-            <div class="flex-1 relative w-full min-h-0 flex items-center justify-center p-2">
+            <div id="chartContainer" class="flex-1 relative w-full min-h-0 flex items-center justify-center p-2">
                 <canvas id="stockChart"></canvas>
             </div>
         </div>
 
-        <div class="dashboard-card">
-            <div class="flex items-center justify-between mb-4 shrink-0">
-                <h3 class="text-lg font-extrabold text-gray-900">미션 달성 현황</h3>
-            </div>
+        <jsp:include page="myPageMission.jsp" />
 
-            <div class="flex-1 flex flex-col justify-around py-2">
-                <div>
-                    <div class="flex justify-between text-sm font-bold mb-1.5">
-                        <span class="text-gray-600">일간 미션</span>
-                        <span class="text-primary font-extrabold">80%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-4">
-                        <div class="bg-primary h-4 rounded-full progress-bar-fill shadow-sm" style="width: 80%"></div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1.5 truncate">오늘 접속하기, 관심종목 추가</p>
-                </div>
-
-                <div>
-                    <div class="flex justify-between text-sm font-bold mb-1.5">
-                        <span class="text-gray-600">주간 미션</span>
-                        <span class="text-emerald-500 font-extrabold">45%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-4">
-                        <div class="bg-emerald-500 h-4 rounded-full progress-bar-fill shadow-sm" style="width: 45%"></div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1.5 truncate">수익률 3% 달성 도전</p>
-                </div>
-
-                <div>
-                    <div class="flex justify-between text-sm font-bold mb-1.5">
-                        <span class="text-gray-600">월간 미션</span>
-                        <span class="text-amber-500 font-extrabold">20%</span>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-4">
-                        <div class="bg-amber-500 h-4 rounded-full progress-bar-fill shadow-sm" style="width: 20%"></div>
-                    </div>
-                    <p class="text-xs text-gray-400 mt-1.5 truncate">누적 거래액 500만원</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="dashboard-card relative overflow-hidden">
+        <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative overflow-hidden">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-lg font-extrabold text-gray-900">획득 뱃지</h3>
             </div>
-
             <div class="flex-1 flex flex-col items-center justify-center text-center pb-4">
                 <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-5 rotate-12 border border-slate-100 shadow-sm">
                     <i data-lucide="message-circle-warning" class="w-10 h-10 text-slate-300 -rotate-12"></i>
@@ -225,83 +161,103 @@
 </div>
 
 <script>
-    lucide.createIcons();
+    // [중요] 즉시 실행 함수(IIFE)로 감싸서 변수 충돌 방지 및 즉시 실행 보장
+    (function() {
+        // 1. 아이콘 로드 (HTMX로 들어왔을 때 아이콘이 깨지는 현상 방지)
+        if (window.lucide) lucide.createIcons();
 
-    // 1. 서버(Controller)에서 넘겨준 JSON 데이터 받기
-    const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
-    const ctx = document.getElementById('stockChart').getContext('2d');
+        // 2. 차트 그리기 함수
+        function drawStockChart() {
+            // 차트 부모 컨테이너 찾기
+            const container = document.getElementById('chartContainer');
+            // 컨테이너가 없으면 실행 중단 (오류 방지)
+            if (!container) return;
 
-    console.log("차트 데이터:", chartDataFromServer); // [디버깅용 로그]
+            // [Nuclear Option]
+            // 캔버스 영역을 강제로 비우고 새로 만듭니다.
+            // HTMX로 페이지를 왔다 갔다 할 때 꼬이는 차트 문제를 100% 방지합니다.
+            container.innerHTML = '';
 
-    // 2. 데이터 유무에 따른 차트 그리기
-    if (chartDataFromServer.length === 0) {
-        // 데이터가 없을 경우: 회색 원
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['데이터 없음'],
-                datasets: [{
-                    data: [100],
-                    backgroundColor: ['#F1F5F9'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
+            const newCanvas = document.createElement('canvas');
+            newCanvas.id = 'stockChart';
+            container.appendChild(newCanvas);
+
+            const ctx = newCanvas.getContext('2d');
+
+            // 서버 데이터 로드 (JSP 변수 -> JS 변수)
+            const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
+
+            // 차트 옵션 설정
+            const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: { legend: { display: false }, tooltip: { enabled: false } }
-            }
-        });
-    } else {
-        // 데이터가 있을 경우: 정상 차트
-        const labels = chartDataFromServer.map(item => item.stockName);
-        const data = chartDataFromServer.map(item => item.weightPct);
-        const colors = chartDataFromServer.map(item => item.color);
+                animation: false, // 깜빡임 방지를 위해 애니메이션 끔
+                cutout: '65%',
+                layout: { padding: 10 }
+            };
 
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors,
-                    borderWidth: 0,
-                    hoverOffset: 15
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: {
-                            font: { family: 'Pretendard', size: 12, weight: 'bold' },
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            padding: 15,
-                            color: '#64748B'
-                        }
+            if (chartDataFromServer.length === 0) {
+                // 데이터 없음 (회색 도넛)
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['데이터 없음'],
+                        datasets: [{ data: [100], backgroundColor: ['#F1F5F9'], borderWidth: 0 }]
                     },
-                    tooltip: {
-                        backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                        padding: 12,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        bodyFont: { family: 'Pretendard', size: 14 },
-                        callbacks: {
-                            label: function(context) {
-                                return context.label + ': ' + context.raw + '%';
+                    options: {
+                        ...commonOptions,
+                        cutout: '70%',
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            } else {
+                // 실제 데이터 차트 그리기
+                const labels = chartDataFromServer.map(item => item.stockName);
+                const data = chartDataFromServer.map(item => item.weightPct);
+                const colors = chartDataFromServer.map(item => item.color);
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    font: { family: 'Pretendard', size: 12, weight: 'bold' },
+                                    usePointStyle: true, boxWidth: 8, padding: 15, color: '#64748B'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                                padding: 12, cornerRadius: 8, displayColors: false,
+                                bodyFont: { family: 'Pretendard', size: 14 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.raw + '%';
+                                    }
+                                }
                             }
                         }
                     }
-                },
-                cutout: '65%',
-                layout: { padding: 10 }
+                });
             }
-        });
-    }
+        }
+
+        // [핵심 수정] 이벤트 리스너 없이 바로 실행!
+        // HTMX가 이 HTML을 화면에 끼워 넣자마자 이 코드가 실행되어 차트를 그립니다.
+        drawStockChart();
+
+    })(); // 함수 끝
 </script>
 </body>
 </html>

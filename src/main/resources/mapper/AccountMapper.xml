@@ -4,7 +4,7 @@
 
 <mapper namespace="com.tickerbell.jujuclub.auth.mapper.AccountMapper">
 
-    <select id="checkAccountExist" parameterType="long" resultType="int">
+    <select id="checkAccountExist" parameterType="Integer" resultType="int">
         SELECT COUNT(*)
         FROM USER_ACCOUNT
         WHERE user_seq = #{userSeq}
@@ -24,7 +24,7 @@
                      NOW(),  NOW()   )
     </insert>
 
-    <select id="selectAccountByUserSeq" parameterType="long" resultType="com.tickerbell.jujuclub.auth.dto.AccountDTO">
+    <select id="selectAccountByUserSeq" parameterType="Integer" resultType="com.tickerbell.jujuclub.auth.dto.AccountDTO">
         SELECT
             account_seq as accountSeq,
             user_seq as userSeq,

@@ -84,7 +84,7 @@
     };
 
     window.onload = function () {
-        updateButtonUI('D');ㄸ
+        updateButtonUI('D');
     };
 
     function getSelectedChart(stockCode, stockName) {

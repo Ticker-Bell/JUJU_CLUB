@@ -1,9 +1,6 @@
 package com.tickerbell.jujuclub.invest.controller;
 
-import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
-import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
-import com.tickerbell.jujuclub.invest.dto.WatchlistItemDTO;
+import com.tickerbell.jujuclub.invest.dto.*;
 import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
@@ -73,6 +70,12 @@ public class StockMyRestController {
     public KISDataDTO test(@RequestParam("stockCode") String stockCode){
         return kisApiService.getPriceData(stockCode);
     }
+
+    @GetMapping("/kisapitest2")
+    public KISCorpInfoDTO test2(@RequestParam("stockCode") String stockCode){
+        return kisApiService.getCorpInfoData(stockCode);
+    }
+
     @GetMapping("/watchlist")
     public List<WatchlistItemDTO> watchlist(@RequestParam int userSeq){
         return watchlistService.getWatchlistItems(userSeq);

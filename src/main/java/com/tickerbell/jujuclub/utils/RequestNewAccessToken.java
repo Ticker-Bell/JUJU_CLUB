@@ -33,7 +33,7 @@ public class RequestNewAccessToken {
 
         HttpURLConnection conn = null;
 
-        try{
+        try {
             //토큰 발급 요청 보낼 주소
             URL url = new URL(BASE_URL + "/oauth2/tokenP");
 
@@ -53,7 +53,7 @@ public class RequestNewAccessToken {
                     + "}";
 
             //데이터 전송
-            try(OutputStream os = conn.getOutputStream()){
+            try (OutputStream os = conn.getOutputStream()) {
                 os.write(requestBody.getBytes("UTF-8"));
             }
 
@@ -61,7 +61,7 @@ public class RequestNewAccessToken {
             StringBuilder response = new StringBuilder();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
                 String line;
-                while ((line = br.readLine()) != null){
+                while ((line = br.readLine()) != null) {
                     response.append(line);
                 }
             }

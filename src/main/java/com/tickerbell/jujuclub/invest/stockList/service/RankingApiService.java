@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
-import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -33,7 +30,7 @@ public class RankingApiService {
     @Value("${kis.baseurl}")
     private String baseurl;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImI1ODRiNmQzLWQzZTItNGUwOC05OTg0LWNiYmJjMGRmMmYzYiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTEyNjY0OCwiaWF0IjoxNzY5MDQwMjQ4LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.iYk4DBtIJHkQmwG9N2rEv54glhbLn_3ksU7WWDke8MRK2KdhehpeXo-orz5_1WfCk5Evrj4KakUStNnhdJ3M0Q";
+    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjBmMTk3ZTc3LWNkYTItNGRlMS05NmZhLTM2YzBkNmNiMzY0ZiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTE1NTYyMiwiaWF0IjoxNzY5MDY5MjIyLCJqdGkiOiJQU2FqN2dWVkpMMnVCZkpyMHhwU2twSDRFYVNoVlhSU2JoNFMifQ.o1_Tw0cL26jlmFOwBshsMUUDU5ZbbcoNTwSRpmLPPMSn0bgbxkTtu2jeUXdGXJDfleS2AyzCypFHKrskPh-15A";
 
     @Autowired
     private RestTemplate restTemplate;

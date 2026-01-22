@@ -146,39 +146,27 @@
         var currentChapterIdx = chapterMap[chId];
 
         <c:if test="${not empty item.lessonId}">
+
         nodesData.push({
-            type: 'lesson',
             id: '${item.lessonId}',
             chapterIdx: currentChapterIdx,
             inChapterIdx: nodesData.filter(n => n.chapterIdx === currentChapterIdx).length,
             lessonName: '${item.lessonName}',
-            lessonType: '${item.lessonType}',
-            status: '${item.lessonStatus}',
+            lessonDesc: '${item.lessonDesc}',
+            type: '${item.lessonType}', // THEORY, PRACTICE, TEST
+            status: '${item.status}',
             chapterId: '${item.chapterId}',
             chapterName: '${item.chapterName}',
+            testReward: '${item.testReward}',
+            testPay: '${item.testPay}',
             levelId: '${item.levelId}',
             levelName: '${item.levelName}'
         });
         </c:if>
-
-        <c:if test="${status.index % 5 == 4}">
-        nodesData.push({
-            type: 'chapter',
-            id: '${item.chapterId}',
-            chapterIdx: currentChapterIdx,
-            inChapterIdx: 5,
-            chapterId: '${item.chapterId}',
-            chapterName: '${item.chapterName}',
-            levelId: '${item.levelId}',
-            levelName: '${item.levelName}',
-            testReward: '${item.testReward}',
-            testPay: '${item.testPay}',
-            status: '${item.chapterPass}'
-        });
-        </c:if>
         </c:forEach>
 
-        // 전역 변수로 nodePositions 관리
+        console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
+
         let nodePositions = [];
 
         /* =========================================
@@ -256,24 +244,27 @@
         window.openTooltip = (pos, el) => {
             const tooltip = document.getElementById('tooltip');
             const inner = document.getElementById('innerContent');
+
             if (!tooltip || !inner) return;
 
             const data = pos.data;
-            const isChapter = data.type === 'chapter';
+            const isChapter = data.type === 'TEST';
 
             let title;
             try {
                 const rawId = isChapter ? data.chapterId : data.id;
                 const num = rawId.replace(/[^0-9]/g, '').slice(-3);
-                title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
+
+                title =  (isChapter ? "Chapter " : "Lesson ")  + parseInt(num || "0");
             } catch (e) {
                 title = isChapter ? "Chapter Test" : "Lesson";
             }
 
-            document.getElementById('tip-title').innerText = title;
+            document.getElementById('tip-chapter').innerText = title;
+            document.getElementById('tip-title').innerText = isChapter ? data.chapterName : data.lessonName;
             document.getElementById('tip-desc').innerText = isChapter
                 ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
-                : (data.lessonName || "레슨 설명이 없습니다.");
+                : (data.lessonDesc || "레슨 설명이 없습니다.");
 
             const status = data.status || 'locked';
             const badge = document.getElementById('tip-badge');
@@ -291,7 +282,7 @@
                 infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
                     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
             } else {
-                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.lessonType === 'THEORY' ? '이론' : '실습') + '</div></div>' +
+                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.type === 'THEORY' ? '이론' : '실습') + '</div></div>' +
                     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
             }
 
@@ -312,7 +303,10 @@
 
                 newBtn.setAttribute('hx-post', CPATH + '/lesson/' + (isChapter ? 'chapter-test' : 'lessonInfo'));
                 newBtn.setAttribute('hx-target', '#main');
-                newBtn.setAttribute('hx-vals', JSON.stringify({lessonId: data.id}));
+
+                var param = {lessonId: data.id};
+                if(isChapter) param.chapterId = data.chapterId;
+                newBtn.setAttribute('hx-vals', JSON.stringify(param));
             } else {
                 // 잠김이거나 챕터테스트를 완료한 경우
                 newBtn.disabled = true;
@@ -326,10 +320,10 @@
 
             const TIP_WIDTH = 300;
             let left = pos.x - 150;
-            let top = pos.y + 70;
+            let top = pos.y + 60;
             if (left < 10) left = 10;
             if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
-            if (top + 250 > inner.offsetHeight) top = pos.y - 280;
+            if (top + 250 > inner.offsetHeight) top = pos.y - 320;
 
             tooltip.style.left = left + "px";
             tooltip.style.top = top + "px";
@@ -357,7 +351,7 @@
 
             // 발판 위치 지정
             nodesData.forEach((node, i) => {
-                const marginX = vw * 0.1;
+                const marginX = vw * 0.12;
                 const availableW = vw - (marginX * 2);
                 const stepX = availableW / (NODES_PER_CHAPTER - 1);
                 const x = (node.chapterIdx * vw) + marginX + (node.inChapterIdx * stepX);
@@ -373,7 +367,7 @@
             nodePositions.forEach(pos => {
                 const el = document.createElement('div');
                 const data = pos.data;
-                const isChapter = data.type === 'chapter';
+                const isChapter = data.type === 'TEST';
                 const status = data.status;
 
                 el.className = 'orb ' + status;
@@ -382,9 +376,24 @@
                     el.style.height = '80px';
                 }
 
-                if (status === 'completed') el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
-                else if (status === 'current') el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                else el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
+                if (isChapter) {
+                    if (status === 'completed') {
+                        el.innerHTML = '<i data-lucide="trophy" class="w-10 h-10 text-yellow-400 fill-yellow-100"></i>';
+                        el.classList.add('border-yellow-400', 'bg-yellow-50');
+                    } else if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="unlock" class="w-10 h-10 text-white animate-pulse"></i>';
+                    } else {
+                        el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
+                    }
+                } else {
+                    if (status === 'completed') {
+                        el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
+                    } else if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
+                    } else {
+                        el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
+                    }
+                }
 
 
                 el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
@@ -444,6 +453,7 @@
             }
         }
 
+        // 라인 그리기
         const drawContinuousPath = () => {
             const pathBorder = document.getElementById('roadBorder');
             const pathMain = document.getElementById('roadPath');
@@ -507,7 +517,7 @@
                 });
             });
 
-            // 이동 버튼 (드롭다운 내의 이동버튼이 있다면)
+            // 이동 버튼 (드롭다운 내의 이동버튼)
             const moveBtn = document.getElementById('moveBtn');
             if (moveBtn) {
                 moveBtn.onclick = () => {
@@ -641,18 +651,41 @@
         // 리사이즈 시에는 위치만 다시 계산 (스크롤 이동 X)
         window.addEventListener('resize', () => initRoadmap(false));
 
-        // 초기 실행: 처음 로딩이므로 true 전달
-        initRoadmap(true);
-        initRoadMapDropdowns();
-        initChapterNavigation();
+        // 실행 함수 (초기화)
+        const initialize = () => {
+            initRoadMapDropdowns();
+            initChapterNavigation();
 
-        document.body.addEventListener('htmx:afterSettle', function (evt) {
-            if (document.getElementById('roadmapScroll')) {
-                // HTMX로 다시 로드되었을 때도 강제 스크롤 적용
-                initRoadmap(true);
-                initRoadMapDropdowns();
-                initChapterNavigation();
+            // 리사이즈 이벤트는 전역이므로, 기존 리스너가 있다면 제거하고 다시 등록하거나
+            // 간단하게 덮어씌우는 방식으로 처리 (메모리 누수 방지 노력)
+            window.removeEventListener('resize', handleResize);
+            window.addEventListener('resize', handleResize);
+
+            // [핵심] 렌더링 안정성을 위해 약간의 지연 후 그리기
+            setTimeout(() => {
+                initRoadmap(true); // true = 내 위치로 스크롤 이동
+            }, 100);
+        };
+
+        const handleResize = () => {
+            // 리사이즈 시에는 스크롤 이동 없이 다시 그리기만
+            initRoadmap(false);
+            // 챕터 네비게이션 버튼 상태 업데이트
+            const scrollContainer = document.getElementById('roadmapScroll');
+            if(scrollContainer) {
+                const event = new Event('scroll');
+                scrollContainer.dispatchEvent(event);
             }
-        });
+        };
+
+        // 스크립트가 로드되자마자 실행
+        initialize();
+
+        /* (선택사항) 만약 HTMX로 인해 DOM 내에서 아이콘이 사라진다면
+           명시적으로 Lucide 아이콘을 다시 그려줍니다.
+        */
+        if (window.lucide) {
+            setTimeout(() => window.lucide.createIcons(), 50);
+        }
     }
 </script>

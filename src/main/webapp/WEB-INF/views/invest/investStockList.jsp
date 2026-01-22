@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="ko">
@@ -9,6 +11,8 @@
     <title>Stock List Component</title>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
@@ -118,6 +122,12 @@
             box-shadow: inset 0 0 0 2px #5E45EB;
         }
 
+        /* 키보드로 선택된 항목 강조 스타일 */
+        .result-item.active{
+            background-color: #F5F3FF;
+            box-shadow: inset 3px 0 0 0 #5E45EB;
+        }
+
 
     </style>
 </head>
@@ -160,8 +170,20 @@
                             <span class="txt-code num-font">${stock.stockCode}</span>
                         </div>
                         <div class="text-col items-end">
-                            <span class="txt-price color-red num-font">000000</span>
-                            <span class="txt-rate color-red num-font">+0.00%</span>
+                            <c:choose>
+                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '+')}">
+                                    <span class="txt-price color-red num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-red num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:when>
+                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '-')}">
+                                    <span class="txt-price color-blue num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-blue num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="txt-price color-gray num-font"><fmt:formatNumber value="${codeKISDataMap[stock.stockCode].currentPrice}" type="number"/></span>
+                                    <span class="txt-rate color-gray num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                 </c:forEach>
@@ -170,15 +192,133 @@
     </div>
 </div>
 
+
+<script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
 <script>
     const contextPath = "${pageContext.request.contextPath}";
+
+    //리스트의 종목 가격을 실시간으로 업데이트
+    function initListSocket(stockCodes){
+
+        if(!stockCodes || stockCodes.length === 0) return;
+
+        // StockSocket 연결 시작
+        StockSocket.connect(
+            contextPath,      // 서버 주소
+            stockCodes,       // 구독할 종목 코드들
+            function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
+
+                // 해당 종목이 화면에 있다면
+                if($item.length > 0){
+                    // 2.가격 업데이트 (콤마 찍기)
+                    const formattedPrice = stockData.displayPrice;
+                    $item.find('.txt-price').text(formattedPrice);
+
+                    // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                    let rate = stockData.displayRate;
+                    $item.find('.txt-rate').text(rate);
+
+                    // 4. 색상 변경 (빨강/파랑/검정)
+                    const $priceTexts = $item.find('.txt-price, .txt-rate');
+
+                    if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                        // 이때만 기존 색 지우고 다시 입힘
+                        $priceTexts.removeClass('color-red color-blue color-gray');
+
+                        if(rate.startsWith("+")){
+                            $priceTexts.addClass('color-red');
+                        } else{
+                            $priceTexts.addClass('color-blue');
+                        }
+                    }
+                }
+            }
+        )
+    }
 
     // 검색창
     $(document).ready(function (){
 
         let debounceTimer; // 디바운싱을 위한 타이머
 
-        $('.search-input').on('keyup',function (){
+        $('.search-input').on('keydown', function (e){
+            const $resultBox = $('.search-result');
+            const $items = $resultBox.find('.result-item');
+            const $active = $resultBox.find('.result-item.active');
+
+            // 1. 엔터키 (Enter)
+            if(e.keyCode === 13){
+                e.preventDefault(); // 폼 전송 등 막기
+                let keyword = $(this).val().trim();
+
+                // (1) 입력값이 비어있으면 -> 관심종목 탭 이동
+                if(keyword.length === 0){
+                    $('.tab-btn[data-sort="interest"]').trigger('click');
+                    $resultBox.hide();
+                    $(this).blur();
+                    return;
+                }
+
+                // (2) 입력값이 있고, 활성화된(강조된) 항목이 있으면 클릭 트리거
+                if($active.length > 0 && $resultBox.is(':visible')){
+                    $active.trigger('click');
+                    $(this).blur();
+                }
+                return;
+            }
+
+            // 2. 방향키 아래 (Down Arrow)
+            if(e.keyCode === 40){
+                e.preventDefault(); // 커서가 맨 뒤나 앞으로 튀는 것 방지
+
+                // 리스트가 없거나 안 보이면 무시
+                if (!$resultBox.is(':visible') || $items.length === 0) return;
+
+                if($active.length === 0){
+                    let $first = $items.first();
+                    // 선택된 게 없으면 첫 번째 선택
+                    $first.addClass('active');
+                    // 스크롤 이동
+                    $first[0].scrollIntoView({block: 'nearest'});
+                } else {
+                    // 다음 항목으로 이동
+                    let $next = $active.next('.result-item');
+                    if($next.length > 0){
+                        $active.removeClass('active');
+                        $next.addClass('active');
+
+                        // 스크롤이 생겼을 때 따라가게
+                        $next[0].scrollIntoView({block: 'nearest'});
+                    }
+                }
+            }
+
+            // 3. 방향키 위 (Up Arrow)
+            if(e.keyCode === 38){
+                e.preventDefault();
+
+                if (!$resultBox.is(':visible') || $items.length === 0) return;
+
+                if($active.length > 0){
+                    let $prev = $active.prev('.result-item');
+                    if($prev.length > 0){
+                        $active.removeClass('active');
+                        $prev.addClass('active');
+
+                        // 이전 항목이 보이도록 스크롤 자동 조정
+                        $prev[0].scrollIntoView({block: 'nearest'});
+                    }
+                }
+            }
+        })
+
+        $('.search-input').on('keyup',function (e){
+            // 방향키(37~40)와 엔터(13)는 keyup에서 무시 (keydown에서 처리했으므로)
+            if(e.keyCode === 13 || (e.keyCode >= 37 && e.keyCode <= 40)) return;
+
             let keyword = $(this).val();
             let $resultBox = $('.search-result'); //선택자 캐싱
 
@@ -236,6 +376,12 @@
             }, 300); // 0.3초 대기 시간
         });
 
+        // 마우스 오버 시 active 클래스 이동 (마우스랑 키보드 충돌 방지)
+        $(document).on('mouseenter', '.result-item', function(){
+            $('.result-item').removeClass('active');
+            $(this).addClass('active');
+        });
+
         // 리스트 항목 클릭시 검색창에 값 넣기
         $(document).on('click', '.result-item', function(){
             let selectedName = $(this).data('name');
@@ -249,21 +395,88 @@
             $('#left-tab-slider').hide();
             $('.tab-btn').removeClass('active');
 
-            // 메인 리스트에 선택한 항목 1개만 출력하기
-            let singleItemHtml = `
-                <div class="stock-item selected" data-code="\${selectedCode}" data-name="\${selectedName}">
-                    <div class="text-col">
-                        <span class="txt-name">\${selectedName}</span>
-                        <span class="txt-code num-font">\${selectedCode}</span>
-                    </div>
-                    <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">000000</span>
-                        <span class="txt-rate color-red num-font">+0.00%</span>
-                    </div>
-                </div>
-            `;
+            $.ajax({
+                url: contextPath + "/invest/stock/selected",
+                type: 'POST',
+                data: {
+                    stockCode: selectedCode,
+                    stockName: selectedName
+                },
+                success: function (stock){
+                    let colorClass = "color-gray";
+                    if(stock.changePct && stock.changePct.startsWith("+")){
+                        colorClass = "color-red";
+                    } else if(stock.changePct && stock.changePct.startsWith("-")){
+                        colorClass = "color-blue";
+                    }
 
-            $('#stockList').html(singleItemHtml);
+                    // 숫자 콤마
+                    let formattedPrice = Number(stock.currentPrice).toLocaleString();
+
+                    // 메인 리스트에 선택한 항목 1개만 출력하기
+                    let singleItemHtml = `
+                        <div class="stock-item selected" data-code="\${stock.stockCode}" data-name="\${stock.stockName}">
+                            <div class="text-col">
+                                <span class="txt-name">\${stock.stockName}</span>
+                                <span class="txt-code num-font">\${stock.stockCode}</span>
+                            </div>
+                            <div class="text-col items-end">
+                                <span class="txt-price \${colorClass} num-font">\${formattedPrice}</span>
+                                <span class="txt-rate \${colorClass} num-font">\${stock.changePct}%</span>
+                            </div>
+                        </div>
+                    `;
+
+                    $('#stockList').html(singleItemHtml);
+
+                    // 리스트에 그려진 종목을 클릭한 것으로 트리거 발동
+                    // 아래에 정의된 .stock-item 클릭 이벤트가 실행되면서 차트/기업정보 AJAX가 나감
+                    $('#stockList .stock-item').trigger('click');
+
+                    // 기존 subscribe 모두 unsubscribe
+                    const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
+                    StockSocket.unsubscribe(currentSubscribedCodes);
+
+                    // connect에서는 구독할 종목 코드를 배열로 보내줘야 한다.
+                    // 지금은 하나의 종목만 있기 때문에 배열로 변경한 후 보내준다.
+                    const converCodeTotList = [selectedCode];
+
+                    StockSocket.connect(
+                        contextPath,      // 서버 주소
+                        converCodeTotList,       // 구독할 종목 코드들
+                        function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                            // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                            const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
+
+                            // 해당 종목이 화면에 있다면
+                            if($item.length > 0){
+                                // 2.가격 업데이트 (콤마 찍기)
+                                const formattedPrice = stockData.displayPrice;
+                                $item.find('.txt-price').text(formattedPrice);
+
+                                // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                                let rate = stockData.displayRate;
+                                $item.find('.txt-rate').text(rate);
+
+                                // 4. 색상 변경 (빨강/파랑/검정)
+                                const $priceTexts = $item.find('.txt-price, .txt-rate');
+
+                                if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                                    // 이때만 기존 색 지우고 다시 입힘
+                                    $priceTexts.removeClass('color-red color-blue color-gray');
+
+                                    if(rate.startsWith("+")){
+                                        $priceTexts.addClass('color-red');
+                                    } else{
+                                        $priceTexts.addClass('color-blue');
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
+            })
         });
 
         // 검색 결과 외 클릭 시 닫기
@@ -316,6 +529,19 @@
 
         // 2. 초기 탭 슬라이더 위치 잡기 (첫 번째 탭 기준)
         updateTabSlider($('.tab-btn.active'));
+
+        // 초기 로딩된 리스트(관심종목)에 대해 소켓 연결
+        // 화면에 있는 .stock-item 들을 찾아서 코드를 수집
+        let initialCodes = [];
+        $('.stock-item').each(function (){
+            // data-code 값을 가져와서 배열에 담기
+            initialCodes.push($(this).data('code'));
+        })
+
+        // 코드가 하나라도 있으면 소켓 연결 시작
+        if(initialCodes.length > 0){
+            initListSocket(initialCodes);
+        }
 
         // 3. 탭 클릭 이벤트 바인딩
         $('.tab-btn').on('click', function() {
@@ -388,19 +614,26 @@
                 rankHtml = `<span class="rank">\${item.rank}</span>`;
             }
 
-            // 가격, 등락률 등 데이터 포맷팅 필요 시 여기서 처리
-            // 예: let priceClass = (item.rate > 0) ? 'color-red' : 'color-blue';
+            let colorClass = "color-gray";
+            if(item.changePct && item.changePct.startsWith("+")){
+                colorClass = "color-red";
+            } else if(item.changePct && item.changePct.startsWith("-")){
+                colorClass = "color-blue";
+            }
+
+            // 숫자 콤마
+            let formattedPrice = Number(item.currentPrice).toLocaleString();
 
             html += `
-                <div class="stock-item data-code="\${item.stockCode}" data-name="\${item.stockName}">
+                <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
                         \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>
                         <span class="txt-code num-font">\${item.stockCode}</span>
                     </div>
                     <div class="text-col items-end">
-                        <span class="txt-price color-red num-font">000000</span>
-                        <span class="txt-rate color-red num-font">+0.00%</span>
+                        <span class="txt-price \${colorClass} num-font">\${formattedPrice}</span>
+                        <span class="txt-rate \${colorClass} num-font">\${item.changePct}%</span>
                     </div>
                 </div>
             `;
@@ -408,6 +641,49 @@
 
         // DOM 업데이트
         $container.html(html);
+
+        // 기존 subscribe 모두 unsubscribe
+        const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
+        StockSocket.unsubscribe(currentSubscribedCodes);
+
+        // 화면에 뿌린 종목들의 코드 긁어오기
+        // map을 사용해 data 배열에서 stockCode만 뽑아서 새 배열로 만들기
+        const codes = data.map(item => item.stockCode);
+        console.log("구독해야 할 종목들: " ,codes);
+        StockSocket.connect(
+            contextPath,      // 서버 주소
+            codes,       // 구독할 종목 코드들
+            function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
+
+                // 해당 종목이 화면에 있다면
+                if($item.length > 0){
+                    // 2.가격 업데이트 (콤마 찍기)
+                    const formattedPrice = stockData.displayPrice;
+                    $item.find('.txt-price').text(formattedPrice);
+
+                    // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                    let rate = stockData.displayRate;
+                    $item.find('.txt-rate').text(rate);
+
+                    // 4. 색상 변경 (빨강/파랑/검정)
+                    const $priceTexts = $item.find('.txt-price, .txt-rate');
+
+                    if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                        // 이때만 기존 색 지우고 다시 입힘
+                        $priceTexts.removeClass('color-red color-blue color-gray');
+
+                        if(rate.startsWith("+")){
+                            $priceTexts.addClass('color-red');
+                        } else{
+                            $priceTexts.addClass('color-blue');
+                        }
+                    }
+                }
+            }
+        )
     }
 </script>
 </body>

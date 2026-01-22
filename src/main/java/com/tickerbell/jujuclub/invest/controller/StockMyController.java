@@ -41,7 +41,7 @@ public class StockMyController {
 
         //테스트 유저
         if (userSeq == null) {
-            userSeq = 2;
+            userSeq = 1;
             session.setAttribute("userSeq", userSeq);
         }
 

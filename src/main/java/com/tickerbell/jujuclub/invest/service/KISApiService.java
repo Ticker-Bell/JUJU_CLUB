@@ -1,5 +1,8 @@
 package com.tickerbell.jujuclub.invest.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.invest.dto.KISCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,7 @@ public class KISApiService {
 
     public String getAccessToken() throws Exception {
 
-        //토근이 발급됐다면 다시 사용
+        //토근이 발급됐다면 다시 사용(하루에 한번 정도?)
         if (accessToken != null && System.currentTimeMillis() < tokenExpireTime - 60000) {
             return accessToken;
         }
@@ -104,7 +107,6 @@ public class KISApiService {
     public KISDataDTO getPriceData(String stockCode) {
 
         HttpURLConnection conn = null;
-
         try {
             //토큰가져오기
             String token = getAccessToken();
@@ -133,8 +135,11 @@ public class KISApiService {
             StringBuilder response = new StringBuilder();
             try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
                 String line;
-                while ((line = br.readLine()) != null) response.append(line);
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
             }
+
             //데이터 추출, 파싱
             String json = response.toString();
 
@@ -143,7 +148,7 @@ public class KISApiService {
             String priceStr = json.substring(priceStart, priceEnd);
             int currentPrice = Integer.parseInt(priceStr);
 
-            int rateStart = json.indexOf("\"prdy_ctrt\":\"") + 13; //등락률:prdy_ctrt
+            int rateStart = json.indexOf("\"prdy_ctrt\":\"") + 13; //등락률:prdy_ctrt(전일대비)
             int rateEnd = json.indexOf("\"", rateStart);
             String priceRate = json.substring(rateStart, rateEnd);
 
@@ -163,6 +168,73 @@ public class KISApiService {
             }
         }
 
+    }
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    //시가총액 hts_avls
+    //52주 최고/최저 w_52_hgpr / w_52_lwpr
+    //상장 주식 수 lstn_stcn
+    public KISCorpInfoDTO getCorpInfoData(String stockCode) {
+        HttpURLConnection conn = null;
+        try {
+            //토큰얻기
+            String token = getAccessToken();
+
+            String urlStr = BASE_URL
+                    + "/uapi/domestic-stock/v1/quotations/inquire-price"
+                    + "?FID_COND_MRKT_DIV_CODE=J"
+                    + "&FID_INPUT_ISCD="
+                    + stockCode;
+
+            URL url = new URL(urlStr);
+            //API 발급 접근 HTTP프로토콜
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+
+            conn.setRequestProperty("authorization", "Bearer " + token);
+            conn.setRequestProperty("appkey", APP_KEY);
+            conn.setRequestProperty("appsecret", APP_SECRET);
+            conn.setRequestProperty("tr_id", "FHKST01010100");
+
+            //응답받기
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    response.append(line);
+                }
+            }
+
+            String json = response.toString();
+            System.out.println("KIS api 기업정보 응답" +  json);
+
+            //Jackson 사용
+            //JSON 전체를 JsonNode로
+            JsonNode root = objectMapper.readTree(json);
+            //output만 추출
+            JsonNode outputData = root.path("output");
+            if(outputData.isMissingNode() || outputData.isNull()){
+                System.out.println("KIS응답에 output이 없습니다. stockCode = " + stockCode);
+                return null;
+            }
+
+            //JSON -> DTO
+            String outputDataJson = outputData.toString();
+            KISCorpInfoDTO kisCorpInfoDTO = objectMapper.readValue(outputDataJson, KISCorpInfoDTO.class);
+
+            return kisCorpInfoDTO;
+
+        } catch (Exception e) {
+            System.out.println("기업정보 API 호출 에러: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+
+        } finally {
+            if(conn != null) {
+                conn.disconnect(); //끊어주기
+            }
+        }
     }
 
 }

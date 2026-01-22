@@ -1,12 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
 
-    <title>Invest</title>
     <style>
 
         /* 탭 네비게이션 */
@@ -21,7 +15,7 @@
         .tab-nav a {
             text-decoration: none;
             color: #999;
-            font-size: 18px;
+            font-size: 18px;,7
             font-weight: 500;
             padding-bottom: 10px;
             position: relative;
@@ -42,8 +36,7 @@
             background-color: #ffc107;
         }
     </style>
-</head>
-<body>
+
 <div class="w-full h-full flex flex-col">
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
@@ -59,7 +52,12 @@
                 <jsp:include page="investStockList.jsp"></jsp:include>
                 <jsp:include page="investBuySell.jsp"></jsp:include>
             </div>
+            <div class="flex flex-col gap-4 flex-1">
             <jsp:include page="investChart.jsp"></jsp:include>
+                <div id="stockCorpInfo-container">
+                    <jsp:include page="stockCorpInfoCard.jsp"></jsp:include>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -77,5 +75,3 @@
         }
     }
 </script>
-</body>
-</html>

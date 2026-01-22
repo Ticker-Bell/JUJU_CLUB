@@ -83,15 +83,15 @@ public class StockListController {
     }
 
     // 테스트용  나중에 제거하기
-    @GetMapping("/chart/selectedStockInfo")
-    @ResponseBody
-    public StockDTO paramTest(@RequestParam String stockCode, @RequestParam String stockName) {
-
-        return StockDTO.builder()
-                .stockCode(stockCode)
-                .stockName(stockName)
-                .build();
-    }
+//    @GetMapping("/chart/selectedStockInfo")
+//    @ResponseBody
+//    public StockDTO paramTest(@RequestParam String stockCode, @RequestParam String stockName) {
+//
+//        return StockDTO.builder()
+//                .stockCode(stockCode)
+//                .stockName(stockName)
+//                .build();
+//    }
 
     // 테스트용  나중에 제거하기
     @GetMapping("/corpoInfo/selectedStockInfo")

@@ -1,0 +1,27 @@
+package com.tickerbell.jujuclub.invest.stockChart.service;
+
+import com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO;
+import com.tickerbell.jujuclub.invest.stockChart.mapper.StockChartDataMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class StockChartDataService {
+    private final StockChartDataMapper stockChartDataMapper;
+
+    public String selectMarketType(String stockCode) {
+        return stockChartDataMapper.selectMarketType(stockCode);
+    }
+
+    @Transactional
+    public void insertWatchList(WatchListDTO watchListDTO) {
+        stockChartDataMapper.insertWatchList(watchListDTO);
+    }
+
+    @Transactional
+    public void deleteWatchList(WatchListDTO watchListDTO) {
+        stockChartDataMapper.deleteWatchList(watchListDTO);
+    }
+}

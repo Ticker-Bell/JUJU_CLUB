@@ -437,7 +437,44 @@
                     const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
                     StockSocket.unsubscribe(currentSubscribedCodes);
 
-                    StockSocket.subscribeStock(stock.stockCode);
+                    // connect에서는 구독할 종목 코드를 배열로 보내줘야 한다.
+                    // 지금은 하나의 종목만 있기 때문에 배열로 변경한 후 보내준다.
+                    const converCodeTotList = [selectedCode];
+
+                    StockSocket.connect(
+                        contextPath,      // 서버 주소
+                        converCodeTotList,       // 구독할 종목 코드들
+                        function (stockData){  // 3초마다 실행될 데이터 처리 함수
+                            // 1. 데이터가 도착한 종목의 HTML 박스 찾기
+                            const $item = $('.stock-item[data-code="' + stockData.stockCode + '"]');
+
+                            // 해당 종목이 화면에 있다면
+                            if($item.length > 0){
+                                // 2.가격 업데이트 (콤마 찍기)
+                                const formattedPrice = stockData.displayPrice;
+                                $item.find('.txt-price').text(formattedPrice);
+
+                                // 3.등락률 업데이트 (+- 기호 및 % 붙이기)
+                                let rate = stockData.displayRate;
+                                $item.find('.txt-rate').text(rate);
+
+                                // 4. 색상 변경 (빨강/파랑/검정)
+                                const $priceTexts = $item.find('.txt-price, .txt-rate');
+
+                                if(rate && (rate.startsWith("+") || rate.startsWith("-"))){
+
+                                    // 이때만 기존 색 지우고 다시 입힘
+                                    $priceTexts.removeClass('color-red color-blue color-gray');
+
+                                    if(rate.startsWith("+")){
+                                        $priceTexts.addClass('color-red');
+                                    } else{
+                                        $priceTexts.addClass('color-blue');
+                                    }
+                                }
+                            }
+                        }
+                    )
                 }
             })
         });

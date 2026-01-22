@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.roadMap.controller;
 
+import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import org.springframework.stereotype.Controller;
@@ -7,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,13 +24,16 @@ public class RoadMapController {
     }
 
     @GetMapping("/main.do")
-    public String getRoadMap(Model model) {
-        Integer levelSeq = 1;
-        Integer userSeq = 11;
-        String chapterId = "LV2_CH001";
+    public String getRoadMap(Model model, HttpServletRequest request) {
+//        Integer levelSeq = 1;
+//        Integer userSeq = 12;
+//        String chapterId = "LV2_CH001";
+        HttpSession session = request.getSession();
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Integer userSeq = loginUser.getUserSeq();
 
         List<LevelDTO> levelList = roadMapService.levelList();
-        List<ChapterDTO> chptList = roadMapService.chapterList(levelSeq);
+        //List<ChapterDTO> chptList = roadMapService.chapterList(levelSeq);
         //List<RoadMapLessonDTO> lessonList = roadMapService.lessonList(chapterId);
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
         //List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelSeq, chapterId);
@@ -68,16 +74,25 @@ public class RoadMapController {
             ChapterResultDTO result = resultMap.get(lesson.getChapterId());
 
             boolean testFinished = result != null && result.getIsPass().equals("Y");
-
-            lesson.setLessonStatus(lessonStatus(user));
-            lesson.setChapterPass(chapterStatus(result, lesson, chptClearCount));
+            if(userMap.isEmpty() && resultMap.isEmpty()) {
+                allLearningList.get(0).setLessonStatus("current");
+                allLearningList.get(0).setChapterPass("locked");
+                return;
+            } else {
+                lesson.setLessonStatus(lessonStatus(user));
+                lesson.setChapterPass(chapterStatus(result, lesson, chptClearCount));
+            }
         });
 
+
+        // 현재 진행하고 있는 유저 레슨/챕터 정보 전달
+        LevelChapterLessonDTO userLesson = allLearningList.stream()
+                .filter(lesson -> "current".equals(lesson.getLessonStatus()))
+                        .findFirst()
+                        .orElse(allLearningList.get(0));
+
         model.addAttribute("levelList", levelList);
-        //model.addAttribute("chptList", chptList); // 레벨 선택하면 챕터리스트 조회
-        //model.addAttribute("lessonList", lessonList);
-        //model.addAttribute("selectLearningList", selectLearningList); // 레벨/챕터에 맞는 레슨 전체 조회
-        //model.addAttribute("userLesson", userLessonList); // 현재 유저 레슨 정보
+        model.addAttribute("userLesson", userLesson); // 현재 유저 레슨 정보
         model.addAttribute("isMissionClear", 4 > successCount); // 미션 클리어 확인
         model.addAttribute("allLearningList", allLearningList); // 전체 레슨 + 유저 진행상황
 

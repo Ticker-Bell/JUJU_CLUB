@@ -6,6 +6,7 @@
     <%--얘 없으면 기능 활성화가 안돼요--%>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <%--개념형 문제 css--%>
@@ -22,6 +23,7 @@
 
     <%--선택형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+        <title>JUJU CLUB</title>
 </head>
 
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">

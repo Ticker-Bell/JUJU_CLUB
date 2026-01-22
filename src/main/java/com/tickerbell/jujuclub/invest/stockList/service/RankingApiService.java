@@ -2,6 +2,8 @@ package com.tickerbell.jujuclub.invest.stockList.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
+import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +33,13 @@ public class RankingApiService {
     @Value("${kis.baseurl}")
     private String baseurl;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjQ2MmI0ZDdmLTM4YWUtNDMwNS04MDcyLWVmNmI4NzM1YzQ4NCIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2ODg3NzAzNSwiaWF0IjoxNzY4NzkwNjM1LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.0EymY-NjLn61Gjr7ga8_rW78p4v5y4V06DxiYFSOkxZtMgckcqC3it70xWCq2-aK-Nx4OriF0SU_5MDGW7nF0Q";
+    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImI1ODRiNmQzLWQzZTItNGUwOC05OTg0LWNiYmJjMGRmMmYzYiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTEyNjY0OCwiaWF0IjoxNzY5MDQwMjQ4LCJqdGkiOiJQU0V3eWU5RXd3YUhDVDZUbEVKQmVqdUdtdHVEbXNaUkxzVFAifQ.iYk4DBtIJHkQmwG9N2rEv54glhbLn_3ksU7WWDke8MRK2KdhehpeXo-orz5_1WfCk5Evrj4KakUStNnhdJ3M0Q";
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private KISApiService kisApiService;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -196,7 +201,7 @@ public class RankingApiService {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
-                    .path("//uapi/domestic-stock/v1/ranking/fluctuation")
+                    .path("/uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
                     .queryParam("fid_cond_scr_div_code", "20170")  //조건 화면 분류 코드 - Unique key( 20170 )
@@ -260,7 +265,7 @@ public class RankingApiService {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
-                    .path("//uapi/domestic-stock/v1/ranking/fluctuation")
+                    .path("/uapi/domestic-stock/v1/ranking/fluctuation")
                     .queryParam("fid_rsfl_rate2", "")  // 등락 비율2 - 공백 입력 시 전체 (~ 비율
                     .queryParam("fid_cond_mrkt_div_code", "J")  //조건 시장 분류 코드 - 시장구분코드 (J:KRX, NX:NXT)
                     .queryParam("fid_cond_scr_div_code", "20170")  //조건 화면 분류 코드 - Unique key( 20170 )
@@ -355,6 +360,37 @@ public class RankingApiService {
             rankingDTOList.add(rankingDTO);
         }
 
+        return rankingDTOList;
+    }
+
+    public List<RankingDTO> addKisDataDtoToRankingDto(List<RankingDTO> rankingDTOList){
+        int batchSize = 15;
+        int count = 0;
+
+        for(int i=0; i<rankingDTOList.size(); i++){
+            RankingDTO rankingDTO = rankingDTOList.get(i);
+
+            KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
+            // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+            if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+            }
+            rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
+            rankingDTO.setChangePct(kisDataDTO.getChangePct());
+
+            count++;
+
+            // API호출 최대 1초당 20번이기 때문에
+            // 15개마다 1초 쉬기 (마지막은 제외해도 됨)
+            if(count % batchSize == 0 && i < rankingDTOList.size()-1){
+                try{
+                    Thread.sleep(900);
+                }catch(InterruptedException e){
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException("API 호출 대기 중 인터럽트 발생",e);
+                }
+            }
+        }
         return rankingDTOList;
     }
 

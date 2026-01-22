@@ -10,7 +10,6 @@ public class ChapterResultDTO {
     private Integer userSeq; // user_seq
     private String chapterId; // chapter_id
     private Integer score;
-    private Integer tryCount; // attempt_no
-    private String isPass; // is_pass
+    private String isPass; // is_pass Y or N
     private Date testDate; // tested_at
 }

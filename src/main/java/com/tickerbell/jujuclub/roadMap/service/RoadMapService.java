@@ -73,7 +73,11 @@ public class RoadMapService {
                 case "watchList":
                     mission.setProgress(check.getWatchList());
                     break;
+                default:
+                    mission.setProgress(0);
+                    break;
             }
+
         }
         return list;
     }

@@ -8,9 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="common.jsp"%>
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/sidebar/sidebar.css">
-<script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" />
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
 <aside class="w-[220px] bg-primary/5 flex flex-col flex-shrink-0 z-40 py-8 pl-4 border-r border-transparent h-full overflow-y-auto transition-all duration-300">
     <div class="flex-shrink-0"></div>
 

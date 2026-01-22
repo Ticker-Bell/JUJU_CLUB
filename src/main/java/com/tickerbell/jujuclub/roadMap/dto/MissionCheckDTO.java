@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class MissionCheckDTO {
-    private Integer lesson;
-    private Integer chapterTest;
-    private Integer buyStocks;
-    private Integer watchList;
+    private int lesson;
+    private int chapterTest;
+    private int buyStocks;
+    private int watchList;
 }

@@ -19,6 +19,6 @@
         <c:if test="${isMissionClear}">
             <span class="mission-dot" id="missionDot"></span>
         </c:if>
-        <img class="w-8 h-8 stroke-[-2]" src="${cpath}/resources/images/roadMapIcons/target.svg" alt="미션아이콘">
+        <img class="w-10 h-10 stroke-[-2]" src="${cpath}/resources/images/roadMapIcons/target.svg" alt="미션아이콘">
     </button>
 </div>

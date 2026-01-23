@@ -32,7 +32,7 @@
 
 </head>
 <body>
-<div class="flex flex-col gap-4">
+<div class="flex flex-col w-full gap-4">
     <div class="p-6 border-bottom border-gray-100 stock-info-header">
         <div class="flex flex-row justify-between">
 

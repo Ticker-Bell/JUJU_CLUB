@@ -4,8 +4,6 @@ import lombok.Data;
 
 @Data
 public class LevelChapterLessonDTO {
-    // 전체 다 가져오는 거 비효율적인가?
-    // 일단해봐;;;
     private String levelId; // level_seq
     private String levelName; // level_name
 

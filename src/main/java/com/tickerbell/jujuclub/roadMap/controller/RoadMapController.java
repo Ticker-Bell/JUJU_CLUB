@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.roadMap.controller;
 
+import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,26 +21,21 @@ import java.util.Map;
 public class RoadMapController {
     private final RoadMapService roadMapService;
 
-//    public RoadMapController(RoadMapService roadMapService) {
-//        this.roadMapService = roadMapService;
-//    }
-
     @GetMapping("/main.do")
     public String getRoadMap(Model model, HttpServletRequest request) {
-        Integer levelSeq = 1;
-        Integer userSeq = 11;
-        String chapterId = "LV2_CH001";
+        // 테스트용
+//        Integer levelSeq = 1;
+//        Integer userSeq = 11;
+//        String chapterId = "LV2_CH001";
 
         // TODO: 개발 완료 후 세션 연결
-//        HttpSession session = request.getSession();
-//        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
-//        Integer userSeq = loginUser.getUserSeq();
+        HttpSession session = request.getSession();
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Integer userSeq = loginUser.getUserSeq();
 
         List<LevelDTO> levelList = roadMapService.levelList();
         //List<ChapterDTO> chptList = roadMapService.chapterList(levelSeq);
-        //List<RoadMapLessonDTO> lessonList = roadMapService.lessonList(chapterId);
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
-        //List<LevelChapterLessonDTO> selectLearningList = roadMapService.selectLearningList(levelSeq, chapterId);
         List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
 

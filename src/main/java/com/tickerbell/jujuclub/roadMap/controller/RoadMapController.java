@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.roadMap.controller;
 
 import com.tickerbell.jujuclub.auth.dto.MemberDTO;
+import com.tickerbell.jujuclub.common.service.UserInfoService;
 import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/roadMap")
 public class RoadMapController {
     private final RoadMapService roadMapService;
+    private final UserInfoService userInfoService;
 
     @GetMapping("/main.do")
     public String getRoadMap(Model model, HttpSession session) {
@@ -98,6 +100,9 @@ public class RoadMapController {
                 .filter(lesson -> "current".equals(lesson.getStatus()))
                 .findFirst()
                 .orElse(allLearningList.get(0));
+
+        // users 테이블 레벨 정보 업데이트
+        userInfoService.userLevelUpdate(userSeq, userLesson.getLessonId());
 
         model.addAttribute("levelList", levelList); // 레벨 전체 조회
         model.addAttribute("userLesson", userLesson); // 현재 유저 레슨 정보

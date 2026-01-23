@@ -13,4 +13,12 @@
            JOIN user_account AS a ON u.user_seq = a.user_seq
     WHERE u.user_seq = #{userSeq}
   </select>
+
+  <update id="userLevelUpdate">
+    update users
+    set user_level = IF(user_level &lt; substring(#{lessonId}, 3, 1),
+    substring(#{lessonId}, 3, 1),
+    user_level)
+    where user_seq = #{userSeq}
+  </update>
 </mapper>

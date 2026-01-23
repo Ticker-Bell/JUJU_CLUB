@@ -28,8 +28,9 @@ public class LessonService {
   /**
    * 레슨 화면  개념형 문제 채팅 조회
    */
-  public Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> getLessonChat(String lessonId) throws Exception {
-    List<QstChatMsgDTO> jsonList = lessonMapper.selectQstChat(lessonId);
+  public Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> getLessonChat(QstChatMsgDTO.QstChatMsgRequest qstChatMsgRequest) throws Exception {
+
+    List<QstChatMsgDTO> jsonList = lessonMapper.selectQstChat(qstChatMsgRequest);
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = new HashMap<>();
 

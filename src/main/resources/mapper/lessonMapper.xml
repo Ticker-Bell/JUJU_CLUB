@@ -37,12 +37,12 @@
       AND CHAPTER_ID = #{chapterId}
   </update>
 
-  <select id="selectQstChat" parameterType="String"
+  <select id="selectQstChat" parameterType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO$QstChatMsgRequest"
     resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
     SELECT OPTIONS
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND question_id = 'LV1_CH001_LS001_Q001'
+    AND question_id = #{questionId}
   </select>
 
   <select id="selectLssnTitle" parameterType="String"

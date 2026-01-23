@@ -13,6 +13,15 @@ import org.apache.ibatis.type.Alias;
 public class QstChatMsgDTO {
   private String options;
 
+  @Alias("QstChatMsgRequest")
+  @Builder
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class QstChatMsgRequest{
+    private String lessonId;
+    private String questionId;
+  }
 
   @Alias("QstChatMsgJsonDTO")
   @Builder

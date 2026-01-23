@@ -7,7 +7,6 @@
         display: flex;
         border-bottom: 2px solid #E6E7EB;
         margin-bottom: 20px;
-
         gap: 5px;
     }
 
@@ -66,18 +65,15 @@
                     <jsp:include page="investStockList.jsp"></jsp:include>
                     <jsp:include page="investBuySell.jsp"></jsp:include>
                 </div>
-                <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[20px] outline outline-2 outline-[#E6E7EB]">
+                <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
 
                     <jsp:include page="investChart.jsp"></jsp:include>
-                    <div id="stockCorpInfo-container">
+
                         <jsp:include page="stockCorpInfoCard.jsp"></jsp:include>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
-
-
 </div>
 <script>
     function changeJsp(element, type) {

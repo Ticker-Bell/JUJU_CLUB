@@ -4,7 +4,7 @@
     <title>매도매수</title>
 </head>
 <body>
-<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[20px] outline outline-2 outline-[#E6E7EB]">
+<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
     <div id="tab-header" class="w-1/2 flex my-4 border-b border-[#E6E7EB] ">
         <button onclick="switchTab(this, 'sell')"
                 class="tab-item active flex-1 py-2 px-1 border-b-[3px] border-[#5E45EB] border-xs text-[#2D14B8] font-medium text-base transition-all hover:text-[#3819E6]">

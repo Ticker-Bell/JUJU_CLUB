@@ -276,7 +276,7 @@
             target: '#main',
             values: {
               usrSeq: 1,
-              lessonId: 'LV1_CH001_LSN001',
+              lessonId: 'LV1_CH001_LS001',
             }
           });
         };

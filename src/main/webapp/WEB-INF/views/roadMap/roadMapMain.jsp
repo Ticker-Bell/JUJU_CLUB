@@ -16,7 +16,6 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
 
-
 <div class="flex flex-col -m-8 w-[calc(100%+4rem)] h-[calc(100%+4rem)] min-h-0 bg-gray-50 relative p-0 border-0">
 
     <div class="absolute top-4 left-4 z-40 gap-2">
@@ -45,73 +44,44 @@
          class="w-full h-full overflow-x-auto overflow-y-hidden snap-container scroll-smooth relative">
         <div id="innerContent" class="h-full relative">
 
-            <div id="bgLayer" class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
-                 style="z-index: 0;">
+            <div id="space-bg" class="absolute inset-0 overflow-hidden pointer-events-none"
+                 style="background:#0b0820;">
 
-                <div class="absolute inset-0 bg-pastel-flow opacity-60"></div>
-
-                <div class="elemental-zone absolute top-0 left-0 w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[5%] left-[10%] w-auto h-[12%] animate-float-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2663/2663067.png" alt="bird"
-                             class="h-full object-contain opacity-80">
-                    </div>
-
-                    <div class="absolute bottom-[2%] left-[10%] w-auto h-[18%] animate-bounce-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2422/2422204.png" alt="mushroom"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[2%] right-[10%] w-auto h-[10%]">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2990/2990234.png" alt="flower"
-                             class="h-full object-contain opacity-90">
-                    </div>
+                <!-- 🌙 Big Dome -->
+                <div class="absolute bottom-[-40%] left-1/2 -translate-x-1/2
+              w-[140%] h-[140%] rounded-full"
+                     style="background:
+         radial-gradient(circle at 50% 30%,
+           #7c5cff 0%,
+           #4b3bd6 35%,
+           #2a1e78 60%,
+           transparent 70%);">
                 </div>
 
-                <div class="elemental-zone absolute top-0 left-[25%] w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[8%] left-[20%] w-auto h-[10%] animate-float-slower">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1163/1163624.png" alt="cloud"
-                             class="h-full object-contain opacity-70">
-                    </div>
-
-                    <div class="absolute bottom-[3%] left-[15%] w-auto h-[15%] animate-wiggle">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2765/2765275.png" alt="float"
-                             class="h-full object-contain">
-                    </div>
-                    <div class="absolute bottom-[5%] left-[60%] w-auto h-[12%] animate-float-mini">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2618/2618636.png" alt="duck"
-                             class="h-full object-contain">
-                    </div>
+                <!-- 🌌 Inner Glow -->
+                <div class="absolute bottom-[-30%] left-1/2 -translate-x-1/2
+              w-[90%] h-[90%] rounded-full blur-2xl"
+                     style="background:
+         radial-gradient(circle,
+           #9f7bff 0%,
+           #5b4bdb 45%,
+           transparent 70%);">
                 </div>
 
-                <div class="elemental-zone absolute top-0 left-[50%] w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[5%] right-[20%] w-auto h-[15%] animate-rise-mini">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3261/3261546.png" alt="balloon"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[2%] left-[20%] w-auto h-[18%] animate-spin-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2460/2460875.png" alt="windmill"
-                             class="h-full object-contain opacity-90">
-                    </div>
+                <!-- ⭐ Soft Stars -->
+                <div class="absolute inset-0"
+                     style="
+        background-image:
+          radial-gradient(#fff6c9 2px, transparent 3px),
+          radial-gradient(#fff6c9 1.5px, transparent 3px);
+        background-size: 120px 120px, 80px 80px;
+        background-position: 0 0, 40px 60px;
+        opacity: 0.6;
+       ">
                 </div>
-
-                <div class="elemental-zone absolute top-0 left-[75%] w-[25%] h-full">
-                    <div class="absolute top-[8%] left-[10%] w-auto h-[12%] animate-pulse-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1835/1835567.png" alt="sun"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[3%] right-[30%] w-auto h-[16%] animate-flicker-soft">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4334/4334587.png" alt="fire"
-                             class="h-full object-contain">
-                    </div>
-                    <div class="absolute bottom-[3%] left-[10%] w-auto h-[12%] animate-bounce-quick">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4762/4762311.png" alt="monster"
-                             class="h-full object-contain">
-                    </div>
-                </div>
-
             </div>
+
+
 
             <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 10;">
                 <path id="roadBorder" d=""/>
@@ -146,39 +116,27 @@
         var currentChapterIdx = chapterMap[chId];
 
         <c:if test="${not empty item.lessonId}">
+
         nodesData.push({
-            type: 'lesson',
             id: '${item.lessonId}',
             chapterIdx: currentChapterIdx,
             inChapterIdx: nodesData.filter(n => n.chapterIdx === currentChapterIdx).length,
             lessonName: '${item.lessonName}',
-            lessonType: '${item.lessonType}',
-            status: '${item.lessonStatus}',
+            lessonDesc: '${item.lessonDesc}',
+            type: '${item.lessonType}', // THEORY, PRACTICE, TEST
+            status: '${item.status}',
             chapterId: '${item.chapterId}',
             chapterName: '${item.chapterName}',
+            testReward: '${item.testReward}',
+            testPay: '${item.testPay}',
             levelId: '${item.levelId}',
             levelName: '${item.levelName}'
         });
         </c:if>
-
-        <c:if test="${status.index % 5 == 4}">
-        nodesData.push({
-            type: 'chapter',
-            id: '${item.chapterId}',
-            chapterIdx: currentChapterIdx,
-            inChapterIdx: 5,
-            chapterId: '${item.chapterId}',
-            chapterName: '${item.chapterName}',
-            levelId: '${item.levelId}',
-            levelName: '${item.levelName}',
-            testReward: '${item.testReward}',
-            testPay: '${item.testPay}',
-            status: '${item.chapterPass}'
-        });
-        </c:if>
         </c:forEach>
 
-        // 전역 변수로 nodePositions 관리
+        console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
+
         let nodePositions = [];
 
         /* =========================================
@@ -256,24 +214,27 @@
         window.openTooltip = (pos, el) => {
             const tooltip = document.getElementById('tooltip');
             const inner = document.getElementById('innerContent');
+
             if (!tooltip || !inner) return;
 
             const data = pos.data;
-            const isChapter = data.type === 'chapter';
+            const isChapter = data.type === 'TEST';
 
             let title;
             try {
                 const rawId = isChapter ? data.chapterId : data.id;
                 const num = rawId.replace(/[^0-9]/g, '').slice(-3);
+
                 title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
             } catch (e) {
                 title = isChapter ? "Chapter Test" : "Lesson";
             }
 
-            document.getElementById('tip-title').innerText = title;
+            document.getElementById('tip-chapter').innerText = title;
+            document.getElementById('tip-title').innerText = isChapter ? data.chapterName : data.lessonName;
             document.getElementById('tip-desc').innerText = isChapter
                 ? '챕터 테스트를 통과하면 다음 챕터로 갈 수 있어요. \n도전하고 보상금을 받으세요!!'
-                : (data.lessonName || "레슨 설명이 없습니다.");
+                : (data.lessonDesc || "레슨 설명이 없습니다.");
 
             const status = data.status || 'locked';
             const badge = document.getElementById('tip-badge');
@@ -291,7 +252,7 @@
                 infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
                     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
             } else {
-                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.lessonType === 'THEORY' ? '이론' : '실습') + '</div></div>' +
+                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.type === 'THEORY' ? '이론' : '실습') + '</div></div>' +
                     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
             }
 
@@ -312,7 +273,10 @@
 
                 newBtn.setAttribute('hx-post', CPATH + '/lesson/' + (isChapter ? 'chapter-test' : 'lessonInfo'));
                 newBtn.setAttribute('hx-target', '#main');
-                newBtn.setAttribute('hx-vals', JSON.stringify({lessonId: data.id}));
+
+                var param = {lessonId: data.id};
+                if (isChapter) param.chapterId = data.chapterId;
+                newBtn.setAttribute('hx-vals', JSON.stringify(param));
             } else {
                 // 잠김이거나 챕터테스트를 완료한 경우
                 newBtn.disabled = true;
@@ -326,10 +290,10 @@
 
             const TIP_WIDTH = 300;
             let left = pos.x - 150;
-            let top = pos.y + 70;
+            let top = pos.y + 60;
             if (left < 10) left = 10;
             if (left + TIP_WIDTH > inner.offsetWidth) left = inner.offsetWidth - TIP_WIDTH - 10;
-            if (top + 250 > inner.offsetHeight) top = pos.y - 280;
+            if (top + 250 > inner.offsetHeight) top = pos.y - 320;
 
             tooltip.style.left = left + "px";
             tooltip.style.top = top + "px";
@@ -357,7 +321,7 @@
 
             // 발판 위치 지정
             nodesData.forEach((node, i) => {
-                const marginX = vw * 0.1;
+                const marginX = vw * 0.12;
                 const availableW = vw - (marginX * 2);
                 const stepX = availableW / (NODES_PER_CHAPTER - 1);
                 const x = (node.chapterIdx * vw) + marginX + (node.inChapterIdx * stepX);
@@ -373,7 +337,7 @@
             nodePositions.forEach(pos => {
                 const el = document.createElement('div');
                 const data = pos.data;
-                const isChapter = data.type === 'chapter';
+                const isChapter = data.type === 'TEST';
                 const status = data.status;
 
                 el.className = 'orb ' + status;
@@ -382,9 +346,24 @@
                     el.style.height = '80px';
                 }
 
-                if (status === 'completed') el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
-                else if (status === 'current') el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                else el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
+                if (isChapter) {
+                    if (status === 'completed') {
+                        el.innerHTML = '<i data-lucide="trophy" class="w-10 h-10 text-yellow-400 fill-yellow-100"></i>';
+                        el.classList.add('border-yellow-400', 'bg-yellow-50');
+                    } else if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="unlock" class="w-10 h-10 text-white animate-pulse"></i>';
+                    } else {
+                        el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
+                    }
+                } else {
+                    if (status === 'completed') {
+                        el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
+                    } else if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
+                    } else {
+                        el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
+                    }
+                }
 
 
                 el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
@@ -444,6 +423,7 @@
             }
         }
 
+        // 라인 그리기
         const drawContinuousPath = () => {
             const pathBorder = document.getElementById('roadBorder');
             const pathMain = document.getElementById('roadPath');
@@ -507,7 +487,7 @@
                 });
             });
 
-            // 이동 버튼 (드롭다운 내의 이동버튼이 있다면)
+            // 이동 버튼 (드롭다운 내의 이동버튼)
             const moveBtn = document.getElementById('moveBtn');
             if (moveBtn) {
                 moveBtn.onclick = () => {
@@ -641,18 +621,41 @@
         // 리사이즈 시에는 위치만 다시 계산 (스크롤 이동 X)
         window.addEventListener('resize', () => initRoadmap(false));
 
-        // 초기 실행: 처음 로딩이므로 true 전달
-        initRoadmap(true);
-        initRoadMapDropdowns();
-        initChapterNavigation();
+        // 실행 함수 (초기화)
+        const initialize = () => {
+            initRoadMapDropdowns();
+            initChapterNavigation();
 
-        document.body.addEventListener('htmx:afterSettle', function (evt) {
-            if (document.getElementById('roadmapScroll')) {
-                // HTMX로 다시 로드되었을 때도 강제 스크롤 적용
-                initRoadmap(true);
-                initRoadMapDropdowns();
-                initChapterNavigation();
+            // 리사이즈 이벤트는 전역이므로, 기존 리스너가 있다면 제거하고 다시 등록하거나
+            // 간단하게 덮어씌우는 방식으로 처리 (메모리 누수 방지 노력)
+            window.removeEventListener('resize', handleResize);
+            window.addEventListener('resize', handleResize);
+
+            // [핵심] 렌더링 안정성을 위해 약간의 지연 후 그리기
+            setTimeout(() => {
+                initRoadmap(true); // true = 내 위치로 스크롤 이동
+            }, 100);
+        };
+
+        const handleResize = () => {
+            // 리사이즈 시에는 스크롤 이동 없이 다시 그리기만
+            initRoadmap(false);
+            // 챕터 네비게이션 버튼 상태 업데이트
+            const scrollContainer = document.getElementById('roadmapScroll');
+            if (scrollContainer) {
+                const event = new Event('scroll');
+                scrollContainer.dispatchEvent(event);
             }
-        });
+        };
+
+        // 스크립트가 로드되자마자 실행
+        initialize();
+
+        /* (선택사항) 만약 HTMX로 인해 DOM 내에서 아이콘이 사라진다면
+           명시적으로 Lucide 아이콘을 다시 그려줍니다.
+        */
+        if (window.lucide) {
+            setTimeout(() => window.lucide.createIcons(), 50);
+        }
     }
 </script>

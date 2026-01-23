@@ -3,7 +3,7 @@ package com.tickerbell.jujuclub.roadMap.controller;
 
 import com.tickerbell.jujuclub.roadMap.dto.ChapterDTO;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,10 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/roadMapApi")
 public class RoadMapApiController {
-    @Autowired
-    private RoadMapService roadMapService;
+
+    private final RoadMapService roadMapService;
 
     @GetMapping("/chapters")
     public List<ChapterDTO> getChapter(@RequestParam("levelId") Integer levelId) {

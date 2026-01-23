@@ -64,7 +64,7 @@
          , ANSWER
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND QUESTION_ID !='LV1_CH001_LS001_Q001'
+    AND QUESTION_ID NOT LIKE '%Q001'
   </select>
 
   <select id="countUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"

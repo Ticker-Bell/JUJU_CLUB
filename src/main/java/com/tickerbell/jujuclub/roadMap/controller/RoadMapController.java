@@ -34,7 +34,6 @@ public class RoadMapController {
         Integer userSeq = loginUser.getUserSeq();
 
         List<LevelDTO> levelList = roadMapService.levelList();
-        //List<ChapterDTO> chptList = roadMapService.chapterList(levelSeq);
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
         List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);

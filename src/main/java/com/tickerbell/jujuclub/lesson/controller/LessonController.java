@@ -114,7 +114,7 @@ public class LessonController {
 
 
     if (isHtmx) {
-      return "/roadMap/roadMapMain";
+      return "redirect:/roadMap/main.do";
     } else {
       // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
       // Redirect를 하거나 에러 페이지를 띄움

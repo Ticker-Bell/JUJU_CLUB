@@ -275,8 +275,8 @@
           htmx.ajax('POST', '${cpath}/lesson/updateLssnInfo', {
             target: '#main',
             values: {
-              usrSeq: 1,
-              lessonId: 'LV1_CH001_LS001',
+              usrSeq: ${userSeq},
+              lessonId: '${lessonId}',
             }
           });
         };

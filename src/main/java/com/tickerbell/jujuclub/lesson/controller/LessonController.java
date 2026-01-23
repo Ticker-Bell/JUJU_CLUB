@@ -4,6 +4,9 @@ import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,9 +29,10 @@ public class LessonController {
   public String getLessonInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
+      HttpSession session,
       Model model) throws Exception {
 // 세션 연결예쩡
-    Integer userSeq = 1;
+    int userSeq = (int) session.getAttribute("userSeq");
 
 //    if (userSeq == null) {
 //      // 로그인 안된 상태면 처리
@@ -66,8 +70,12 @@ public class LessonController {
   @PostMapping("/qst")
   public String getQstInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
-      @RequestParam String lessonId,@RequestParam String questionId,
+      @RequestParam String lessonId,
+      @RequestParam String questionId,
+      HttpSession session,
       Model model) throws Exception {
+
+    int userSeq = (int) session.getAttribute("userSeq");
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
@@ -75,8 +83,8 @@ public class LessonController {
 
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
-
-
+    model.addAttribute("lessonId",lessonId);
+    model.addAttribute("userSeq",userSeq);
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
@@ -106,9 +114,10 @@ public class LessonController {
   @PostMapping("/updateLssnInfo")
   public String getLessonInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
-      @RequestParam String lessonId) throws Exception {
-// 세션 연결예쩡
-    Integer userSeq = 1;
+      @RequestParam String lessonId,
+      HttpSession session) throws Exception {
+
+    int userSeq = (int) session.getAttribute("userSeq");
 
     lessonService.updateLssnInfo(userSeq,lessonId);
 
@@ -128,10 +137,10 @@ public class LessonController {
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String chapterId,
       @RequestParam String lessonId,
-
+      HttpSession session,
       Model model) throws Exception {
-    // 세션 연결예쩡
-    Integer userSeq = 1;
+
+    int userSeq = (int) session.getAttribute("userSeq");
 
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();
     lessonRequest.setChapterId(chapterId);
@@ -158,14 +167,15 @@ public class LessonController {
   }
 
   @PostMapping("/update-chapter")
-  public String updateChapterRslt(
+  public void updateChapterRslt(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String chapterId,
-      int score,
-      String isPass,
+      @RequestParam int score,
+      @RequestParam String isPass,
+      HttpSession session,
       Model model) throws Exception {
-    // 세션 연결예쩡
-    Integer userSeq = 1;
+
+    int userSeq = (int) session.getAttribute("userSeq");
 
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();
 
@@ -178,6 +188,5 @@ public class LessonController {
 
     model.addAttribute("userSeq",userSeq);
 
-    return "업데이트 완료";
   }
 }

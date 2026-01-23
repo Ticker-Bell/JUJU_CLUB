@@ -172,7 +172,7 @@
         htmx.ajax('POST', '${cpath}/lesson/qst', {
           target: '#main',
           values: {
-            lessonId: 'LV1_CH001_LS001',
+            lessonId: '${lessonId}',
             questionId: 'LV1_CH001_LS001_Q004'
           }
         });

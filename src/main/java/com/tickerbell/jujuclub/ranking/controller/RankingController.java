@@ -20,13 +20,7 @@ public class RankingController {
        HttpSession session
       ,Model model) {
 
-    Integer userSeq = (Integer) session.getAttribute("loginUser");
-    userSeq = 3;
-
-//    if (userSeq == null) {
-//      // 로그인 안 된 경우 처리
-//      return "redirect:/auth/login.ajax";
-//    }
+    Integer userSeq = (Integer) session.getAttribute("userSeq");
 
     RankingDTO.RankingResponse response =rankingService.getRankingInfo(userSeq);
 

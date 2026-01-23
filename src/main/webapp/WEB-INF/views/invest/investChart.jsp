@@ -46,17 +46,17 @@
             </div>
             <div id="button-group"
                  class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
-                <button id="btn-D" onclick="loadChartData('D')"
+                <button id="btn-D" onclick="loadChartData('D',selectedStockState.stockCode)"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     일별
                 </button>
 
-                <button id="btn-W" onclick="loadChartData('W')"
+                <button id="btn-W" onclick="loadChartData('W',selectedStockState.stockCode)"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     주별
                 </button>
 
-                <button id="btn-M" onclick="loadChartData('M')"
+                <button id="btn-M" onclick="loadChartData('M',selectedStockState.stockCode)"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     월별
                 </button>

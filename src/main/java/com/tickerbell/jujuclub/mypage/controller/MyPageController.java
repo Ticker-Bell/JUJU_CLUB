@@ -101,7 +101,7 @@ public class MyPageController {
         // [3] 미션 정보 조회 (일일 미션)
         // ---------------------------------------------------------
         try {
-            List<MissionDTO> missionList = roadMapService.missionList();
+            List<MissionDTO> missionList = roadMapService.missionList(userSeq);
             int successCount = (int) missionList.stream()
                     .filter(m -> m.getCount() <= m.getProgress())
                     .count();

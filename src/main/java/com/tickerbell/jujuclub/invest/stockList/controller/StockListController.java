@@ -34,9 +34,6 @@ public class StockListController {
     @GetMapping("main.do")
     public String investMain(Model model, HttpSession session){
 
-        // 세션에서 user_seq 가져오기
-        session.setAttribute("userSeq", 1); // 일단 구현안되어있으므로 임시 값
-
         Integer userSeq = (Integer)session.getAttribute("userSeq");
 
         // 해당하는 유저의 관심종목들의 종목정보 리스트 반환

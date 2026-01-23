@@ -688,6 +688,17 @@
             // AJAX 데이터 요청
             fetchStockList(sortType);
         });
+
+        // 처음 페이지 로딩시에는 삼성전자 코드 뿌리기
+        const code = "005930";
+        const name = "삼성전자";
+
+        //investChart 차트데이터 전달
+        getSelectedChart(code, name);
+
+        // 기업정보에 전달
+        getSelectedCorpInfo(code);
+
     });
 
     // 탭 슬라이더 UI 업데이트 함수

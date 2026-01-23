@@ -7,11 +7,13 @@ import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import com.tickerbell.jujuclub.invest.stockList.service.RankingApiService;
 import com.tickerbell.jujuclub.invest.stockList.service.StockService;
+import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -27,9 +29,10 @@ public class StockListController {
     private final StockService stockService;
     private final RankingApiService rankingApiService;
     private final KISApiService kisApiService;
+    private final GetValidAccessToken getValidAccessToken;
 
     @GetMapping("main.do")
-    public String investMain(Model model, HttpSession session) {
+    public String investMain(Model model, HttpSession session){
 
         // 세션에서 user_seq 가져오기
         session.setAttribute("userSeq", 1); // 일단 구현안되어있으므로 임시 값
@@ -62,9 +65,11 @@ public class StockListController {
 
     @GetMapping("/main/stock/list")
     @ResponseBody
-    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, HttpSession session) {
+    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, HttpSession session, HttpServletRequest request) throws Exception {
 
         List<RankingDTO> rankingDTOList = new ArrayList<>();
+
+        String accessToken = getValidAccessToken.getValidToken(request);
 
         switch (sortType) {
             case "interest":  //관심종목
@@ -90,19 +95,19 @@ public class StockListController {
                 return rankingDTOList;
 
             case "volume":  //거래량순
-                rankingDTOList = rankingApiService.getTradingVolumeRanking();
+                rankingDTOList = rankingApiService.getTradingVolumeRanking(accessToken);
                 rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
                 return rankingDTOList;
             case "rising":  //상승률순 (전날 종가 대비)
-                rankingDTOList = rankingApiService.getTopGainersRanking();
+                rankingDTOList = rankingApiService.getTopGainersRanking(accessToken);
                 rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
                 return rankingDTOList;
             case "falling":  //하락률순 (전날 종가 대비)
-                rankingDTOList = rankingApiService.getTopLosersRanking();
+                rankingDTOList = rankingApiService.getTopLosersRanking(accessToken);
                 rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
                 return rankingDTOList;
             case "marketCap":  //시가총액순
-                rankingDTOList = rankingApiService.getMarketCapRanking();
+                rankingDTOList = rankingApiService.getMarketCapRanking(accessToken);
                 rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
                 return rankingDTOList;
             default: return new ArrayList<>();

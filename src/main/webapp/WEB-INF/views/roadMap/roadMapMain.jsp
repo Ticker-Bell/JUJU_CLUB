@@ -16,7 +16,6 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
 
-
 <div class="flex flex-col -m-8 w-[calc(100%+4rem)] h-[calc(100%+4rem)] min-h-0 bg-gray-50 relative p-0 border-0">
 
     <div class="absolute top-4 left-4 z-40 gap-2">
@@ -45,73 +44,44 @@
          class="w-full h-full overflow-x-auto overflow-y-hidden snap-container scroll-smooth relative">
         <div id="innerContent" class="h-full relative">
 
-            <div id="bgLayer" class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden"
-                 style="z-index: 0;">
+            <div id="space-bg" class="absolute inset-0 overflow-hidden pointer-events-none"
+                 style="background:#0b0820;">
 
-                <div class="absolute inset-0 bg-pastel-flow opacity-60"></div>
-
-                <div class="elemental-zone absolute top-0 left-0 w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[5%] left-[10%] w-auto h-[12%] animate-float-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2663/2663067.png" alt="bird"
-                             class="h-full object-contain opacity-80">
-                    </div>
-
-                    <div class="absolute bottom-[2%] left-[10%] w-auto h-[18%] animate-bounce-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2422/2422204.png" alt="mushroom"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[2%] right-[10%] w-auto h-[10%]">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2990/2990234.png" alt="flower"
-                             class="h-full object-contain opacity-90">
-                    </div>
+                <!-- 🌙 Big Dome -->
+                <div class="absolute bottom-[-40%] left-1/2 -translate-x-1/2
+              w-[140%] h-[140%] rounded-full"
+                     style="background:
+         radial-gradient(circle at 50% 30%,
+           #7c5cff 0%,
+           #4b3bd6 35%,
+           #2a1e78 60%,
+           transparent 70%);">
                 </div>
 
-                <div class="elemental-zone absolute top-0 left-[25%] w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[8%] left-[20%] w-auto h-[10%] animate-float-slower">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1163/1163624.png" alt="cloud"
-                             class="h-full object-contain opacity-70">
-                    </div>
-
-                    <div class="absolute bottom-[3%] left-[15%] w-auto h-[15%] animate-wiggle">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2765/2765275.png" alt="float"
-                             class="h-full object-contain">
-                    </div>
-                    <div class="absolute bottom-[5%] left-[60%] w-auto h-[12%] animate-float-mini">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2618/2618636.png" alt="duck"
-                             class="h-full object-contain">
-                    </div>
+                <!-- 🌌 Inner Glow -->
+                <div class="absolute bottom-[-30%] left-1/2 -translate-x-1/2
+              w-[90%] h-[90%] rounded-full blur-2xl"
+                     style="background:
+         radial-gradient(circle,
+           #9f7bff 0%,
+           #5b4bdb 45%,
+           transparent 70%);">
                 </div>
 
-                <div class="elemental-zone absolute top-0 left-[50%] w-[25%] h-full border-r border-white/20">
-                    <div class="absolute top-[5%] right-[20%] w-auto h-[15%] animate-rise-mini">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3261/3261546.png" alt="balloon"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[2%] left-[20%] w-auto h-[18%] animate-spin-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/2460/2460875.png" alt="windmill"
-                             class="h-full object-contain opacity-90">
-                    </div>
+                <!-- ⭐ Soft Stars -->
+                <div class="absolute inset-0"
+                     style="
+        background-image:
+          radial-gradient(#fff6c9 2px, transparent 3px),
+          radial-gradient(#fff6c9 1.5px, transparent 3px);
+        background-size: 120px 120px, 80px 80px;
+        background-position: 0 0, 40px 60px;
+        opacity: 0.6;
+       ">
                 </div>
-
-                <div class="elemental-zone absolute top-0 left-[75%] w-[25%] h-full">
-                    <div class="absolute top-[8%] left-[10%] w-auto h-[12%] animate-pulse-slow">
-                        <img src="https://cdn-icons-png.flaticon.com/512/1835/1835567.png" alt="sun"
-                             class="h-full object-contain">
-                    </div>
-
-                    <div class="absolute bottom-[3%] right-[30%] w-auto h-[16%] animate-flicker-soft">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4334/4334587.png" alt="fire"
-                             class="h-full object-contain">
-                    </div>
-                    <div class="absolute bottom-[3%] left-[10%] w-auto h-[12%] animate-bounce-quick">
-                        <img src="https://cdn-icons-png.flaticon.com/512/4762/4762311.png" alt="monster"
-                             class="h-full object-contain">
-                    </div>
-                </div>
-
             </div>
+
+
 
             <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 10;">
                 <path id="roadBorder" d=""/>
@@ -255,7 +225,7 @@
                 const rawId = isChapter ? data.chapterId : data.id;
                 const num = rawId.replace(/[^0-9]/g, '').slice(-3);
 
-                title =  (isChapter ? "Chapter " : "Lesson ")  + parseInt(num || "0");
+                title = (isChapter ? "Chapter " : "Lesson ") + parseInt(num || "0");
             } catch (e) {
                 title = isChapter ? "Chapter Test" : "Lesson";
             }
@@ -305,7 +275,7 @@
                 newBtn.setAttribute('hx-target', '#main');
 
                 var param = {lessonId: data.id};
-                if(isChapter) param.chapterId = data.chapterId;
+                if (isChapter) param.chapterId = data.chapterId;
                 newBtn.setAttribute('hx-vals', JSON.stringify(param));
             } else {
                 // 잠김이거나 챕터테스트를 완료한 경우
@@ -672,7 +642,7 @@
             initRoadmap(false);
             // 챕터 네비게이션 버튼 상태 업데이트
             const scrollContainer = document.getElementById('roadmapScroll');
-            if(scrollContainer) {
+            if (scrollContainer) {
                 const event = new Event('scroll');
                 scrollContainer.dispatchEvent(event);
             }

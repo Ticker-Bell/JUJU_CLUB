@@ -1,6 +1,8 @@
 package com.tickerbell.jujuclub.invest.stockList.controller;
 
 import com.tickerbell.jujuclub.common.dto.UserInfoDTO;
+import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
+import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import com.tickerbell.jujuclub.invest.stockList.service.RankingApiService;
@@ -11,8 +13,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,6 +26,7 @@ public class StockListController {
 
     private final StockService stockService;
     private final RankingApiService rankingApiService;
+    private final KISApiService kisApiService;
 
     @GetMapping("main.do")
     public String investMain(Model model, HttpSession session) {
@@ -32,6 +38,23 @@ public class StockListController {
 
         // 해당하는 유저의 관심종목들의 종목정보 리스트 반환
         List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
+
+        Map<String, KISDataDTO> codeKISDataMap = new HashMap<String, KISDataDTO>();
+
+        // 리스트를 처음 띄울때의 현재가와 등락률은 restAPI로 호출해서 출력한다.
+        for(StockDTO stockDTO : stockDTOList) {
+            KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
+            // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+            if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+            }
+
+            codeKISDataMap.put(stockDTO.getStockCode(), kisDataDTO);
+        }
+
+        System.out.println("codeKISDataMap: " + codeKISDataMap);
+
+        model.addAttribute("codeKISDataMap", codeKISDataMap);
         model.addAttribute("stockDTOList", stockDTOList);
 
         return "invest/investMain";
@@ -41,31 +64,47 @@ public class StockListController {
     @ResponseBody
     public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, HttpSession session) {
 
+        List<RankingDTO> rankingDTOList = new ArrayList<>();
+
         switch (sortType) {
             case "interest":  //관심종목
                 Integer userSeq = (Integer)session.getAttribute("userSeq");
                 List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
-                List<RankingDTO> rankingDTOList = new ArrayList<>();
 
                 // List<RankingDTO>를 반환해야하기에 stockDTO에 있는 Name과 Code를 넣어서 RankingDTO로 전환한다.
                 // Name과 Code는 양쪽에 존재하기 때문에 상관없지만, rank는 없기 때문에 null로 넣는다.
                 for (StockDTO stockDTO : stockDTOList) {
+                    KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
+                    // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+                    if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                        kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+                    }
                     RankingDTO rankingDTO = RankingDTO.builder()
                             .stockName(stockDTO.getStockName())
                             .stockCode(stockDTO.getStockCode())
+                            .currentPrice(kisDataDTO.getCurrentPrice())
+                            .changePct(kisDataDTO.getChangePct())
                             .build();
                     rankingDTOList.add(rankingDTO);
                 }
                 return rankingDTOList;
 
             case "volume":  //거래량순
-                return rankingApiService.getTradingVolumeRanking();
+                rankingDTOList = rankingApiService.getTradingVolumeRanking();
+                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
+                return rankingDTOList;
             case "rising":  //상승률순 (전날 종가 대비)
-                return rankingApiService.getTopGainersRanking();
+                rankingDTOList = rankingApiService.getTopGainersRanking();
+                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
+                return rankingDTOList;
             case "falling":  //하락률순 (전날 종가 대비)
-                return rankingApiService.getTopLosersRanking();
+                rankingDTOList = rankingApiService.getTopLosersRanking();
+                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
+                return rankingDTOList;
             case "marketCap":  //시가총액순
-                return rankingApiService.getMarketCapRanking();
+                rankingDTOList = rankingApiService.getMarketCapRanking();
+                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
+                return rankingDTOList;
             default: return new ArrayList<>();
         }
     }
@@ -82,25 +121,20 @@ public class StockListController {
         return stockService.getSearchList(keyword);
     }
 
-    // 테스트용  나중에 제거하기
-    @GetMapping("/chart/selectedStockInfo")
+    @PostMapping("/stock/selected")
     @ResponseBody
-    public StockDTO paramTest(@RequestParam String stockCode, @RequestParam String stockName) {
+    public RankingDTO getSelectedStock(@RequestParam("stockCode") String stockCode, @RequestParam("stockName") String stockName) {
+        KISDataDTO kisDataDTO = kisApiService.getPriceData(stockCode);
+        // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+        if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+            kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+        }
 
-        return StockDTO.builder()
+        return RankingDTO.builder()
                 .stockCode(stockCode)
                 .stockName(stockName)
+                .currentPrice(kisDataDTO.getCurrentPrice())
+                .changePct(kisDataDTO.getChangePct())
                 .build();
     }
-
-    // 테스트용  나중에 제거하기
-    @GetMapping("/corpoInfo/selectedStockInfo")
-    @ResponseBody
-    public StockDTO paramTest2(Model model, @RequestParam String stockCode) {
-
-        return StockDTO.builder()
-                .stockCode(stockCode)
-                .build();
-    }
-
 }

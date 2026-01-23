@@ -27,14 +27,21 @@ public class StockChartService {
     private final StockChartParser stockChartParser;
     private final String APPROVAL_KEY = "5622cc60-8a75-4bbb-845a-9f70babcc1bd";
 
-    public synchronized void connectToStockChartApi(List<String> stockCodeList) {
+    public synchronized void connectToStockChartApi(String trType, List<String> stockCodeList) {
+        //세션이 없거나 닫혀있으면 연결
         if (externalSession == null || !externalSession.isOpen()) {
             initConnection(stockCodeList);
-        } else {
+        } else if (trType.equals("1")) {
+            //구독 요청
             for (String stockCode : stockCodeList) {
                 if (!subscribedCodes.contains(stockCode)) {
                     sendSubscribeMessage(externalSession, stockCode);
                 }
+            }
+        } else if (trType.equals("2")) {
+            //구독 해제
+            for (String stockCode : stockCodeList) {
+                sendUnsubscribeMessage(externalSession, stockCode);
             }
         }
     }
@@ -98,8 +105,29 @@ public class StockChartService {
             session.sendMessage(new TextMessage(subscribeMessage));
             subscribedCodes.add(stockCode);
             log.info("종목 구독: {}", stockCode);
+
+            messagingTemplate.convertAndSend("/topic/stock/" + stockCode,
+                    Map.of("stockCode", stockCode, "status", "Init", "message", "데이터 로드 시작"));
         } catch (Exception e) {
             log.error("구독 전송 에러 ({}) : {}", stockCode, e.getMessage());
+        }
+    }
+
+    private void sendUnsubscribeMessage(WebSocketSession session, String stockCode) {
+        try {
+            String subscribeMessage = String.format(
+                    "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"2\",\"content-type\":\"utf-8\"}," +
+                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", APPROVAL_KEY, stockCode);
+
+
+            session.sendMessage(new TextMessage(subscribeMessage));
+            subscribedCodes.remove(stockCode);
+            log.info("종목 구독 취소: {}", stockCode);
+
+            messagingTemplate.convertAndSend("/topic/stock/" + stockCode,
+                    Map.of("stockCode", stockCode, "status", "UnSubscribe", "message", "구독 해제 완료"));
+        } catch (Exception e) {
+            log.error("구독 취소 전송 에러 ({}) : {}", stockCode, e.getMessage());
         }
     }
 

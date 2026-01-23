@@ -34,47 +34,55 @@
 <body>
 <div class="flex flex-col gap-4">
     <div class="p-6 border-bottom border-gray-100 stock-info-header">
-        <div class="flex items-baseline gap-4">
-            <h2 id="header-stockName" class="text-gray-500 text-lg font-medium">기업</h2>
-            <span id="header-stock" class="text-3xl font-extrabold tracking-tight text-gray-900">000000</span>
+        <div class="flex flex-row justify-between">
+
+            <div class="flex items-center gap-4">
+                <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">기업이름</h2>
+                <span id="header-stock"
+                      class="px-2 rounded-md bg-[#D9D9D9] text-gray-500 text-sm font-medium">000000</span>
+                <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[F4F4F4] text-sm font-medium">KOSPI</span>
+                <img id="header-stockLike" data-liked="false"
+                     class="w-5 h-5 cursor-pointer" src="${cpath}/resources/images/stockIcons/heart.svg" alt="하트아이콘">
+            </div>
+            <div id="button-group"
+                 class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
+                <button id="btn-D" onclick="loadChartData('D')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    일별
+                </button>
+
+                <button id="btn-W" onclick="loadChartData('W')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    주별
+                </button>
+
+                <button id="btn-M" onclick="loadChartData('M')"
+                        class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
+                    월별
+                </button>
+
+            </div>
+
         </div>
-    </div>
-    <div class="p-6 border-bottom border-gray-100 stock-info-header">
-        <div class="flex items-baseline gap-4">
-            <h2 id="header-price" class="text-3xl font-extrabold tracking-tight text-gray-900">0원</h2>
+
+        <div class="flex items-baseline gap-4 mt-4">
+            <h2 id="header-price" class="text-2xl font-extrabold tracking-tight text-gray-900">0원</h2>
             <div class="change-info">
-                <span id="header-change" class="text-lg font-semibold">0</span>
+                <span id="header-change" class="text-sm font-semibold">0</span>
             </div>
         </div>
     </div>
 
-
+    <div class="p-4 h-[400px]">
+        <canvas id="myChart"></canvas>
+    </div>
 </div>
-<div id="button-group" class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
-    <button id="btn-D" onclick="loadChartData('D')"
-            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-        일별
-    </button>
 
-    <button id="btn-W" onclick="loadChartData('W')"
-            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-        주별
-    </button>
 
-    <button id="btn-M" onclick="loadChartData('M')"
-            class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
-        월별
-    </button>
-
-</div>
-<div class="p-4 h-[400px]">
-    <canvas id="myChart"></canvas>
-</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/invest/stockLineChart.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
-
 <script>
     let myChartInstance;
     let currentPeriod = 'D';
@@ -84,28 +92,64 @@
     };
 
     window.onload = function () {
+        getSelectedChart();
         updateButtonUI('D');
     };
 
-    function getSelectedChart(stockCode, stockName) {
-        selectedStockState.stockName = stockName;
-        selectedStockState.stockCode = stockCode;
+    function toggleLike(likeEl) {
+        const isLiked = likeEl.dataset.liked === "true";
 
-        document.getElementById('header-stockName').innerText = stockName;
-        document.getElementById('header-stock').innerText = stockCode;
+        const url = `${cpath}/stock/watchlist`;
+        const method = isLiked ? "DELETE" : "POST";
 
-        const url = `${pageContext.request.contextPath}/invest/chart/selectedStockInfo?stockCode=${stockCode}&stockName=${stockName}`;
+        fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                stockCode: selectedStockState.stockCode
+            })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("서버 오류");
+                return res;
+            })
+            .then(() => {
+                likeEl.dataset.liked = (!isLiked).toString();
+                likeEl.src = isLiked
+                    ? `${cpath}/resources/images/stockIcons/heart.svg`
+                    : `${cpath}/resources/images/stockIcons/filled-heart.svg`;
 
-        $.ajax({
-            url: url,
-            type: 'GET',
-            success: function () {
-                updateButtonUI('D');
-                loadChartData('D', selectedStockState.stockCode);
+                console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }
 
-            }
+    document.getElementById("header-stockLike")
+        .addEventListener("click", function () {
+            toggleLike(this);
         });
 
+
+    function getSelectedChart(stockCode, stockName) {
+        //선택된 주식 리스트
+        selectedStockState.stockName =stockName;
+        selectedStockState.stockCode =stockCode;
+
+        document.getElementById('header-stock').innerText = selectedStockState.stockCode;
+        document.getElementById('header-stockName').innerText = selectedStockState.stockName;
+        console.log("받아온 차트 데이터: " + selectedStockState.stockCode + selectedStockState.stockName);
+        loadChartData('D', selectedStockState.stockCode);
+
+        //시장 타입 가져오기
+        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=${stockCode}`)
+            .then(res => res.text())
+            .then(marketType => {
+                document.getElementById('header-marketType').innerText = marketType;
+            });
     }
 
 
@@ -129,7 +173,7 @@
                 myChartInstance = renderStockChart('myChart', formattedData, periodCode);
 
                 if (periodCode === 'D') {
-                    initSocket(myChartInstance, [stockCode]); //배열 형태의 stockCode가 들어가야함
+                    initSocket(myChartInstance, stockCode); //배열 형태의 stockCode가 들어가야함
                 }
                 updateButtonUI(periodCode);
             })
@@ -147,13 +191,10 @@
         }
     }
 
-
-    function updateHeaderInfo(stock) {
+    function updateHeaderStock(stock) {
         if (!stock) return;
         const priceEl = document.getElementById('header-price');
         const changeEl = document.getElementById('header-change');
-
-
         if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
         if (stock.displayChange) changeEl.innerText = stock.displayChange;
 
@@ -177,7 +218,7 @@
                 const lastIdx = dataArray.length - 1;
 
                 dataArray[lastIdx] = stockData.currentPrice;
-                updateHeaderInfo(stockData);
+                updateHeaderStock(stockData);
                 targetChart.update('none');
 
             }

@@ -41,7 +41,7 @@ public class RequestNewApprovalKey {
             String requestBody = "{"
                     + "\"grant_type\": \"client_credentials\","
                     + "\"appkey\": \"" + APP_KEY + "\","
-                    + "\"appsecret\": \"" + APP_SECRET + "\""
+                    + "\"secretkey\": \"" + APP_SECRET + "\""
                     + "}";
 
             // 데이터 전송

@@ -11,20 +11,19 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class GetValidApprovalKey {
     private final RequestNewApprovalKey requestNewApprovalKey;
+    private final ServletContext servletContext;
 
-    public String getValidApprovalKey(HttpServletRequest request) throws Exception {
-        ServletContext application;
-        application = request.getServletContext();
+    public synchronized String getValidApprovalKey() throws Exception {
 
-        String key = (String)application.getAttribute("APPROVAL_KEY");
-        LocalDateTime expireAt = (LocalDateTime)application.getAttribute("APPROVAL_KEY_EXPIRE_AT");
+        String key = (String)servletContext.getAttribute("APPROVAL_KEY");
+        LocalDateTime expireAt = (LocalDateTime)servletContext.getAttribute("APPROVAL_KEY_EXPIRE_AT");
 
         // 키가 없거나 만료된 경우
         if (key == null || expireAt == null || expireAt.isBefore(LocalDateTime.now())) {
             key = requestNewApprovalKey.getApprovalKey();
 
-            application.setAttribute("APPROVAL_KEY", key);
-            application.setAttribute("APPROVAL_KEY_EXPIRE_AT", LocalDateTime.now().plusHours(24));
+            servletContext.setAttribute("APPROVAL_KEY", key);
+            servletContext.setAttribute("APPROVAL_KEY_EXPIRE_AT", LocalDateTime.now().plusHours(24));
         }
 
         return key;

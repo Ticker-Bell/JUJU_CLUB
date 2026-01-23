@@ -18,8 +18,11 @@ public class LessonDTO {
   @NoArgsConstructor
   public static class LessonRequest{
 
-    private String userSeq;
+    private int userSeq;
     private String lessonId;
+    private String chapterId;
+    private int score;
+    private String isPass;
 
   }
 

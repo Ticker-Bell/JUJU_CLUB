@@ -12,8 +12,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountDTO {
-    private Long accountSeq;
-    private Long userSeq;
+    private Integer accountSeq;
+    private Integer userSeq;
     private String accountNo;
     private Long cashBalance;
     private Date createdAt;

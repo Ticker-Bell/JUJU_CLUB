@@ -1,0 +1,301 @@
+/* Scroll Snap 및 컨테이너 설정 */
+.snap-container {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.snap-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* SVG Styles */
+#roadBorder {
+    fill: none;
+    stroke: #312E81;
+    stroke-width: 100px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.1;
+}
+
+#roadPath {
+    fill: none;
+    stroke: #4F46E5;
+    stroke-width: 6px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+#roadDashed {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.4);
+    stroke-width: 2px;
+    stroke-dasharray: 10 15;
+    stroke-linecap: round;
+    pointer-events: none;
+}
+
+#roadPathActive {
+    fill: none;
+    stroke: #818CF8;
+    stroke-width: 6px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.8));
+    transition: d 0.8s ease-in-out;
+}
+
+/* Orb (노드) 스타일 */
+.orb {
+    position: absolute;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 4px solid #E0E7FF;
+    z-index: 30;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: transform .18s ease, box-shadow .18s ease;
+    user-select: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+}
+
+.orb:hover {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
+}
+
+/* 상태별 스타일 */
+.orb.completed {
+    border-color: #4F46E5;
+    background: #fff;
+    color: #4F46E5;
+}
+
+.orb.current {
+    border-color: #4F46E5;
+    background: #4F46E5;
+    color: #fff;
+    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.25);
+    animation: pulse 2s infinite;
+}
+
+.orb.locked {
+    background: #F3F4F6;
+    border-color: #E5E7EB;
+    color: #9CA3AF;
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.6);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(79, 70, 229, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    }
+}
+
+/* 툴팁 스타일 */
+.tip {
+    position: absolute;
+    z-index: 50;
+    width: 300px;
+    background: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #F3F4F6;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+}
+
+.tip::before,
+.tip::after {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+    background: none !important;
+}
+
+.tip.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* 챕터 이동 버튼 전용 스타일 */
+/* 2. 미션 버튼 전용 스타일 (독립시킴) */
+.nav-btn-locaton-left {
+    position: absolute;
+    bottom: 24px;
+    left: 32px;
+    z-index: 40;
+}
+
+.nav-btn-locaton-right {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    z-index: 40;
+}
+
+.nav-btn {
+    /* [기존 control-item 스타일을 여기로 가져옴] */
+    height: 60px;
+    width: 60px; /* 정사각형 */
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(229, 231, 235, 1);
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+    border-radius: 99px;
+    padding: 10px 10px 10px 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 중앙 정렬 */
+
+    cursor: pointer;
+    user-select: none;
+    backdrop-filter: blur(8px);
+    transition: all .2s ease;
+    outline: none;
+    position: relative;
+}
+
+/* 호버 효과 */
+.nav-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(17, 24, 39, 0.12);
+}
+
+
+/*  ----- 로드맵 배경 ----- */
+/* 1. 배경 그라데이션 (아주 연하게) */
+.bg-pastel-flow {
+    background: linear-gradient(to right,
+    #D1FAE5 0%, /* Earth (Mint) */ #BAE6FD 30%, /* Water (Sky Blue) */ #E9D5FF 60%, /* Air (Lavender) */ #FDE68A 100% /* Fire (Yellow) */
+    );
+}
+
+/* --- 귀여운 애니메이션 모음 --- */
+
+/* 둥실둥실 (구름, 열기구) */
+.animate-float-slow {
+    animation: floatSlow 4s ease-in-out infinite;
+}
+
+.animate-float-slower {
+    animation: floatSlow 6s ease-in-out infinite reverse;
+}
+
+@keyframes floatSlow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* 잔잔한 물결 위 (오리, 튜브) */
+.animate-float-mini {
+    animation: floatMini 3s ease-in-out infinite;
+}
+
+@keyframes floatMini {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-5px) rotate(2deg);
+    }
+}
+
+/* 통통 튀기 (버섯, 캐릭터) */
+.animate-bounce-slow {
+    animation: bounceSlow 3s ease-in-out infinite;
+}
+
+@keyframes bounceSlow {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px) scaleY(0.95);
+    }
+}
+
+/* 씰룩씰룩 (물체) */
+.animate-wiggle {
+    animation: wiggle 3s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(-3deg);
+    }
+    50% {
+        transform: rotate(3deg);
+    }
+}
+
+/* 천천히 회전 (바람개비) */
+.animate-spin-slow {
+    animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 반짝반짝 (해) */
+.animate-pulse-slow {
+    animation: pulseSlow 4s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+/* 불멍 (캠프파이어) */
+.animate-flicker-soft {
+    animation: flicker 2s ease-in-out infinite alternate;
+    transform-origin: bottom center;
+}
+
+@keyframes flicker {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+    100% {
+        transform: scale(1.05);
+        filter: brightness(1.2);
+    }
+}

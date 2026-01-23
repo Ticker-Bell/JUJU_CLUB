@@ -3,9 +3,9 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <!-- 사용자 정보 조회 -->
 <mapper namespace="com.tickerbell.jujuclub.common.mapper.UserInfoMapper">
-  <select id="userInfo" parameterType="int" resultType="com.tickerbell.jujuclub.common.dto.UserInfoDTO">
-    SELECT u.user_seq AS userSeq,
-      u.user_id      AS userId,
+  <select id="userInfo" resultType="com.tickerbell.jujuclub.common.dto.UserInfoDTO">
+    SELECT
+      u.user_seq      AS userSeq,
       u.user_name    AS userName,
       u.user_level   AS userLevel,
       a.cash_balance AS cashBalance

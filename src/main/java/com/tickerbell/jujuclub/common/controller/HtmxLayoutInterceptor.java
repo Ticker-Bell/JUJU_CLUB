@@ -18,29 +18,28 @@ public class HtmxLayoutInterceptor implements HandlerInterceptor {
 
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView mv) throws Exception {
         // 유효성 체크 (뷰가 없거나 리다이렉트인 경우 넘김)
-        if(mv == null || mv.getViewName() == null) return;
+        if (mv == null || mv.getViewName() == null) return;
         String viewName = mv.getViewName();
-        if(viewName.startsWith("redirect:")) return;
+        if (viewName.startsWith("redirect:")) return;
 
         // Htmx 요청 확인 (header 체크)
         boolean isHtmx = request.getHeader("HX-Request") != null;
 
-        // session 확인  TODO: session에서 userSeq 확인로직으로 수정 필요
+        // session 확인
         HttpSession session = request.getSession();
-        if (session.getAttribute("user") == null) {
-            int testSeq = 1111;
-            UserInfoDTO userInfo = userInfoService.getUserInfo(testSeq);
+        Integer userSeq = (Integer) session.getAttribute("userSeq");
+        UserInfoDTO userInfo = userInfoService.getUserInfo(userSeq);
 
-            if(userInfo != null) {
-                System.out.println("=== [Interceptor] userInfo 세션 저장 성공: " + userInfo.getUserSeq());
-                session.setAttribute("user", userInfo);
-            } else {
-                System.out.println("=== [Interceptor] userInfo 조회 실패");
-            }
+        if (userInfo != null) {
+            System.out.println("=== [Interceptor] userInfo 세션 저장 성공: " + userInfo.getUserSeq());
+            session.setAttribute("user", userInfo);
+        } else {
+            System.out.println("=== [Interceptor] userInfo 조회 실패");
         }
 
+
         // Htxm 요청이 아닌 경우
-        if(!isHtmx) {
+        if (!isHtmx) {
             mv.addObject("targetPage", viewName);
             mv.setViewName("common/main");
         }

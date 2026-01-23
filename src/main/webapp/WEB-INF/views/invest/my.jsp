@@ -530,8 +530,9 @@
                                                                              pattern="#,###"/></td>
                                     <td class="text-right"><fmt:formatNumber value="${holding.avgPrice}"
                                                                              pattern="#,###"/></td>
-                                    <td class="text-right currentPriceData"><fmt:formatNumber value="${holding.currentPrice}"
-                                                                             pattern="#,###"/></td>
+                                    <td class="text-right currentPriceData"><fmt:formatNumber
+                                            value="${holding.currentPrice}"
+                                            pattern="#,###"/></td>
                                     <td class="text-right profit ${holding.pnl >= 0 ? 'positive' : 'negative'} pnlData">
                                         <c:if test="${holding.pnl >= 0}">+</c:if>
                                         <fmt:formatNumber value="${holding.pnl}" pattern="#,###"/>
@@ -555,7 +556,8 @@
 
             <div class="chart-container">
                 <canvas id="holdingsChart"></canvas>
-                <div id="emptyChartMessage" class="empty-chart-message" style="${empty holdings ? '' : 'display:none;'}">
+                <div id="emptyChartMessage" class="empty-chart-message"
+                     style="${empty holdings ? '' : 'display:none;'}">
                     <div class="icon">📈</div>
                     <div class="message">보유 종목이 없습니다</div>
                     <div class="sub-message">주식을 매수하면 차트가 표시됩니다</div>
@@ -614,7 +616,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/invest/portfolioDonutChart.js"></script>
 <script>
     //보유 종목 없을 경우 차트 메세지 토글
-    function setChartEmptyState(isEmpty){
+    function setChartEmptyState(isEmpty) {
         const message = document.getElementById("emptyChartMessage");
         const canvas = document.getElementById("holdingsChart");
         if (!message || !canvas) return;
@@ -640,7 +642,7 @@
 
         updateData();
         //페이지 자동 갱신(1분) 60*1000
-        setInterval(updateData, 30*1000);
+        setInterval(updateData, 30 * 1000);
     });
 
     //1분마다 데이터 자동 갱신 AJAX
@@ -649,12 +651,12 @@
     //3)setInterval() 1분마다 updateData() 실행
 
     let flag = false; //중복 호출 방지
-    const userSeq = 2; //userSeq (세션 저장 완료시 변경) <%--${sessionScope.userSeq}--%>
+    const userSeq = 1; //userSeq (세션 저장 완료시 변경) <%--${sessionScope.userSeq}--%>
 
-    async function updateData(){
-        if(flag) return;
+    async function updateData() {
+        if (flag) return;
         flag = true;
-        try{
+        try {
             const url =
                 "${pageContext.request.contextPath}/stock/api/invest/selectedData"
                 + "?userSeq=" + userSeq //userSeq (세션 저장 완료시 변경)
@@ -673,13 +675,13 @@
 
             //사용자 자산
             const assetData = data.userInvestSummeryData;
-            if(assetData){
+            if (assetData) {
                 document.getElementById("totalAsset").textContent = Number(assetData.totalAsset).toLocaleString("ko-KR");
                 document.getElementById("cashBalance").textContent = Number(assetData.cashBalance).toLocaleString("ko-KR");
                 document.getElementById("totalStockValue").textContent = Number(assetData.totalStockValue).toLocaleString("ko-KR");
                 const pct = Number(assetData.totalReturnPct);
                 const pctData = document.getElementById("totalReturnPct");
-                if(pctData && !Number.isNaN(pct)){
+                if (pctData && !Number.isNaN(pct)) {
                     pctData.classList.remove("positive", "negative");
                     pctData.classList.add(pct >= 0 ? "positive" : "negative");
                     pctData.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%";
@@ -690,11 +692,11 @@
             }
             //관심종목
             const watchlist = data.watchlistItemList;
-            if(Array.isArray(watchlist)){
+            if (Array.isArray(watchlist)) {
                 watchlist.forEach(item => {
                     const code = item.stockCode;
                     const row = document.querySelector('.watch-row[data-code="' + code + '"]');
-                    if(!row) return;
+                    if (!row) return;
 
                     //현재가
                     const curData = row.querySelector(".currentPriceValue");
@@ -746,7 +748,7 @@
                     const stockCode = item.stockCode;
                     //JSP에서 각 행에 data-code="005930" 이런 식으로 박혀있음
                     const row = document.querySelector('.holding-row[data-code="' + stockCode + '"]');
-                    if (!row){
+                    if (!row) {
                         console.warn("화면에 없는 보유종목(새로 생긴 듯):", stockCode);
                         return;
                     }

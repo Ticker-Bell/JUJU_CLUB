@@ -43,7 +43,7 @@
         <c:if test="${not empty sessionScope.user}">
             <div class="flex items-center gap-6">
                 <div class="text-right">
-                    <div class="text-[10px] font-extrabold text-gray-500">총 자산</div>
+                    <div class="text-[10px] font-extrabold text-gray-500">보유자산</div>
                     <div class="text-sm font-extrabold num-font text-gray-900">
                         ₩ <fmt:formatNumber value="${sessionScope.user.cashBalance}" type="number" />
                     </div>
@@ -85,7 +85,7 @@
             <div class="w-[1px] h-4 bg-primary/20"></div>
 
             <%-- TODO: 로그아웃 경로로 수정 필요 --%>
-            <button onclick="location.href='/main/rankingMain.do'" class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
+            <button onclick="location.href='${cpath}/auth/logout'" class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
                 <span class="text-xs font-bold">로그아웃</span>
                 <div class="w-8 h-8 rounded-full flex items-center justify-center bg-white group-hover:bg-red-50 transition-colors shadow-sm">
                     <img src="${cpath}/resources/images/navIcons/exit-outline.svg" alt="나가기아이콘" class="w-4 h-4">

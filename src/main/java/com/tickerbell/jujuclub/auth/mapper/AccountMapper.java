@@ -5,7 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface AccountMapper {
-    int checkAccountExist(Long userId);
+    int checkAccountExist(Integer userSeq);
     int insertAccount(AccountDTO account);
-    AccountDTO selectAccountByUserSeq(Long userSeq);
+    AccountDTO selectAccountByUserSeq(Integer userSeq);
 }

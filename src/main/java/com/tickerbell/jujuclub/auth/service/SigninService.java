@@ -26,7 +26,7 @@ public class SigninService {
     }
 
     // [추가] 레벨 업데이트 서비스
-    public void updateUserLevel(Long userSeq, int level) {
+    public void updateUserLevel(Integer userSeq, Integer level) {
         signinMapper.updateUserLevel(userSeq, level);
     }
 }

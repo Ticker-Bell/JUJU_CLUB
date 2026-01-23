@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.roadMap.controller;
 
 import com.tickerbell.jujuclub.auth.dto.MemberDTO;
+import com.tickerbell.jujuclub.common.service.UserInfoService;
 import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -20,16 +20,15 @@ import java.util.Map;
 @RequestMapping("/roadMap")
 public class RoadMapController {
     private final RoadMapService roadMapService;
+    private final UserInfoService userInfoService;
 
     @GetMapping("/main.do")
-    public String getRoadMap(Model model, HttpServletRequest request) {
+    public String getRoadMap(Model model, HttpSession session) {
         // 테스트용
 //        Integer levelSeq = 1;
 //        Integer userSeq = 11;
 //        String chapterId = "LV2_CH001";
-
-        // TODO: 개발 완료 후 세션 연결
-        HttpSession session = request.getSession();
+        
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
 
@@ -39,7 +38,7 @@ public class RoadMapController {
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
 
         // 미션 확인용
-        List<MissionDTO> missionList = roadMapService.missionList();
+        List<MissionDTO> missionList = roadMapService.missionList(userSeq);
         int successCount = (int) missionList.stream()
                 .filter(mission -> mission.getCount() <= (mission.getProgress() == null ? 0 : mission.getProgress()))
                 .count();
@@ -102,6 +101,9 @@ public class RoadMapController {
                 .findFirst()
                 .orElse(allLearningList.get(0));
 
+        // users 테이블 레벨 정보 업데이트
+        userInfoService.userLevelUpdate(userSeq, userLesson.getLessonId());
+
         model.addAttribute("levelList", levelList); // 레벨 전체 조회
         model.addAttribute("userLesson", userLesson); // 현재 유저 레슨 정보
         model.addAttribute("isMissionClear", 4 > successCount); // 미션 클리어 확인
@@ -111,8 +113,11 @@ public class RoadMapController {
     }
 
     @GetMapping("/mission.do")
-    public String getMission(Model model) {
-        List<MissionDTO> missionList = roadMapService.missionList();
+    public String getMission(Model model, HttpSession session) {
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Integer userSeq = loginUser.getUserSeq();
+
+        List<MissionDTO> missionList = roadMapService.missionList(userSeq);
         int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
 
         model.addAttribute("mission", missionList);

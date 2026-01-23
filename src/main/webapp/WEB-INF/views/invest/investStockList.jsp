@@ -87,16 +87,18 @@
         }
 
         .tab-wrapper {
-            margin-top: 16px;
             position: relative;
             border-bottom: 1px solid #E5E7EB;
             flex-shrink: 0;
+            padding-bottom: 0;
         }
 
         .tab-list {
             display: flex;
-            gap: 24px;
+            gap: 30px;
             align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         .tab-btn {
@@ -221,20 +223,25 @@
         .search-wrapper {
             position: relative;
             width: 300px;
+            margin: 20px auto 10px auto;
+            flex-shrink: 0;
         }
 
         /* 자동완성 결과 박스 */
         .search-result {
             position: absolute; /* 바로 아래 배치 */
-            top: 100%;
+            top: 105%;
             left: 0;
             width: 100%;
             background: white;
-            border: 1px solid #ccc;
+            border: 1px solid #e5e7eb;
             z-index: 1000; /* 다른 요소보다 위에 오도록 */
             display: none; /* 평소엔 숨김 */
             max-height: 200px; /* 너무 길면 스크롤 */
             overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         /* 리스트 아이템 스타일 */
@@ -242,10 +249,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 12px 14px;
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.15s;
+            border-bottom: 1px solid #F9FAFB;
         }
 
         .result-item:hover {
@@ -269,18 +277,19 @@
             box-shadow: inset 3px 0 0 0 #5E45EB;
         }
 
+        /* 탭 버튼이 잠겼을 때 적용할 클래스 */
+        .tab-btn.locked{
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
 
     </style>
 </head>
 <body>
 
 <div class="stock-app-container">
-
-    <div class="search-wrapper">
-        <i data-lucide="search" class="search-icon"></i>
-        <input type="text" placeholder="종목명/코드 검색" class="search-input">
-        <div class="search-result"></div>
-    </div>
 
     <div class="tab-wrapper">
         <div class="tab-list">
@@ -291,6 +300,12 @@
             <button class="tab-btn" data-sort="marketCap">시가총액</button>
         </div>
         <div id="left-tab-slider"></div>
+    </div>
+
+    <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" placeholder="종목명/코드 검색" class="search-input">
+        <div class="search-result"></div>
     </div>
 
     <div class="stock-list-container">
@@ -650,6 +665,16 @@
         getSelectedCorpInfo(code);
     })
 
+    // 탭 잠금 상태 변수
+    let isTabLocked = false;
+
+    // 탭 잠금 해제 함수 (공통 사용)
+    function unlockTabs(){
+        setTimeout(function (){
+            isTabLocked = false;
+            $('.tab-btn').removeClass('locked');
+        }, 2000);
+    }
 
     // jQuery Ready Function
     $(document).ready(function () {
@@ -674,8 +699,22 @@
 
         // 3. 탭 클릭 이벤트 바인딩
         $('.tab-btn').on('click', function () {
+
+            // 락이 걸려있으면 (true) 클릭 이벤트를여기서 중단
+            if(isTabLocked){
+                return;
+            }
+
+            // 락 걸기
+            isTabLocked = true;
+
+            $('.tab-btn').addClass('locked');
+
             const $this = $(this);
             const sortType = $this.data('sort'); // data-sort 값 가져오기
+
+            // 이미 활성화된 탭을 눌렀을 때도 락
+            if($this.hasClass('active')) return;
 
             // 슬라이더 다시 보이기 (검색으로 숨겨졌을 수 있으므로)
             $('#left-tab-slider').show();
@@ -728,7 +767,7 @@
             type: 'GET',
             data: {
                 sortType: sortType,
-                page: page
+                page: page  //0,1,2
             }, // 파라미터 전달
             dataType: 'json', // 응답을 JSON으로 기대함
             success: function (data) {
@@ -739,12 +778,17 @@
                         setTimeout(()=>{
                             fetchStockBatch(sortType, page+1);
                         }, 200);
+                    }else{
+                        unlockTabs();
                     }
+                }else{
+                    unlockTabs();
                 }
             },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", error);
                 $('#stockList').html('<div style="padding:20px; text-align:center;">데이터를 불러오지 못했습니다.</div>');
+                unlockTabs();
             }
         });
     }

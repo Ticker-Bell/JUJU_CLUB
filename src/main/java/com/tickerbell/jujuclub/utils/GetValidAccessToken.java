@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class GetValidAccessToken {
-    private RequestNewAccessToken requestNewToken;
+    private final RequestNewAccessToken requestNewToken;
 
     public String getValidToken(HttpServletRequest request) throws Exception {
         ServletContext application;

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+import java.util.Map;
+
 @RequestMapping("/lesson")
 @Controller
 @RequiredArgsConstructor
@@ -120,7 +123,7 @@ public class LessonController {
 
 
     if (isHtmx) {
-      return "/roadMap/roadMapMain";
+      return "redirect:/roadMap/main.do";
     } else {
       // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
       // Redirect를 하거나 에러 페이지를 띄움

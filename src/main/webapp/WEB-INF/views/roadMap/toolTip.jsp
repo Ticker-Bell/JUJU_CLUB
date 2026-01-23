@@ -7,14 +7,21 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div id="tooltip" class="tip">
-    <div class="flex items-start justify-between gap-3">
-        <div>
-            <div id="tip-title" class="text-sm font-extrabold text-gray-900"></div>
-            <div id="tip-desc" class="mt-1 text-[11px] font-semibold text-gray-500 leading-relaxed"></div>
-        </div>
-        <div id="tip-badge"></div>
-    </div>
+    <div class="flex flex-col gap-2 w-full">
+        <div class="flex items-center justify-between w-full">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <div id="tip-chapter" class="text-xs font-extrabold text-gray-400">일일 미션</div>
+            </div>
 
+            <div id="tip-badge" class="shrink-0"></div>
+        </div>
+
+        <div>
+            <div id="tip-title" class="text-sm font-extrabold text-gray-900 break-words"></div>
+            <div id="tip-desc" class="mt-1 text-[11px] font-semibold text-gray-500 leading-relaxed break-words"></div>
+        </div>
+    </div>
     <div id="tip-info" class="mt-3 grid grid-cols-2 gap-2"></div>
 
     <div class="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-2">

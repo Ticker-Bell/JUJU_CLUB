@@ -686,8 +686,19 @@
             updateTabSlider($this);
 
             // AJAX 데이터 요청
-            fetchStockList(sortType);
+            loadStockList(sortType);
         });
+
+        // 처음 페이지 로딩시에는 삼성전자 코드 뿌리기
+        const code = "005930";
+        const name = "삼성전자";
+
+        //investChart 차트데이터 전달
+        getSelectedChart(code, name);
+
+        // 기업정보에 전달
+        getSelectedCorpInfo(code);
+
     });
 
     // 탭 슬라이더 UI 업데이트 함수
@@ -701,18 +712,35 @@
         }
     }
 
+    // 페이지 로드 시 또는 탭 클릭 시 호출
+    function loadStockList(sortType){
+        $('#stockList').empty(); //초기화
+        fetchStockBatch(sortType, 0); //0페이지부터 시작
+    }
+
     // AJAX 데이터 요청 함수 (jQuery $.ajax 사용)
-    function fetchStockList(sortType) {
+    function fetchStockBatch(sortType, page){
         // URL 생성
         const url = contextPath + '/invest/main/stock/list';
 
         $.ajax({
             url: url,
             type: 'GET',
-            data: {sortType: sortType}, // 파라미터 전달
+            data: {
+                sortType: sortType,
+                page: page
+            }, // 파라미터 전달
             dataType: 'json', // 응답을 JSON으로 기대함
             success: function (data) {
-                renderStockList(data, sortType);
+                if(data && data.length > 0){
+                    renderStockList(data,sortType, page);
+
+                    if( data.length === 10 && page < 2){
+                        setTimeout(()=>{
+                            fetchStockBatch(sortType, page+1);
+                        }, 200);
+                    }
+                }
             },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", error);
@@ -722,7 +750,7 @@
     }
 
     // 리스트 렌더링 함수
-    function renderStockList(data, sortType) {
+    function renderStockList(data, sortType, page) {
         const $container = $('#stockList');
 
         if (!data || data.length === 0) {
@@ -769,16 +797,17 @@
         });
 
         // DOM 업데이트
-        $container.html(html);
+        $container.append(html);
 
-        // 기존 subscribe 모두 unsubscribe
-        const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
-        StockSocket.unsubscribe(currentSubscribedCodes);
+        if(page === 0){
+            // 기존 subscribe 모두 unsubscribe
+            const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
+            StockSocket.unsubscribe(currentSubscribedCodes);
+        }
 
         // 화면에 뿌린 종목들의 코드 긁어오기
         // map을 사용해 data 배열에서 stockCode만 뽑아서 새 배열로 만들기
         const codes = data.map(item => item.stockCode);
-        console.log("구독해야 할 종목들: ", codes);
         StockSocket.connect(
             contextPath,      // 서버 주소
             codes,       // 구독할 종목 코드들

@@ -3,6 +3,7 @@ package com.tickerbell.jujuclub.lesson.controller;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
+import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO.QstChatMsgRequest;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
 import java.util.List;
 import java.util.Map;
@@ -14,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.List;
-import java.util.Map;
 
 @RequestMapping("/lesson")
 @Controller
@@ -31,13 +29,9 @@ public class LessonController {
       @RequestParam String lessonId,
       HttpSession session,
       Model model) throws Exception {
-// 세션 연결예쩡
-    int userSeq = (int) session.getAttribute("userSeq");
 
-//    if (userSeq == null) {
-//      // 로그인 안된 상태면 처리
-//      return "redirect:/login";
-//    }
+    int userSeq = (int) session.getAttribute("userSeq");
+    String questionId = lessonId + "_Q001";
 
     // 레슨 시작 정보 등록
     if(! lessonId.equals("LV1_CH001_LSN006")){
@@ -45,26 +39,24 @@ public class LessonController {
       lessonService.insertLssnInfo(userSeq,lessonId);
     }
 
-    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+    QstChatMsgDTO.QstChatMsgRequest qstChatMsgRequest = new QstChatMsgRequest();
+    qstChatMsgRequest.setLessonId(lessonId);
+    qstChatMsgRequest.setQuestionId(questionId);
+
+    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(qstChatMsgRequest);
 
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
 
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
+    model.addAttribute("lessonId",lessonId);
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
     model.addAttribute("userSeq",userSeq);
 
-    if (isHtmx) {
-      return "lesson/lessonInfo";
-    } else {
-      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
-      // Redirect를 하거나 에러 페이지를 띄움
-      return "redirect:/main";
-    }
-
+    return "lesson/lessonInfo";
   }
 
   @PostMapping("/qst")
@@ -77,23 +69,15 @@ public class LessonController {
 
     int userSeq = (int) session.getAttribute("userSeq");
 
-    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
-
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
     model.addAttribute("lessonId",lessonId);
     model.addAttribute("userSeq",userSeq);
-    model.addAttribute("chat", chatMap);
-    model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
 
-    if (!isHtmx) {
-      // 주소창 직접 접근 방지
-      return "redirect:/main";
-    }
 
     switch (questionId) {
       case "LV1_CH001_LS001_Q002":
@@ -121,15 +105,7 @@ public class LessonController {
 
     lessonService.updateLssnInfo(userSeq,lessonId);
 
-
-    if (isHtmx) {
-      return "redirect:/roadMap/main.do";
-    } else {
-      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
-      // Redirect를 하거나 에러 페이지를 띄움
-      return "redirect:/main";
-    }
-
+    return "redirect:/roadMap/main.do";
   }
 
   @PostMapping("/chapter-test")
@@ -156,14 +132,8 @@ public class LessonController {
     //챕터 update시 필요한 chapterId값, html body dom에 저장해둠
     model.addAttribute("chapterId",chapterId);
 
-    if (isHtmx) {
-      return "lesson/chapterTest";
-    } else {
-      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
-      // Redirect를 하거나 에러 페이지를 띄움
-      return "redirect:/main";
-    }
 
+    return "lesson/chapterTest";
   }
 
   @PostMapping("/update-chapter")

@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
@@ -22,14 +21,12 @@ public class RoadMapController {
     private final RoadMapService roadMapService;
 
     @GetMapping("/main.do")
-    public String getRoadMap(Model model, HttpServletRequest request) {
+    public String getRoadMap(Model model, HttpSession session) {
         // 테스트용
 //        Integer levelSeq = 1;
 //        Integer userSeq = 11;
 //        String chapterId = "LV2_CH001";
-
-        // TODO: 개발 완료 후 세션 연결
-        HttpSession session = request.getSession();
+        
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
 
@@ -39,7 +36,7 @@ public class RoadMapController {
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
 
         // 미션 확인용
-        List<MissionDTO> missionList = roadMapService.missionList();
+        List<MissionDTO> missionList = roadMapService.missionList(userSeq);
         int successCount = (int) missionList.stream()
                 .filter(mission -> mission.getCount() <= (mission.getProgress() == null ? 0 : mission.getProgress()))
                 .count();
@@ -111,8 +108,11 @@ public class RoadMapController {
     }
 
     @GetMapping("/mission.do")
-    public String getMission(Model model) {
-        List<MissionDTO> missionList = roadMapService.missionList();
+    public String getMission(Model model, HttpSession session) {
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Integer userSeq = loginUser.getUserSeq();
+
+        List<MissionDTO> missionList = roadMapService.missionList(userSeq);
         int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
 
         model.addAttribute("mission", missionList);

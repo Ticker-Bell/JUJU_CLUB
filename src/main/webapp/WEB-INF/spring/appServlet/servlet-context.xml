@@ -57,6 +57,26 @@
 			<!-- <exclude-mapping path="/login/**"/>-->
 			<beans:bean class="com.tickerbell.jujuclub.common.controller.HtmxLayoutInterceptor"/>
 		</interceptor>
+
+		<interceptor>
+			<mapping path="/**"/>
+
+			<exclude-mapping path="/"/>
+			<exclude-mapping path="/resources/**"/>
+			<exclude-mapping path="/css/**"/>
+			<exclude-mapping path="/js/**"/>
+			<exclude-mapping path="/img/**"/>
+			<exclude-mapping path="/favicon.ico"/>
+			<exclude-mapping path="/auth/**"/>
+
+			<beans:bean class="com.tickerbell.jujuclub.common.controller.LoginCheckInterceptor"/>
+		</interceptor>
+
+		<interceptor>
+			<mapping path="/"/>
+
+			<beans:bean class="com.tickerbell.jujuclub.common.controller.LogoutCheckInterceptor"/>
+		</interceptor>
 	</interceptors>
 	
 </beans:beans>

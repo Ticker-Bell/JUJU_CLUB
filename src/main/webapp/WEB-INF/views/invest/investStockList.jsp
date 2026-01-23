@@ -269,6 +269,13 @@
             box-shadow: inset 3px 0 0 0 #5E45EB;
         }
 
+        /* 탭 버튼이 잠겼을 때 적용할 클래스 */
+        .tab-btn.locked{
+            cursor: not-allowed;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
 
     </style>
 </head>
@@ -650,6 +657,16 @@
         getSelectedCorpInfo(code);
     })
 
+    // 탭 잠금 상태 변수
+    let isTabLocked = false;
+
+    // 탭 잠금 해제 함수 (공통 사용)
+    function unlockTabs(){
+        setTimeout(function (){
+            isTabLocked = false;
+            $('.tab-btn').removeClass('locked');
+        }, 2000);
+    }
 
     // jQuery Ready Function
     $(document).ready(function () {
@@ -674,8 +691,22 @@
 
         // 3. 탭 클릭 이벤트 바인딩
         $('.tab-btn').on('click', function () {
+
+            // 락이 걸려있으면 (true) 클릭 이벤트를여기서 중단
+            if(isTabLocked){
+                return;
+            }
+
+            // 락 걸기
+            isTabLocked = true;
+
+            $('.tab-btn').addClass('locked');
+
             const $this = $(this);
             const sortType = $this.data('sort'); // data-sort 값 가져오기
+
+            // 이미 활성화된 탭을 눌렀을 때도 락
+            if($this.hasClass('active')) return;
 
             // 슬라이더 다시 보이기 (검색으로 숨겨졌을 수 있으므로)
             $('#left-tab-slider').show();
@@ -728,7 +759,7 @@
             type: 'GET',
             data: {
                 sortType: sortType,
-                page: page
+                page: page  //0,1,2
             }, // 파라미터 전달
             dataType: 'json', // 응답을 JSON으로 기대함
             success: function (data) {
@@ -739,12 +770,17 @@
                         setTimeout(()=>{
                             fetchStockBatch(sortType, page+1);
                         }, 200);
+                    }else{
+                        unlockTabs();
                     }
+                }else{
+                    unlockTabs();
                 }
             },
             error: function (xhr, status, error) {
                 console.error("AJAX Error:", error);
                 $('#stockList').html('<div style="padding:20px; text-align:center;">데이터를 불러오지 못했습니다.</div>');
+                unlockTabs();
             }
         });
     }

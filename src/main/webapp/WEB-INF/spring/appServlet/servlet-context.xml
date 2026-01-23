@@ -23,7 +23,7 @@
 	
 	<context:component-scan base-package="com.tickerbell.jujuclub" />
 	<!-- properties 파일 읽기용도 추가  -->
-<!--	<context:property-placeholder location="classpath:kis.properties"/>-->
+	<context:property-placeholder location="classpath:kis.properties"/>
 
     <!-- 한투API를 사용하기 위한 restTemplate -->
     <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate">

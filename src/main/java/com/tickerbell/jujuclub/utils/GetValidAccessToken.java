@@ -27,7 +27,7 @@ public class GetValidAccessToken {
             application.setAttribute("API_TOKEN", token);
             application.setAttribute(
                     "API_TOKEN_EXPIRE_AT",
-                    LocalDateTime.now().plusHours(24)
+                    LocalDateTime.now().plusHours(6)
             );
         }
 

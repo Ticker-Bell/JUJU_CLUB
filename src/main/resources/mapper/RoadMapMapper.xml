@@ -68,19 +68,19 @@
         SELECT
             (SELECT COUNT(*)
              FROM user_question_result
-             WHERE DATE_FORMAT(finished_at, '%Y-%m-%d') = CURDATE()) AS lesson,
+             WHERE user_seq = #{user_seq} and DATE_FORMAT(finished_at, '%Y-%m-%d') = CURDATE()) AS lesson,
 
             (SELECT COUNT(*)
              FROM user_test_result
-             WHERE DATE_FORMAT(tested_at, '%Y-%m-%d') = CURDATE())   AS chapterTest,
+             WHERE user_seq = #{user_seq} and DATE_FORMAT(tested_at, '%Y-%m-%d') = CURDATE())   AS chapterTest,
 
             (SELECT COUNT(*)
              FROM mock_trade
-             WHERE DATE_FORMAT(traded_at, '%Y-%m-%d') = CURDATE())   AS buyStocks,
+             WHERE user_seq = #{user_seq} and DATE_FORMAT(traded_at, '%Y-%m-%d') = CURDATE())   AS buyStocks,
 
             (SELECT COUNT(*)
              FROM user_watchlist
-             WHERE DATE_FORMAT(created_at, '%Y-%m-%d') = CURDATE())  AS watchList
+             WHERE user_seq = #{user_seq} and DATE_FORMAT(created_at, '%Y-%m-%d') = CURDATE())  AS watchList
         FROM DUAL
     </select>
 

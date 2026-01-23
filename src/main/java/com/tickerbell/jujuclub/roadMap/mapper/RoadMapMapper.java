@@ -24,7 +24,7 @@ public interface RoadMapMapper {
     List<MissionDTO> missionList();
 
     // mission 진행 횟수 조회
-    MissionCheckDTO missionCheck();
+    MissionCheckDTO missionCheck(@Param("user_seq") Integer userSeq);
 
     // chapter test 전부 조회
     List<ChapterResultDTO> chapterTestResult(@Param("user_seq") Integer userSeq);

@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
@@ -31,8 +33,8 @@ public class StockChartController {
 
     @GetMapping("api/invest/chartData")
     @ResponseBody
-    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode, @RequestParam(value = "stockCode") String stockCode) {
-        return stockChartRestService.getStockRestData(periodCode, stockCode);
+    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode, @RequestParam(value = "stockCode") String stockCode, HttpServletRequest request) throws Exception {
+        return stockChartRestService.getStockRestData(periodCode, stockCode, request);
     }
 
     @GetMapping("/invest/chart/marketType")

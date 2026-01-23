@@ -34,9 +34,9 @@ public class RoadMapService {
     }
 
     // 미션 모두 조회
-    public List<MissionDTO> missionList() {
+    public List<MissionDTO> missionList(Integer userSeq) {
         List<MissionDTO> list = roadMapMapper.missionList();
-        MissionCheckDTO check = roadMapMapper.missionCheck();
+        MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
 
         for(MissionDTO mission: list) {
             switch (mission.getType()) {

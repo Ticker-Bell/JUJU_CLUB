@@ -4,7 +4,7 @@
     <title>매도매수</title>
 </head>
 <body>
-<div class="w-full h-full p-2 bg-[#FBFBFB] rounded-[20px] outline outline-2 outline-[#E6E7EB]">
+<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[20px] outline outline-2 outline-[#E6E7EB]">
     <div id="tab-header" class="w-1/2 flex my-4 border-b border-[#E6E7EB] ">
         <button onclick="switchTab(this, 'sell')"
                 class="tab-item active flex-1 py-2 px-1 border-b-[3px] border-[#5E45EB] border-xs text-[#2D14B8] font-medium text-base transition-all hover:text-[#3819E6]">
@@ -16,7 +16,7 @@
         </button>
     </div>
 
-    <div id="tab-content" class="m-8 px-16">
+    <div id="tab-content" class="p-4">
         <div id="buy-form" class="flex flex-col gap-6">
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">가격</label>
@@ -47,7 +47,7 @@
             </div>
             <p id="buyErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
             <button id="buyButton" onclick="trade()"
-                    class="mt-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
+                    class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매수하기
             </button>
         </div>
@@ -90,7 +90,7 @@
             <p id="sellErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
 
             <button id="sellButton" onclick="trade()"
-                    class="mt-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
+                    class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매도하기
             </button>
 

@@ -87,16 +87,18 @@
         }
 
         .tab-wrapper {
-            margin-top: 16px;
             position: relative;
             border-bottom: 1px solid #E5E7EB;
             flex-shrink: 0;
+            padding-bottom: 0;
         }
 
         .tab-list {
             display: flex;
-            gap: 24px;
+            gap: 30px;
             align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         .tab-btn {
@@ -221,20 +223,25 @@
         .search-wrapper {
             position: relative;
             width: 300px;
+            margin: 20px auto 10px auto;
+            flex-shrink: 0;
         }
 
         /* 자동완성 결과 박스 */
         .search-result {
             position: absolute; /* 바로 아래 배치 */
-            top: 100%;
+            top: 105%;
             left: 0;
             width: 100%;
             background: white;
-            border: 1px solid #ccc;
+            border: 1px solid #e5e7eb;
             z-index: 1000; /* 다른 요소보다 위에 오도록 */
             display: none; /* 평소엔 숨김 */
             max-height: 200px; /* 너무 길면 스크롤 */
             overflow-y: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         /* 리스트 아이템 스타일 */
@@ -242,10 +249,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 12px;
+            padding: 12px 14px;
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.15s;
+            border-bottom: 1px solid #F9FAFB;
         }
 
         .result-item:hover {
@@ -283,12 +291,6 @@
 
 <div class="stock-app-container">
 
-    <div class="search-wrapper">
-        <i data-lucide="search" class="search-icon"></i>
-        <input type="text" placeholder="종목명/코드 검색" class="search-input">
-        <div class="search-result"></div>
-    </div>
-
     <div class="tab-wrapper">
         <div class="tab-list">
             <button class="tab-btn active" data-sort="interest">관심종목</button>
@@ -298,6 +300,12 @@
             <button class="tab-btn" data-sort="marketCap">시가총액</button>
         </div>
         <div id="left-tab-slider"></div>
+    </div>
+
+    <div class="search-wrapper">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" placeholder="종목명/코드 검색" class="search-input">
+        <div class="search-result"></div>
     </div>
 
     <div class="stock-list-container">

@@ -4,26 +4,25 @@
 <html>
 <head>
     <%--얘 없으면 기능 활성화가 안돼요--%>
+        <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <%--개념형 문제 css--%>
+    <%--레슨 공통 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
-    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
     <%--문항 버튼, 모달 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
+    <%--개념형 문제 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonchat.css">
     <%--드래형 문제 css --%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonDrag.css">
     <%--연결형 문제 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonMatch.css">
     <%--랭킹 메인 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/ranking/rankingMain.css">
-
-    <%--선택형 문제 css--%>
-    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lessonSelect.css">
-        <title>JUJU CLUB</title>
+    <%--챕터 테스트 css--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/chapterTest.css">
 </head>
 
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
@@ -37,7 +36,6 @@
     <!-- Main -->
     <main id="main" class="flex-1 overflow-y-auto p-8 flex flex-col bg-gray-50">
         <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
-
     </main>
 </div>
 

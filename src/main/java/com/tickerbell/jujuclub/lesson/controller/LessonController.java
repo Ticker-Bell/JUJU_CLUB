@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.lesson.controller;
 
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
 import java.util.List;
@@ -34,7 +35,10 @@ public class LessonController {
 //    }
 
     // 레슨 시작 정보 등록
-    lessonService.insertLssnInfo(userSeq,lessonId);
+    if(! lessonId.equals("LV1_CH001_LSN006")){
+
+      lessonService.insertLssnInfo(userSeq,lessonId);
+    }
 
     Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
 
@@ -49,7 +53,7 @@ public class LessonController {
     model.addAttribute("userSeq",userSeq);
 
     if (isHtmx) {
-      return "/lesson/lessonInfo";
+      return "lesson/lessonInfo";
     } else {
       // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
       // Redirect를 하거나 에러 페이지를 띄움
@@ -69,6 +73,8 @@ public class LessonController {
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
 
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
+
+
 
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
@@ -114,5 +120,63 @@ public class LessonController {
       return "redirect:/main";
     }
 
+  }
+
+  @PostMapping("/chapter-test")
+  public String getChapterTest(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String chapterId,
+      @RequestParam String lessonId,
+
+      Model model) throws Exception {
+    // 세션 연결예쩡
+    Integer userSeq = 1;
+
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+    lessonRequest.setChapterId(chapterId);
+    lessonRequest.setLessonId(lessonId);
+
+    lessonService.insertChapterRslt(userSeq,chapterId);
+
+    List<LessonDTO.LessonQst> chapterQst = lessonService.getChapterTest(lessonRequest);
+
+
+    model.addAttribute("qst", chapterQst);
+    model.addAttribute("userSeq",userSeq);
+    //챕터 update시 필요한 chapterId값, html body dom에 저장해둠
+    model.addAttribute("chapterId",chapterId);
+
+    if (isHtmx) {
+      return "lesson/chapterTest";
+    } else {
+      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
+      // Redirect를 하거나 에러 페이지를 띄움
+      return "redirect:/main";
+    }
+
+  }
+
+  @PostMapping("/update-chapter")
+  public String updateChapterRslt(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String chapterId,
+      int score,
+      String isPass,
+      Model model) throws Exception {
+    // 세션 연결예쩡
+    Integer userSeq = 1;
+
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+
+    lessonRequest.setUserSeq(userSeq);
+    lessonRequest.setChapterId(chapterId);
+    lessonRequest.setScore(score);
+    lessonRequest.setIsPass(isPass);
+
+    lessonService.updateChapterInfo(lessonRequest);
+
+    model.addAttribute("userSeq",userSeq);
+
+    return "업데이트 완료";
   }
 }

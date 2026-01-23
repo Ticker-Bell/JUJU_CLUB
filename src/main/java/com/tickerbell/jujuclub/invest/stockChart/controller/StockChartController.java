@@ -33,7 +33,7 @@ public class StockChartController {
 
     @GetMapping("api/invest/chartData")
     @ResponseBody
-    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode, @RequestParam(value = "stockCode") String stockCode, @RequestParam(value = "request")HttpServletRequest request) throws Exception {
+    public List<StockChartRestDTO> getRestChartData(@RequestParam(value = "periodCode", defaultValue = "D") String periodCode, @RequestParam(value = "stockCode") String stockCode, HttpServletRequest request) throws Exception {
         return stockChartRestService.getStockRestData(periodCode, stockCode, request);
     }
 

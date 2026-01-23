@@ -40,7 +40,7 @@
                 <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">기업이름</h2>
                 <span id="header-stock"
                       class="px-2 rounded-md bg-[#D9D9D9] text-gray-500 text-sm font-medium">000000</span>
-                <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[F4F4F4] text-sm font-medium">KOSPI</span>
+                <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[#F4F4F4] text-sm font-medium">KOSPI</span>
                 <img id="header-stockLike" data-liked="false"
                      class="w-5 h-5 cursor-pointer" src="${cpath}/resources/images/stockIcons/heart.svg" alt="하트아이콘">
             </div>
@@ -92,14 +92,13 @@
     };
 
     window.onload = function () {
-        getSelectedChart();
         updateButtonUI('D');
     };
 
     function toggleLike(likeEl) {
         const isLiked = likeEl.dataset.liked === "true";
 
-        const url = `${cpath}/stock/watchlist`;
+        const url = `${pageContext.request.contextPath}/stock/watchlist`;
         const method = isLiked ? "DELETE" : "POST";
 
         fetch(url, {
@@ -118,8 +117,8 @@
             .then(() => {
                 likeEl.dataset.liked = (!isLiked).toString();
                 likeEl.src = isLiked
-                    ? `${cpath}/resources/images/stockIcons/heart.svg`
-                    : `${cpath}/resources/images/stockIcons/filled-heart.svg`;
+                    ? `${pageContext.request.contextPath}/resources/images/stockIcons/heart.svg`
+                    : `${pageContext.request.contextPath}/resources/images/stockIcons/filled-heart.svg`;
 
                 console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
             })
@@ -145,7 +144,7 @@
         loadChartData('D', selectedStockState.stockCode);
 
         //시장 타입 가져오기
-        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=${stockCode}`)
+        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=`+stockCode)
             .then(res => res.text())
             .then(marketType => {
                 document.getElementById('header-marketType').innerText = marketType;
@@ -156,10 +155,8 @@
     function loadChartData(periodCode, stockCode) {
         currentPeriod = periodCode;
         updateButtonUI(periodCode);
-
         //rest api 연결
-        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=${periodCode}&stockCode=${stockCode}`;
-
+        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=`+periodCode+"&stockCode="+stockCode;
         fetch(url)
             .then(response => response.json())
             .then(data => {
@@ -209,6 +206,10 @@
 
     function initSocket(targetChart, stockCodes) {
         //웹소켓 연결
+        if (!Array.isArray(stockCodes)) {
+            stockCodes = [stockCodes];
+        }
+
         StockSocket.connect(
             "${pageContext.request.contextPath}",
             stockCodes,

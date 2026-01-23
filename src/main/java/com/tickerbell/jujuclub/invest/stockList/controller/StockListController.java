@@ -65,9 +65,9 @@ public class StockListController {
 
     @GetMapping("/main/stock/list")
     @ResponseBody
-    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, HttpSession session, HttpServletRequest request) throws Exception {
+    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, @RequestParam(value = "page", defaultValue = "0") int page, HttpSession session, HttpServletRequest request) throws Exception {
 
-        List<RankingDTO> rankingDTOList = new ArrayList<>();
+        List<RankingDTO> rankingDTOList = new ArrayList<>(); // 전체 리스트
 
         String accessToken = getValidAccessToken.getValidToken(request);
 
@@ -79,40 +79,59 @@ public class StockListController {
                 // List<RankingDTO>를 반환해야하기에 stockDTO에 있는 Name과 Code를 넣어서 RankingDTO로 전환한다.
                 // Name과 Code는 양쪽에 존재하기 때문에 상관없지만, rank는 없기 때문에 null로 넣는다.
                 for (StockDTO stockDTO : stockDTOList) {
-                    KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
-                    // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
-                    if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
-                        kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
-                    }
                     RankingDTO rankingDTO = RankingDTO.builder()
                             .stockName(stockDTO.getStockName())
                             .stockCode(stockDTO.getStockCode())
-                            .currentPrice(kisDataDTO.getCurrentPrice())
-                            .changePct(kisDataDTO.getChangePct())
                             .build();
                     rankingDTOList.add(rankingDTO);
                 }
-                return rankingDTOList;
+                break;
 
             case "volume":  //거래량순
                 rankingDTOList = rankingApiService.getTradingVolumeRanking(accessToken);
-                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
-                return rankingDTOList;
+                break;
             case "rising":  //상승률순 (전날 종가 대비)
                 rankingDTOList = rankingApiService.getTopGainersRanking(accessToken);
-                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
-                return rankingDTOList;
+                break;
             case "falling":  //하락률순 (전날 종가 대비)
                 rankingDTOList = rankingApiService.getTopLosersRanking(accessToken);
-                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
-                return rankingDTOList;
+                break;
             case "marketCap":  //시가총액순
                 rankingDTOList = rankingApiService.getMarketCapRanking(accessToken);
-                rankingDTOList = rankingApiService.addKisDataDtoToRankingDto(rankingDTOList);
-                return rankingDTOList;
-            default: return new ArrayList<>();
+                break;
         }
+
+        // [Slicing] 요청된 페이지에 맞게 리스트를 10개만 자른다.
+        int pageSize = 10;
+        int startIdx = page * pageSize;
+        int endIdx = Math.min(startIdx + pageSize, rankingDTOList.size());
+
+        // 범위를 벗어나면 빈 리스트 반환
+        if (startIdx >= rankingDTOList.size()) {
+            return new ArrayList<>();
+        }
+
+        // 30개 중 10개만 추출
+        List<RankingDTO> slicedList = rankingDTOList.subList(startIdx, endIdx);
+
+        // 추출한 10개에 대해서만 외부 API 호출
+        if("interest".equals(sortType)) {
+            for(RankingDTO rankingDTO : slicedList) {
+                KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
+                // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+                if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                    kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+                }
+                rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
+                rankingDTO.setChangePct(kisDataDTO.getChangePct());
+            }
+        }else{
+            slicedList = rankingApiService.addKisDataDtoToRankingDto(slicedList);
+        }
+
+        return slicedList;
     }
+
 
     @PostMapping("/search/autocomplete")
     @ResponseBody

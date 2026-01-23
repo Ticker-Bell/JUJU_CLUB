@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.invest.stockChart.service;
 
 import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import com.tickerbell.jujuclub.utils.RequestNewAccessToken;
 import com.tickerbell.jujuclub.utils.StockChartParser;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -25,15 +27,15 @@ public class StockChartRestService {
     @Value("${kis.baseurl}")
     private String BASEURL;
 
-    private final RequestNewAccessToken requestNewAccessToken;
+    private final GetValidAccessToken getValidAccessToken;
 
     private String ACCESSTOKEN;
     private final StockChartParser stockChartParser;
 
 
-    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode) throws Exception {
+    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode, HttpServletRequest request) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        ACCESSTOKEN = requestNewAccessToken.getAccessToken();
+        ACCESSTOKEN = getValidAccessToken.getValidToken(request);
         String url = BASEURL + "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
         HttpHeaders headers = new HttpHeaders();
         headers.set("content_type", "application/json;charset=utf-8");

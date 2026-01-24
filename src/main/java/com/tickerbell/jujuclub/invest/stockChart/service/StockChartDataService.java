@@ -15,13 +15,14 @@ public class StockChartDataService {
         return stockChartDataMapper.selectMarketType(stockCode);
     }
 
-    @Transactional
     public void insertWatchList(WatchListDTO watchListDTO) {
         stockChartDataMapper.insertWatchList(watchListDTO);
     }
 
-    @Transactional
     public void deleteWatchList(WatchListDTO watchListDTO) {
         stockChartDataMapper.deleteWatchList(watchListDTO);
     }
+
+    public boolean selectWatchlist(WatchListDTO watchListDTO) { return stockChartDataMapper.selectWatchListByUserStock( watchListDTO);}
+
 }

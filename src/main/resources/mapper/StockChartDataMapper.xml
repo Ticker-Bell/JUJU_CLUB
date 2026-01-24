@@ -22,6 +22,7 @@
                )
     </insert>
 
+<!-- 관심 종목 삭제   -->
     <delete id="deleteWatchList" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
         DELETE FROM user_watchlist
         WHERE user_seq = #{userSeq}
@@ -31,4 +32,11 @@
             WHERE stock_code = #{stockCode}
         )
     </delete>
+
+    <!--관심 종목 찾기 user_seq, stock_seqs-->
+    <select id="selectWatchListByUserStock" resultType="boolean" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+        SELECT count(*)>0
+        FROM user_watchlist join stock_master on user_watchlist.stock_seq = stock_master.stock_seq
+        WHERE user_seq = #{userSeq} AND stock_code=#{stockCode}
+    </select>
 </mapper>

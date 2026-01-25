@@ -504,7 +504,7 @@
         <!-- 보유 종목 리스트 -->
         <div class="card holdings-card">
             <h3 class="card-title">보유 종목 리스트</h3>
-            마지막 갱신: <span id="test">-</span>
+            마지막 갱신 시간 <span id="test_time">-</span>
             <c:choose>
                 <c:when test="${not empty holdings}">
                     <div class="holdings-scroll">
@@ -651,7 +651,7 @@
     //3)setInterval() 1분마다 updateData() 실행
 
     let flag = false; //중복 호출 방지
-    const userSeq = 1; //userSeq (세션 저장 완료시 변경) <%--${sessionScope.userSeq}--%>
+    const userSeq = ${sessionScope.userSeq};
 
     async function updateData() {
         if (flag) return;
@@ -675,20 +675,27 @@
 
             //사용자 자산
             const assetData = data.userInvestSummeryData;
+            const pctData = document.getElementById("totalReturnPct");
+
             if (assetData) {
                 document.getElementById("totalAsset").textContent = Number(assetData.totalAsset).toLocaleString("ko-KR");
                 document.getElementById("cashBalance").textContent = Number(assetData.cashBalance).toLocaleString("ko-KR");
                 document.getElementById("totalStockValue").textContent = Number(assetData.totalStockValue).toLocaleString("ko-KR");
-                const pct = Number(assetData.totalReturnPct);
-                const pctData = document.getElementById("totalReturnPct");
-                if (pctData && !Number.isNaN(pct)) {
+
+                if(pctData){
+                    //null 또는 undefined일 경우 0으로 처리
+                    const pct = parseFloat(assetData.totalReturnPct) || 0;
                     pctData.classList.remove("positive", "negative");
-                    pctData.classList.add(pct >= 0 ? "positive" : "negative");
-                    pctData.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(1) + "%";
+                    if(pct > 0){
+                        pctData.classList.add("positive");
+                    } else if (pct < 0){
+                        pctData.classList.add("negative");
+                    }
+                    pctData.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
                 }
 
                 //test
-                document.getElementById("test").textContent = new Date().toLocaleTimeString();
+                document.getElementById("test_time").textContent = new Date().toLocaleTimeString();
             }
             //관심종목
             const watchlist = data.watchlistItemList;
@@ -706,11 +713,17 @@
 
                     //등락률
                     const pctData = row.querySelector(".pctValue");
-                    if (pctData != null && item.changePct != null) {
-                        const cp = Number(item.changePct);
+                    if (pctData) {
+                        const cp = parseFloat(item.changePct) || 0;
                         pctData.classList.remove("positive", "negative");
-                        pctData.classList.add(cp >= 0 ? "positive" : "negative");
-                        pctData.textContent = (cp >= 0 ? "+" : "") + cp.toFixed(1) + "%";
+
+                        if (cp > 0) {
+                            pctData.classList.add("positive");
+                        } else if (cp < 0){
+                            pctData.classList.add("negative");
+                        }
+                        //보합(0)일 때도 값이 나오도록 보장
+                        pctData.textContent = (cp > 0 ? "+" : "") + cp.toFixed(2) + "%";
                     }
                 });
             }

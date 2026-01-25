@@ -28,7 +28,6 @@ public class RequestNewAccessToken {
 
         //토근이 발급됐다면 다시 사용
         if (accessToken != null && System.currentTimeMillis() < tokenExpireTime - 60000) {
-            System.out.println("발급기 토큰: " + accessToken);
             return accessToken;
         }
 

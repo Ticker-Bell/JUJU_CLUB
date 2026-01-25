@@ -35,14 +35,8 @@ public class StockMyController {
         //세션에서 유저 시퀀스 가져오기
         Integer userSeq = (Integer)session.getAttribute("userSeq");
 
-//        if (userSeq == null) {
-//            return "redirect:/auth/login";
-//        }
-
-        //테스트 유저
         if (userSeq == null) {
-            userSeq = 1;
-            session.setAttribute("userSeq", userSeq);
+            return "redirect:/auth/login";
         }
 
         //관심종목

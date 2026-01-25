@@ -43,11 +43,11 @@ public class MyPageController {
         Integer userSeq = (Integer) session.getAttribute("userSeq");
 
         if (userSeq == null) {
-            userSeq = 1; // 테스트용 계정
+            //userSeq = 2; // 테스트용 계정
             session.setAttribute("userSeq", userSeq);
             if (loginUser == null) {
                 loginUser = new MemberDTO();
-                loginUser.setUserName("테스트유저(1번)");
+                loginUser.setUserName("테스트유저(2번)");
                 loginUser.setUserId("testUser1");
                 session.setAttribute("loginUser", loginUser);
             }

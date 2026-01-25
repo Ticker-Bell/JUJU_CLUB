@@ -23,9 +23,7 @@ public class StockCorpInfoController {
         System.out.println("들어온 stockCode:"+stockCode);
 
         StockCorpInfoDTO stockCorpInfoDTO = stockCorpInfoService.getConvertStockCorpInfoData(stockCode);
-        double dividendPerShareData = dartApiService.getDividendPerShare(stockCode);
         model.addAttribute("stockCorpInfo", stockCorpInfoDTO);
-        model.addAttribute("dividendPerShareData", dividendPerShareData);
 
         return "invest/stockCorpInfoCard"; //jsp 페이지 리턴
     }

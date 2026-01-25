@@ -2,15 +2,19 @@ package com.tickerbell.jujuclub.invest.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tickerbell.jujuclub.invest.dto.DARTCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import com.tickerbell.jujuclub.invest.mapper.CodeMappingMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.time.LocalDateTime;
 
@@ -19,18 +23,27 @@ import java.time.LocalDateTime;
 public class DARTApiService {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
+
     private final CodeMappingMapper mapping;
 
     private final KISApiService kisApiService;
 
+    private final RestTemplate restTemplate;
+
+    //(배당)
     //https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS002&apiId=2019005
     //GET : https://opendart.fss.or.kr/api/alotMatter.json
 
+    //(재무제표)
+    //https://opendart.fss.or.kr/guide/detail.do?apiGrpCd=DS003&apiId=2019016
+    //GET : https://opendart.fss.or.kr/api/fnlttSinglAcnt.json
+
     @Value("${dart.appkey}")
     private String APP_KEY;
-    //배당
+    //dart -> 배당
     private String BASE_URL = "https://opendart.fss.or.kr/api/alotMatter.json";
-    //재무제표
+    //dart -> 재무제표
+    private String BASE_URL2 = "https://opendart.fss.or.kr/api/fnlttSinglAcnt.json";
 
 
     //사업보고서 년도 계산
@@ -142,6 +155,129 @@ public class DARTApiService {
             }
 
         }
+    }
+
+    public DARTCorpInfoDTO getDartCorpInfo(String stockCode){
+        //ROE : 순이익(당기순이익 : netIncome, account_nm:당기순이익/당기순이익(손실)) / 자본(자본총계 : equity, account_nm:자본총계) * 100
+        //부채비율 : 부채(부채총계 : liabilities, account_nn:부채총계) / 자본(자본총계) * 100
+
+        DARTCorpInfoDTO dartCorpInfoDTO = new DARTCorpInfoDTO();
+
+        //stockCode로 해당하는 corpCode 구해주기
+        String corpCode = mapping.selectCorpCode(stockCode);
+
+        //매출액
+        long sales = 0;
+        //영업이익
+        long operatingProfit = 0;
+        //자본 총계
+        long totalEquity = 0;
+        //부채 총계
+        long totalLiabilities = 0;
+        //당기순이익
+        long netIncome = 0;
+
+        //ROE
+        double roe = 0.0;
+        //부채비율
+        double debtRatio = 0.0;
+
+        HttpURLConnection conn = null;
+
+        try {
+            //요청인자
+            //URL만들기
+            URI uri = UriComponentsBuilder.fromHttpUrl(BASE_URL2)
+                    .queryParam("crtfc_key", APP_KEY)
+                    .queryParam("corp_code", corpCode)
+                    .queryParam("bsns_year", getBsnsYear())
+                    .queryParam("reprt_code", "11011")
+                    .build()
+                    .toUri();
+
+            //            {  <-- 여기가 "root" (JsonNode)
+//                    "status": "000",
+//                    "message": "정상",
+//                    "list": [  <-- 여기가 "root.path('list')"
+//                { "account_nm": "자본", "amount": "100" },
+//                { "account_nm": "부채", "amount": "50" },
+//                                  ...
+//                ]
+//            }
+
+            //연결 + 요청 + 파싱
+            JsonNode root = restTemplate.getForObject(uri, JsonNode.class);
+            JsonNode listNode = root.path("list");
+
+            if(listNode.isMissingNode() || !listNode.isArray()){
+                System.out.println("재무제표 데이터 없음 : " + stockCode);
+                return dartCorpInfoDTO; //빈 객체 리턴
+            }
+
+            //값 찾기
+            for(JsonNode data : listNode){
+                //연결재무제표인지 확인하기
+                String fsDiv = data.path("fs_div").asText();
+                if(!"CFS".equals(fsDiv)){
+                    continue; //OFS값이면 넘어가기
+                }
+                String accountName = data.path("account_nm").asText();
+                String amountStr = data.path("thstrm_amount").asText(); //thstrm : 현재년도 데이터
+
+                if(amountStr == null || amountStr.isEmpty() || amountStr.equals("-")) {
+                    continue;
+                }
+
+                //숫자로 변환
+                long amount = 0;
+                try {
+                    amount = Long.parseLong(amountStr.replace(",","").trim());
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+
+                //자본 총계
+                if("자본총계".equals(accountName) || "자본".equals(accountName)){
+                    totalEquity = amount;
+                }
+                //부채 총계
+                else if ("부채총계".equals(accountName) || "부채".equals(accountName)) {
+                    totalLiabilities = amount;
+                }
+                //당기순이익
+                else if ("당기순이익".equals(accountName) || "당기순이익(손실)".equals(accountName)) {
+                    netIncome = amount;
+                }
+                //매출액
+                else if ("매출액".equals(accountName) || "수익(매출액)".equals(accountName)) {
+                    sales = amount;
+                }
+                //영업이익
+                else if ("영업이익".equals(accountName) || "영업이익(손실)".equals(accountName)) {
+                    operatingProfit = amount;
+                }
+            }
+            //비율계산
+            if(totalEquity > 0){
+                //부채비율 : 부채 / 자본 * 100
+                debtRatio = ((double)totalLiabilities/totalEquity)*100;
+                //roe : 순이익 / 자본 * 100
+                roe = ((double) netIncome/totalEquity)*100;
+            }
+            System.out.println("계산결과 [" + stockCode + "] 자본:" + totalEquity + ", 부채:" + totalLiabilities + ", 순이익:" + netIncome);
+            System.out.println("-> ROE: " + roe + "%, 부채비율: " + debtRatio + "%");
+
+            //DTO에 담기
+            dartCorpInfoDTO.setSales(sales);
+            dartCorpInfoDTO.setOperatingProfit(operatingProfit);
+            dartCorpInfoDTO.setNetIncome(netIncome);
+            dartCorpInfoDTO.setRoe(roe);
+            dartCorpInfoDTO.setDebtRatio(debtRatio);
+
+        } catch (Exception e) {
+            System.out.println("재무제표 조회 실패 : " + e.getMessage());
+        }
+        return dartCorpInfoDTO;
     }
 
 }

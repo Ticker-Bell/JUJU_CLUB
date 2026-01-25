@@ -18,6 +18,12 @@ public class StockCorpInfoDTO {
     private String w52HgprData; //52주 최고가
     private String w52LwprData; //52주 최저가
     private String listedStockCntData; //상장주식수
-    private String dividendPriceRatio; //배당수익률 - 임시
+    private String dividendPriceRatio; //배당수익률
+    private String per;
+    private String pbr;
+    private String eps;
+    private String bps;
+    private String roe;
+    private String debtRatio; //부채비율
 
 }

@@ -16,9 +16,11 @@ public class DARTCorpInfoDTO {
 
     //재무제표 API: 부채비율, 유보율, ROE, EPS 계산용 (자본, 부채, 순이익)
     //배당 API: 배당수익률 계산용 (주당 배당금)
-    //주식총수 API: BPS, 시가총액 계산용 (발행주식수) - KIS에 있으면 생략 가능
+    //주식총수 API: BPS, 시가총액 계산용 (발행주식수) - KIS
 
-    String corpCode;
+    //dartapi는 json구조가 kis랑 다르게 list형태고 key가 반복된다
+    //account_nm, thstrm_amount값을 봐야 뭔지 알 수 있기 때문에
+    //자동으로 매핑되는 @JsonProperty를 사용하지 않았음.
 
     // 1. 재무제표 창고에서 가져올 것들
     private long sales; //매출액

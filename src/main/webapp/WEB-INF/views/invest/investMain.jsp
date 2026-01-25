@@ -80,10 +80,19 @@
     function getSelectedCorpInfo(stockCode) {
         //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
         fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
-            .then(res => res.text())
+            .then(res =>
+                res.text() //html 값 요청, 다음 then으로 결과 토스
+            )
             .then(html => {
-                //화면바꾸기
+                //html 갈기(화면바꾸기)
                 document.getElementById('stockCorpInfo-container').innerHTML = html;
+                //시간찍기(html이랑 순서 바뀌면, 표시 X)
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('ko-KR', {hour12: false});
+                const timeEl = document.getElementById('update_time');
+                if(timeEl){
+                    timeEl.innerText = timeString;
+                }
             })
             .catch(error => {
                 console.error('기업정보로딩실패 : ', error);

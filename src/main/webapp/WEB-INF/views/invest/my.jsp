@@ -438,10 +438,10 @@
 <body>
 <div class="container">
     <!-- 탭 네비게이션 -->
-    <nav class="tab-nav">
-        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>
-        <a href="${pageContext.request.contextPath}/invest/main.do">투자</a>
-    </nav>
+<%--    <nav class="tab-nav">--%>
+<%--        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>--%>
+<%--        <a href="${pageContext.request.contextPath}/invest/main.do">투자</a>--%>
+<%--    </nav>--%>
 
     <!-- 상단 요약 카드 -->
     <div class="summary-wrapper">

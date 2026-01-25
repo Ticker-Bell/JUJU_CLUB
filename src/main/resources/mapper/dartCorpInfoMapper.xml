@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tickerbell.jujuclub.dartdata.mapper.DartCorpInfoMapper">
+  <!-- stock_code 비어있지 않은 값 찾기 -->
+  <select id="selectAllStockCodes" resultType="String">
+    select stock_code
+    from stock_master
+    where stock_code is not null
+      and trim(stock_code) != ''
+  </select>
+
+  <!-- 데이터 삽입 -->
+  <insert id="insert" parameterType="java.util.List">
+    insert into dart_corp_map(corp_code,
+                              corp_name,
+                              stock_code,
+                              modify_date)
+    values 
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.corpCode},
+            #{item.corpName},
+            #{item.stockCode},
+            #{item.modifyDate}
+            )
+        </foreach>
+    <!-- 있으면 수정하고 없으면 삽입하기 -->
+    on duplicate key update
+        corp_name = values(corp_name), modify_date = values(modify_date)
+  </insert>
+
+</mapper>

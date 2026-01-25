@@ -30,7 +30,7 @@ public class RankingApiService {
     @Value("${kis.baseurl}")
     private String baseurl;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjBmMTk3ZTc3LWNkYTItNGRlMS05NmZhLTM2YzBkNmNiMzY0ZiIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTE1NTYyMiwiaWF0IjoxNzY5MDY5MjIyLCJqdGkiOiJQU2FqN2dWVkpMMnVCZkpyMHhwU2twSDRFYVNoVlhSU2JoNFMifQ.o1_Tw0cL26jlmFOwBshsMUUDU5ZbbcoNTwSRpmLPPMSn0bgbxkTtu2jeUXdGXJDfleS2AyzCypFHKrskPh-15A";
+    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImE2YzFkYWRlLTA1MDctNDllMC1hNzcxLThjMzExN2Q2MDJmZSIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTQyMzU3NywiaWF0IjoxNzY5MzM3MTc3LCJqdGkiOiJQU2FqN2dWVkpMMnVCZkpyMHhwU2twSDRFYVNoVlhSU2JoNFMifQ.aZQi-r6_mGNPT3jtueEBbbPvIABIP_UvhrSad-bXNJDf-2vh16jMVPNex37aTFFSiDBLHTTUmEzqfjywM7WpyA";
 
     @Autowired
     private RestTemplate restTemplate;

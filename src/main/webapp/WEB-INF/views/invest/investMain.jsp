@@ -15,7 +15,7 @@
         .tab-nav a {
             text-decoration: none;
             color: #999;
-            font-size: 18px;,7
+            font-size: 18px;
             font-weight: 500;
             padding-bottom: 10px;
             position: relative;
@@ -73,5 +73,21 @@
             document.getElementById('investJsp').classList.remove('hidden');
             document.getElementById('myJsp').classList.add('hidden');
         }
+    }
+
+    const ctx = '${pageContext.request.contextPath}';
+
+    function getSelectedCorpInfo(stockCode) {
+        //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
+        fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
+            .then(res => res.text())
+            .then(html => {
+                //화면바꾸기
+                document.getElementById('stockCorpInfo-container').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('기업정보로딩실패 : ', error);
+                document.getElementById('stockCorpInfo-container').innerHTML = '<p style="padding:10px;">정보를 불러오지 못했습니다.</p>';
+            });
     }
 </script>

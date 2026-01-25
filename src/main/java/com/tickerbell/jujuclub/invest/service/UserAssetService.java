@@ -11,6 +11,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserAssetService {
+
     //총 평가 자산(보유 현금 + 투자금)(변함)
     //보유 현금(USER_ACCOUNT.cash_balance)
     //투자금(주식평가금액) = 현재가 * 보유수량(변함)
@@ -43,6 +44,7 @@ public class UserAssetService {
         //수익률 계산
         double totalReturnPct = 0.0;
         if (initial_cash > 0) {
+            //
             totalReturnPct = ( (double)( totalUserAsset - initial_cash ) / initial_cash ) * 100;
         }
 

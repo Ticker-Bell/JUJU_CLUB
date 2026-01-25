@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <style>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<style>
         .corpo-info-wrapper {
             margin-top: 16px;
             display: grid;
@@ -125,8 +126,17 @@
                 <div class="corpo-info-value" id="w52_lwpr">${stockCorpInfo.w52LwprData}</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">배당수익률(예시)</div>
-                <div class="corpo-info-value highlight" id="dummy">${stockCorpInfo.dividendPriceRatio}</div>
+                <div class="corpo-info-label">배당수익률(%)</div>
+                <div class="corpo-info-value highlight" id="yield">
+                    <c:choose>
+                        <c:when test="${dividendPerShareData == 0.0}">
+                            <span style="color: #999; font-size: 12px;">배당금 없음</span>
+                        </c:when>
+                        <c:otherwise>
+                            <fmt:formatNumber value="${dividendPerShareData}" pattern="#,##0.00"/>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
         </div>
     </div>
@@ -167,15 +177,3 @@
     </div>
 
 </div>
-<script>
-    const ctx = '${pageContext.request.contextPath}';
-
-    function getSelectedCorpInfo(stockCode) {
-        fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('stockCorpInfo-container').innerHTML = html;
-            })
-            .catch(console.error);
-    }
-</script>

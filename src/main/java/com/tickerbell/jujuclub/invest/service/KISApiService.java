@@ -29,6 +29,12 @@ public class KISApiService {
     @Value("${kis.baseurl}")
     private String BASE_URL;
 
+//    public int getCurrentPrice(String stockCode){
+//        KISDataDTO kisDataDTO = getPriceData(stockCode);
+//
+//        return kisDataDTO.getCurrentPrice();
+//    }
+
     //현재가 조회 : 토큰 준비, KIS API 호출(토큰 + 종목코드), 응답에서 추출
     //등락률
     //등락부호
@@ -73,6 +79,7 @@ public class KISApiService {
             int priceEnd = json.indexOf("\"", priceStart);
             String priceStr = json.substring(priceStart, priceEnd);
             int currentPrice = Integer.parseInt(priceStr);
+            System.out.println("현재가 데이터 : " + currentPrice);
 
             int rateStart = json.indexOf("\"prdy_ctrt\":\"") + 13; //등락률:prdy_ctrt
             int rateEnd = json.indexOf("\"", rateStart);

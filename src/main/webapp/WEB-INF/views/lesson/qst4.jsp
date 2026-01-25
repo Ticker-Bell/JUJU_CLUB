@@ -222,8 +222,8 @@
           htmx.ajax('POST', '${cpath}/lesson/qst', {
             target: '#main',
             values: {
-              lessonId: 'LV1_CH001_LSN001',
-              questionId: 'LV1_CH001_LSN001_Q005'
+              lessonId: '${lessonId}',
+              questionId: 'LV1_CH001_LS001_Q005'
             }
           });
         };

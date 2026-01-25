@@ -121,14 +121,15 @@
     // State
     let selectedLeft = null;
     let connections = new Map(); // Map<leftId, rightId>
-
+    //LINK형 정답변수
+    const totalMatchCount = Object.keys(matchQst.matchAnswer).length;
     // Render
     const leftCol = document.getElementById('col-left');
     const rightCol = document.getElementById('col-right');
     const svgLayer = document.getElementById('svg-layer');
     const container = document.getElementById('matchContainer');
 
-    // ✅ DOM 캐싱
+    // DOM 캐싱
     const leftDomMap = new Map();
     const rightDomMap = new Map();
 
@@ -224,8 +225,8 @@
       });
 
       const btn = document.getElementById('checkBtn');
-      btn.disabled = connections.size !== 4;
-      btn.className = connections.size === 4
+      btn.disabled = connections.size !== totalMatchCount;
+      btn.className = connections.size === totalMatchCount
           ? 'px-6 py-3 rounded-xl bg-primary text-white font-extrabold'
           : 'px-6 py-3 rounded-xl bg-gray-200 text-gray-400 font-extrabold';
     }
@@ -250,7 +251,7 @@
 
       modal.classList.remove('hidden');
 
-      if (correctCount === 4) {
+      if (correctCount === totalMatchCount) {
         // All Correct
         icon.textContent = "🎓";
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-green-100 text-green-600";
@@ -275,8 +276,8 @@
           htmx.ajax('POST', '${cpath}/lesson/updateLssnInfo', {
             target: '#main',
             values: {
-              usrSeq: 1,
-              lessonId: 'LV1_CH001_LSN001',
+              usrSeq: ${userSeq},
+              lessonId: '${lessonId}',
             }
           });
         };

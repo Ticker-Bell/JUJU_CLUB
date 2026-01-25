@@ -6,12 +6,19 @@
   <insert id="insertLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
     INSERT INTO USER_QUESTION_RESULT
         (USER_SEQ
-        ,LESSON_ID
+        ,lesson_id
     )
     VALUES(
            #{userSeq}
           ,#{lessonId}
           )
+  </insert>
+  <insert id="insertChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    INSERT INTO user_test_result (chapter_id, user_seq, tested_at)
+    VALUES
+        (#{chapterId}
+        ,#{userSeq}
+        ,CURRENT_TIMESTAMP)
   </insert>
 
   <update id="updateLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
@@ -21,12 +28,21 @@
     AND LESSON_ID = #{lessonId}
   </update>
 
-  <select id="selectQstChat" parameterType="String"
+  <update id="updateChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_TEST_RESULT
+    SET SCORE     = #{score}
+      , IS_PASS   = #{isPass}
+      , TESTED_AT = CURRENT_TIMESTAMP
+    WHERE USER_SEQ = #{userSeq}
+      AND CHAPTER_ID = #{chapterId}
+  </update>
+
+  <select id="selectQstChat" parameterType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO$QstChatMsgRequest"
     resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
     SELECT OPTIONS
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND question_id = 'LV1_CH001_LSN001_Q001'
+    AND question_id = #{questionId}
   </select>
 
   <select id="selectLssnTitle" parameterType="String"
@@ -48,7 +64,7 @@
          , ANSWER
     FROM LEARNING_QUESTION
     WHERE LESSON_ID = #{lessonId}
-    AND QUESTION_ID !='LV1_CH001_LSN001_Q001'
+    AND QUESTION_ID NOT LIKE '%Q001'
   </select>
 
   <select id="countUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
@@ -69,6 +85,23 @@
     FROM USER_QUESTION_RESULT
     WHERE USER_SEQ = #{userSeq}
       AND LESSON_ID = #{lessonId}
+  </select>
+  <select id="getChapterTestQst" parameterType="String"
+          resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
+    SELECT *
+    FROM LEARNING_QUESTION
+           LEFT OUTER JOIN LEARNING_LESSON ON LEARNING_QUESTION.LESSON_ID = LEARNING_LESSON.LESSON_ID
+           LEFT OUTER JOIN LEARNING_CHAPTER ON LEARNING_LESSON.CHAPTER_ID = LEARNING_CHAPTER.CHAPTER_ID
+    WHERE LEARNING_LESSON.CHAPTER_ID = #{chapterId}
+      AND SUBSTRING(QUESTION_ID, 21) != '1';
+
+  </select>
+  <select id="countUserChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM USER_TEST_RESULT
+    WHERE USER_SEQ = #{userSeq}
+    AND CHAPTER_ID = #{chapterId}
   </select>
 
 

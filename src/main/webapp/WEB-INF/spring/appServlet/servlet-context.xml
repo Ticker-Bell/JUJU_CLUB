@@ -23,7 +23,7 @@
 	
 	<context:component-scan base-package="com.tickerbell.jujuclub" />
 	<!-- properties 파일 읽기용도 추가  -->
-	<context:property-placeholder location="classpath:kis.properties, classpath:dart.properties"/>
+	<!-- <context:property-placeholder location="classpath:kis.properties, classpath:dart.properties"/> -->
 
     <!-- 한투API를 사용하기 위한 restTemplate -->
     <beans:bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
@@ -56,6 +56,26 @@
 			<!-- 추후 홈, 로그인, 온보딩 페이지 및 기타 페이지 등록 -->
 			<!-- <exclude-mapping path="/login/**"/>-->
 			<beans:bean class="com.tickerbell.jujuclub.common.controller.HtmxLayoutInterceptor"/>
+		</interceptor>
+
+		<interceptor>
+			<mapping path="/**"/>
+
+			<exclude-mapping path="/"/>
+			<exclude-mapping path="/resources/**"/>
+			<exclude-mapping path="/css/**"/>
+			<exclude-mapping path="/js/**"/>
+			<exclude-mapping path="/img/**"/>
+			<exclude-mapping path="/favicon.ico"/>
+			<exclude-mapping path="/auth/**"/>
+
+			<beans:bean class="com.tickerbell.jujuclub.common.controller.LoginCheckInterceptor"/>
+		</interceptor>
+
+		<interceptor>
+			<mapping path="/"/>
+
+			<beans:bean class="com.tickerbell.jujuclub.common.controller.LogoutCheckInterceptor"/>
 		</interceptor>
 	</interceptors>
 	

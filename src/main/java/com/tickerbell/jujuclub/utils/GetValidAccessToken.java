@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class GetValidAccessToken {
-    private RequestNewAccessToken requestNewToken;
+    private final RequestNewAccessToken requestNewToken;
 
     public String getValidToken(HttpServletRequest request) throws Exception {
         ServletContext application;
@@ -27,7 +27,7 @@ public class GetValidAccessToken {
             application.setAttribute("API_TOKEN", token);
             application.setAttribute(
                     "API_TOKEN_EXPIRE_AT",
-                    LocalDateTime.now().plusHours(24)
+                    LocalDateTime.now().plusHours(6)
             );
         }
 

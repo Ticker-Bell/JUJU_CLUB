@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
+import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,50 +33,15 @@ public class RankingApiService {
     @Value("${kis.baseurl}")
     private String baseurl;
 
-    private String accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6ImE2YzFkYWRlLTA1MDctNDllMC1hNzcxLThjMzExN2Q2MDJmZSIsInByZHRfY2QiOiIiLCJpc3MiOiJ1bm9ndyIsImV4cCI6MTc2OTQyMzU3NywiaWF0IjoxNzY5MzM3MTc3LCJqdGkiOiJQU2FqN2dWVkpMMnVCZkpyMHhwU2twSDRFYVNoVlhSU2JoNFMifQ.aZQi-r6_mGNPT3jtueEBbbPvIABIP_UvhrSad-bXNJDf-2vh16jMVPNex37aTFFSiDBLHTTUmEzqfjywM7WpyA";
-
     @Autowired
     private RestTemplate restTemplate;
 
     @Autowired
     private KISApiService kisApiService;
 
-    private final ObjectMapper mapper = new ObjectMapper();
+//    private final ObjectMapper mapper = new ObjectMapper();
 
-//    // accessToken 발급
-//    public void getAccessToken() {
-//        try{
-//            String url = URL_BASE + "/oauth2/tokenP";
-//
-//            // 헤더 설정
-//            HttpHeaders headers = new HttpHeaders();
-//
-//            // 바디 설정 (Map을 쓰면 JSON으로 자동 변환됨)
-//            Map<String, String> body = new HashMap<>();
-//            body.put("grant_type", "client_credentials");
-//            body.put("appkey", APP_KEY);
-//            body.put("appsecret", APP_SECRET);
-//
-//            // 요청 보내기(POST)
-//            HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
-//            ResponseEntity<JsonNode> response = restTemplate.postForEntity(url, request, JsonNode.class);
-//
-//            // 응답 파싱 및 토큰 저장
-//            JsonNode root = response.getBody();
-//            this.accessToken = root.path("access_token").asText();
-//
-//        } catch (Exception e){
-//            e.printStackTrace();
-//            log.info("토큰 발급 실패");
-//        }
-//    }
-
-    public List<RankingDTO> getTradingVolumeRanking(){
-
-        // 토큰이 없으면 발급 시도
-//        if (this.accessToken == null || this.accessToken.isEmpty()) {
-//            getAccessToken();
-//        }
+    public List<RankingDTO> getTradingVolumeRanking(String accessToken) throws Exception {
 
         try{
             // URL 및 쿼리 파라미터 설정
@@ -96,7 +64,7 @@ public class RankingApiService {
             // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
-            headers.set("authorization", "Bearer " + this.accessToken);
+            headers.set("authorization", "Bearer " + accessToken);
             headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
             headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01710000");  //거래ID - FHPST01710000
@@ -114,16 +82,11 @@ public class RankingApiService {
             String rtCd = root.path("rt_cd").asText();  //성공 여부 코드
             String msgCd = root.path("msg_cd").asText();  //메세지 코드
 
-            if(response.getStatusCode() == HttpStatus.OK && "0".equals(rtCd)){
+            if(response.getStatusCode() == HttpStatus.OK && "0".equals(rtCd)) {
                 // 정상 성공
                 // output에는 순위별로 JSON데이터가 여러개 존재
                 return JsonToDto(root.path("output"));
             }
-//            else if ("EGW00123".equals(msgCd)){
-//                System.out.println("토큰 만료됨. 재발급 후 다시 시도");
-//                getAccessToken();
-//                return getTradingVolumeRanking();
-//            }
             else{
                 System.out.println("Error Code: " + response.getStatusCode());
                 return null;
@@ -135,7 +98,7 @@ public class RankingApiService {
         }
     }
 
-    public List<RankingDTO> getMarketCapRanking(){
+    public List<RankingDTO> getMarketCapRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -155,7 +118,7 @@ public class RankingApiService {
             // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
-            headers.set("authorization", "Bearer " + this.accessToken);
+            headers.set("authorization", "Bearer " + accessToken);
             headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
             headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01740000");  //거래ID - FHPST01740000
@@ -194,7 +157,7 @@ public class RankingApiService {
         }
     }
 
-    public List<RankingDTO> getTopGainersRanking(){
+    public List<RankingDTO> getTopGainersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -219,7 +182,7 @@ public class RankingApiService {
             // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
-            headers.set("authorization", "Bearer " + this.accessToken);
+            headers.set("authorization", "Bearer " + accessToken);
             headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
             headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01700000");  //거래ID - FHPST01700000
@@ -258,7 +221,7 @@ public class RankingApiService {
         }
     }
 
-    public List<RankingDTO> getTopLosersRanking(){
+    public List<RankingDTO> getTopLosersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -283,7 +246,7 @@ public class RankingApiService {
             // 헤더 설정
             HttpHeaders headers = new HttpHeaders();
             headers.set("content-type", "application/json; charset=utf-8");
-            headers.set("authorization", "Bearer " + this.accessToken);
+            headers.set("authorization", "Bearer " + accessToken);
             headers.set("appkey", appkey);  //한국투자증권 홈페이지에서 발급받은 appkey
             headers.set("appsecret", appsecret);  //한국투자증권 홈페이지에서 발급받은 appsecret
             headers.set("tr_id", "FHPST01700000");  //거래ID - FHPST01700000

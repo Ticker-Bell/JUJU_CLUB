@@ -422,11 +422,11 @@
         tProfit.classList.add('hidden');
       }
 
-      // 🔥 나의 랭킹 변경
+      //  나의 랭킹 변경
       document.getElementById('my-rank-number').innerText =
           '# ' + window.RANKING_DATA[type].myRank;
 
-      // 🔥 트로피 + 포트폴리오 변경
+      // 트로피 + 포트폴리오 변경
       updateTop3(type);
 
       positionRankSlider();

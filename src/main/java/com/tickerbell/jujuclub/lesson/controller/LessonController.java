@@ -1,10 +1,13 @@
 package com.tickerbell.jujuclub.lesson.controller;
 
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
+import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
+import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO.QstChatMsgRequest;
 import com.tickerbell.jujuclub.lesson.service.LessonService;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,70 +27,66 @@ public class LessonController {
   public String getLessonInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
+      HttpSession session,
       Model model) throws Exception {
-// 세션 연결예쩡
-    Integer userSeq = 1;
 
-//    if (userSeq == null) {
-//      // 로그인 안된 상태면 처리
-//      return "redirect:/login";
-//    }
+    int userSeq = (int) session.getAttribute("userSeq");
+    String questionId = lessonId + "_Q001";
 
     // 레슨 시작 정보 등록
-    lessonService.insertLssnInfo(userSeq,lessonId);
+    if(! lessonId.equals("LV1_CH001_LSN006")){
 
-    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+      lessonService.insertLssnInfo(userSeq,lessonId);
+    }
+
+    QstChatMsgDTO.QstChatMsgRequest qstChatMsgRequest = new QstChatMsgRequest();
+    qstChatMsgRequest.setLessonId(lessonId);
+    qstChatMsgRequest.setQuestionId(questionId);
+
+    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(qstChatMsgRequest);
 
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
 
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
+    model.addAttribute("lessonId",lessonId);
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
     model.addAttribute("userSeq",userSeq);
 
-    if (isHtmx) {
-      return "/lesson/lessonInfo";
-    } else {
-      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
-      // Redirect를 하거나 에러 페이지를 띄움
-      return "redirect:/main";
-    }
-
+    return "lesson/lessonInfo";
   }
 
   @PostMapping("/qst")
   public String getQstInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
-      @RequestParam String lessonId,@RequestParam String questionId,
+      @RequestParam String lessonId,
+      @RequestParam String questionId,
+      HttpSession session,
       Model model) throws Exception {
 
-    Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> chatMap = lessonService.getLessonChat(lessonId);
+    int userSeq = (int) session.getAttribute("userSeq");
+
 
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
-
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
-    model.addAttribute("chat", chatMap);
-    model.addAttribute("colNames", chatMap.keySet());
+    model.addAttribute("lessonId",lessonId);
+    model.addAttribute("userSeq",userSeq);
     model.addAttribute("titles", title);
     model.addAttribute("qst", lessonQst);
 
-    if (!isHtmx) {
-      // 주소창 직접 접근 방지
-      return "redirect:/main";
-    }
 
     switch (questionId) {
-      case "LV1_CH001_LSN001_Q002":
+      case "LV1_CH001_LS001_Q002":
         return "/lesson/qst2";
-      case "LV1_CH001_LSN001_Q003":
+      case "LV1_CH001_LS001_Q003":
         return "/lesson/qst3";
-      case "LV1_CH001_LSN001_Q004":
+      case "LV1_CH001_LS001_Q004":
         return "/lesson/qst4";
-      case "LV1_CH001_LSN001_Q005":
+      case "LV1_CH001_LS001_Q005":
         return "/lesson/qst5";
       default:
         // 잘못된 questionId
@@ -99,20 +98,65 @@ public class LessonController {
   @PostMapping("/updateLssnInfo")
   public String getLessonInfo(
       @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
-      @RequestParam String lessonId) throws Exception {
-// 세션 연결예쩡
-    Integer userSeq = 1;
+      @RequestParam String lessonId,
+      HttpSession session) throws Exception {
+
+    int userSeq = (int) session.getAttribute("userSeq");
 
     lessonService.updateLssnInfo(userSeq,lessonId);
 
+    return "redirect:/roadMap/main.do";
+  }
 
-    if (isHtmx) {
-      return "/roadMap/roadMapMain";
-    } else {
-      // 주소창에 직접 쳐서 들어오는 경우(GET)를 대비
-      // Redirect를 하거나 에러 페이지를 띄움
-      return "redirect:/main";
-    }
+  @PostMapping("/chapter-test")
+  public String getChapterTest(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String chapterId,
+      @RequestParam String lessonId,
+      HttpSession session,
+      Model model) throws Exception {
+
+    int userSeq = (int) session.getAttribute("userSeq");
+
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+    lessonRequest.setChapterId(chapterId);
+    lessonRequest.setLessonId(lessonId);
+
+    lessonService.insertChapterRslt(userSeq,chapterId);
+
+    List<LessonDTO.LessonQst> chapterQst = lessonService.getChapterTest(lessonRequest);
+
+
+    model.addAttribute("qst", chapterQst);
+    model.addAttribute("userSeq",userSeq);
+    //챕터 update시 필요한 chapterId값, html body dom에 저장해둠
+    model.addAttribute("chapterId",chapterId);
+
+
+    return "lesson/chapterTest";
+  }
+
+  @PostMapping("/update-chapter")
+  public void updateChapterRslt(
+      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
+      @RequestParam String chapterId,
+      @RequestParam int score,
+      @RequestParam String isPass,
+      HttpSession session,
+      Model model) throws Exception {
+
+    int userSeq = (int) session.getAttribute("userSeq");
+
+    LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+
+    lessonRequest.setUserSeq(userSeq);
+    lessonRequest.setChapterId(chapterId);
+    lessonRequest.setScore(score);
+    lessonRequest.setIsPass(isPass);
+
+    lessonService.updateChapterInfo(lessonRequest);
+
+    model.addAttribute("userSeq",userSeq);
 
   }
 }

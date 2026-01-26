@@ -33,9 +33,9 @@ public class StockChartRestService {
     private final StockChartParser stockChartParser;
 
 
-    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode, HttpServletRequest request) throws Exception {
+    public List<StockChartRestDTO> getStockRestData(String periodCode, String stockCode) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
-        ACCESSTOKEN = getValidAccessToken.getValidToken(request);
+        ACCESSTOKEN = getValidAccessToken.getValidToken();
         String url = BASEURL + "/uapi/domestic-stock/v1/quotations/inquire-daily-price";
         HttpHeaders headers = new HttpHeaders();
         headers.set("content_type", "application/json;charset=utf-8");

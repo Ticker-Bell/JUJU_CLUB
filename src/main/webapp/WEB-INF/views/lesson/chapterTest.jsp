@@ -131,7 +131,7 @@
                 <span class="text-[10px] text-gray-400">방금 전</span>
             </div>
             <div class="text-lg font-extrabold text-gray-900 mb-1">입금 완료</div>
-            <div class="text-2xl font-black text-primary num-font">+ 1,000,000 원</div>
+            <div class="text-2xl font-black text-primary num-font">+ ${title[0].testPay}원</div>
             <div class="text-xs text-gray-400 mt-2 font-medium">챕터1 수료 장학금</div>
         </div>
 
@@ -655,7 +655,7 @@
 
   /* ---------------- 최종 제출 처리 ---------------- */
   function finalizeQuiz() {
-    const isPass = score >= 70 ? 'Y' : 'N';
+    const isPass = score >= 7 ? 'Y' : 'N';
     const successModal = document.getElementById('successModal');
     const failModal = document.getElementById('failModal');
 
@@ -691,7 +691,7 @@
   /* ---------------- 서버 저장 ---------------- */
   function submitQuizResults(chapterId, isFinal = true) {
     const totalScore = score*10;
-    const isPass = totalScore >= 30 ? 'Y' : 'N';
+    const isPass = totalScore >= 70 ? 'Y' : 'N';
 
     fetch('/jujuclub/lesson/update-chapter', {
       method: 'POST',

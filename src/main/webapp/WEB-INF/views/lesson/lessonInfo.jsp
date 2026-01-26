@@ -111,35 +111,6 @@
     const resetBtn = document.getElementById("resetBtn");
     let idx = 0;
 
-    function checkAnswer() {
-      const modal = document.getElementById('resultModal');
-      const icon = document.getElementById('modalIcon');
-      const title = document.getElementById('modalTitle');
-      const desc = document.getElementById('modalDesc');
-      const bar = document.getElementById('modalBar');
-      const btn = document.getElementById('modalActionBtn');
-
-      modal.classList.remove('hidden');
-
-
-
-        icon.textContent = "⚖️";
-        icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-indigo-100 text-indigo-600";
-        title.textContent = "개념 문제를 완료했어요!";
-        title.className = "text-2xl font-extrabold text-indigo-600 mb-2";
-        desc.innerHTML = EXPLANATION;
-        bar.className = "h-2 w-full bg-indigo-500";
-        btn.textContent = "다음 문제로";
-
-        confetti({
-          particleCount: 150,
-          spread: 70,
-          origin: {y: 0.6},
-          colors: ['#5E45EB', '#818CF8', '#C7D2FE']
-        });
-      }
-
-
     function scrollToBottom() {
       chatScroll.scrollTop = chatScroll.scrollHeight;
     }

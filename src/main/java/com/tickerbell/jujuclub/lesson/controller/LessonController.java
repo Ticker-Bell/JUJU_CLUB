@@ -125,9 +125,11 @@ public class LessonController {
 
     lessonService.insertChapterRslt(userSeq,chapterId);
 
+    List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
     List<LessonDTO.LessonQst> chapterQst = lessonService.getChapterTest(lessonRequest);
 
 
+    model.addAttribute("title",title);
     model.addAttribute("qst", chapterQst);
     model.addAttribute("userSeq",userSeq);
     //챕터 update시 필요한 chapterId값, html body dom에 저장해둠

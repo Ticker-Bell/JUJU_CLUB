@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <link rel="stylesheet" as="style" crossorigin
@@ -9,7 +10,7 @@
   tailwind.config = {theme: {extend: {colors: {primary: '#5E45EB', secondary: '#10B981'}}}}
 </script>
 
-<body class="flex flex-col h-screen w-full overflow-hidden bg-[#F8FAFC]" >
+<body class="flex flex-col h-screen w-full overflow-hidden bg-[#F8FAFC]">
 
 <header class="w-full h-24 px-8 flex items-center justify-between relative shrink-0">
     <div class="flex items-center gap-3">
@@ -131,11 +132,13 @@
                 <span class="text-[10px] text-gray-400">방금 전</span>
             </div>
             <div class="text-lg font-extrabold text-gray-900 mb-1">입금 완료</div>
-            <div class="text-2xl font-black text-primary num-font">+ ${title[0].testPay}원</div>
-            <div class="text-xs text-gray-400 mt-2 font-medium">챕터1 수료 장학금</div>
+            <div class="text-2xl font-black text-primary num-font">
+                + <fmt:formatNumber value="${title[0].rewardCash}" type="number"/>원
+            </div>
+            <div class="text-xs text-gray-400 mt-2 font-medium">Chapter ${chapterId.substring(8)} 수료 장학금</div>
         </div>
 
-        <button id = "goToRoadmapBtn"
+        <button id="goToRoadmapBtn"
                 class="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/30 hover:brightness-110 hover:-translate-y-1 transition-all text-lg">
             로드맵으로 돌아가기
         </button>
@@ -220,8 +223,9 @@
   const currentStepText = document.getElementById('currentStep');
   const guideArea = document.getElementById('guideArea');
   const chapterId = '${chapterId}'
+  <%--const cpath = '${cpath}'--%>
 
-      console.log(chapterId)
+  console.log(chapterId)
   initQuiz();
 
   /* ---------------- 초기화 ---------------- */
@@ -443,37 +447,48 @@
   function handleDrop(e) {
     e.preventDefault();
 
+    const zone = e.target;
+
     // drop-zone 아니면 무시
-    if (!e.target.classList.contains('drop-zone')) return;
+    if (!zone.classList.contains('drop-zone')) return;
 
-    // 이미 채워져 있으면 무시
-    if (e.target.textContent && e.target.textContent.trim() !== '') return;
+    const prevText = zone.textContent.trim();
 
-    // 드롭
-    e.target.textContent = draggedText;
-    e.target.classList.add('filled');
+    // 같은 단어를 같은 곳에 다시 드롭한 경우 무시
+    if (prevText === draggedText) return;
 
-    // 같은 단어 다시 못 쓰게 숨김
+    if (prevText) {
+      document.querySelectorAll('.drag-item').forEach(item => {
+        if (item.textContent.trim() === prevText) {
+          item.classList.remove('hidden-item');
+        }
+      });
+    }
+
+    zone.textContent = draggedText;
+    zone.classList.add('filled');
+
     document.querySelectorAll('.drag-item').forEach(item => {
       if (item.textContent.trim() === draggedText) {
         item.classList.add('hidden-item');
       }
     });
 
-    // 사용자 답 저장 (텍스트 -> optionList index + 1)
     const zones = document.querySelectorAll('.drop-zone');
     userAnswers[currentIndex] = Array.from(zones).map(z => {
-      const idx = shuffledQuiz[currentIndex].optionList.indexOf(z.textContent.trim());
-      return idx + 1; // DB가 1-based라면 +1
+      const text = z.textContent.trim();
+      if (!text) return null;
+
+      const idx = shuffledQuiz[currentIndex].optionList.indexOf(text);
+      return idx + 1; // DB 1-based
     });
 
-    // ✅ 빈칸 개수 === 채워진 개수
-    const filledCount = userAnswers[currentIndex].filter(v => v !== null).length;
-
-    if (filledCount === zones.length) {
-      enableCheckBtn(true);
-    }
+    const filledCount = document.querySelectorAll('.drop-zone.filled').length;
+    enableCheckBtn(filledCount === zones.length);
   }
+
+
+
 
   /* ---------------- LINK ---------------- */
   function initMatchGame() {
@@ -625,7 +640,7 @@
     }
 
     // --- 탈락 조건 확인 ---
-    if (wrongCount >= 3) {
+    if (wrongCount >= 4) {
       submitQuizResults(chapterId, true); // isFinal=false
       document.getElementById('failModal').classList.add('active');
       return;
@@ -662,7 +677,8 @@
     if (isPass === 'Y') {
       // 폭죽 모달 띄우기
       document.getElementById('finalScore').innerText = score;
-      document.getElementById('finalPercent').innerText = Math.round((score / shuffledQuiz.length) * 100) + '%';
+      document.getElementById('finalPercent').innerText = Math.round(
+          (score / shuffledQuiz.length) * 100) + '%';
       successModal.classList.add('active');
 
       // 모달 안에 버튼 클릭 시 서버 저장 + 이동
@@ -678,8 +694,20 @@
       const duration = 2000;
       const end = Date.now() + duration;
       (function frame() {
-        confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#5E45EB', '#10B981'] });
-        confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#5E45EB', '#10B981'] });
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: {x: 0},
+          colors: ['#5E45EB', '#10B981']
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: {x: 1},
+          colors: ['#5E45EB', '#10B981']
+        });
         if (Date.now() < end) requestAnimationFrame(frame);
       })();
 
@@ -690,12 +718,12 @@
 
   /* ---------------- 서버 저장 ---------------- */
   function submitQuizResults(chapterId, isFinal = true) {
-    const totalScore = score*10;
+    const totalScore = score * 10;
     const isPass = totalScore >= 70 ? 'Y' : 'N';
 
-    fetch('/jujuclub/lesson/update-chapter', {
+    fetch('${cpath}/lesson/update-chapter', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       body: new URLSearchParams({
         chapterId: chapterId,
         score: totalScore,
@@ -706,8 +734,6 @@
     .catch(err => console.error(err));
   }
 
-
-
   /* ---------------- 퀴즈 셔플 ---------------- */
   function shuffleQuiz(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -716,7 +742,6 @@
     }
     return array;
   }
-
 
   /* ---------------- 결과 모달 ---------------- */
   function showFeedbackModal(isCorrect) {
@@ -740,12 +765,19 @@
     }
     lucide.createIcons();
   }
+
   // 나가기 모달 열기/닫기
   function handleFailExit() {
     location.href = '${cpath}/roadMap/main.do';
   }
-  function openExitModal() { document.getElementById('exitModal').classList.add('active'); }
-  function closeExitModal() { document.getElementById('exitModal').classList.remove('active'); }
+
+  function openExitModal() {
+    document.getElementById('exitModal').classList.add('active');
+  }
+
+  function closeExitModal() {
+    document.getElementById('exitModal').classList.remove('active');
+  }
 
   // 리사이즈 시 선 잇기 다시 그리기 (반응형 대응)
   // window.addEventListener('resize', () => { if(shuffleQuiz[currentIndex].type === 'LINK') drawConnections(); });

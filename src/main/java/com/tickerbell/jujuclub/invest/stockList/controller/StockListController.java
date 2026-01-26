@@ -1,12 +1,18 @@
 package com.tickerbell.jujuclub.invest.stockList.controller;
 
-import com.tickerbell.jujuclub.common.dto.UserInfoDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
+import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
+import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
 import com.tickerbell.jujuclub.invest.service.KISApiService;
+import com.tickerbell.jujuclub.invest.service.PortfolioService;
+import com.tickerbell.jujuclub.invest.service.UserAssetService;
+import com.tickerbell.jujuclub.invest.service.WatchlistService;
 import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
 import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
 import com.tickerbell.jujuclub.invest.stockList.service.RankingApiService;
 import com.tickerbell.jujuclub.invest.stockList.service.StockService;
+import com.tickerbell.jujuclub.invest.util.ColorUtil;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +35,11 @@ public class StockListController {
     private final RankingApiService rankingApiService;
     private final KISApiService kisApiService;
     private final GetValidAccessToken getValidAccessToken;
+
+    //모의투자 마이페이지 서비스들
+    private final PortfolioService portfolioService;
+    private final WatchlistService watchlistService;
+    private final UserAssetService userAssetService;
 
     @GetMapping("main.do")
     public String investMain(Model model, HttpSession session){
@@ -56,6 +66,40 @@ public class StockListController {
 
         model.addAttribute("codeKISDataMap", codeKISDataMap);
         model.addAttribute("stockDTOList", stockDTOList);
+
+        //마이페이지 my.jsp에 필요한 데이터 - StockMyController 내용들
+        if (userSeq != null) {
+            //1. 관심종목 (마이페이지용)
+            model.addAttribute("watchlist", watchlistService.getWatchlistItems(userSeq));
+
+            //2. 보유주식 리스트
+            List<PortfolioAllocationItemDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
+            model.addAttribute("holdings", holdings);
+
+            //3. 차트 데이터 생성 (도넛 차트용)
+            List<Map<String, Object>> chartData = new ArrayList<>();
+            for (PortfolioAllocationItemDTO item : holdings) {
+                Map<String, Object> data = new HashMap<>();
+                data.put("stockName", item.getStockName());
+                data.put("stockCode", item.getStockCode()); // JS 업데이트용 코드 추가
+                data.put("weightPct", item.getWeightPct());
+                data.put("color", ColorUtil.colorByStockCode(item.getStockCode()));
+                chartData.add(data);
+            }
+            model.addAttribute("chartData", chartData); // 범례용
+
+            //4. 차트 데이터 JSON 변환 (Chart.js용)
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                model.addAttribute("chartDataJson", objectMapper.writeValueAsString(chartData));
+            } catch (Exception e) {
+                model.addAttribute("chartDataJson", "[]");
+            }
+
+            //5. 사용자 자산 요약
+            UserInvestSummeryDTO userAssetSummary = userAssetService.getUserInvestSummary(userSeq);
+            model.addAttribute("userAsset", userAssetSummary);
+        }
 
         return "invest/investMain";
     }

@@ -27,6 +27,13 @@ public class PortfolioService {
         for (PortfolioAllocationItemDTO data : items){
             KISDataDTO kisDataDTO = kisApiService.getPriceData(data.getStockCode());
 
+            //api호출 조절하기
+            try {
+                Thread.sleep(100); //0.1초 멈춤
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             int currentPrice = (kisDataDTO == null) ? 0 : kisDataDTO.getCurrentPrice(); //현재가
             data.setCurrentPrice(currentPrice);
             //평균단가는 DB에 저장되어있음

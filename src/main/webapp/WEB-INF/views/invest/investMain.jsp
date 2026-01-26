@@ -19,13 +19,11 @@
         top: 0;
         left: 0;
         width: 100%;
-
         opacity: 0;
         transform: translateY(10px);
         pointer-events: none;
         transition: opacity 0.25s ease, transform 0.25s ease;
     }
-
 
     .tab-content.active {
         opacity: 1;
@@ -66,10 +64,10 @@
                     <jsp:include page="investBuySell.jsp"></jsp:include>
                 </div>
                 <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
-
-                    <jsp:include page="investChart.jsp"></jsp:include>
-
-                        <jsp:include page="stockCorpInfoCard.jsp"></jsp:include>
+                    <jsp:include page="investChart.jsp" ></jsp:include>
+                    <div id="stockCorpInfo-container" class="w-full">
+                    <jsp:include page="stockCorpInfoCard.jsp" ></jsp:include>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,5 +89,30 @@
             investTab.classList.add('active');
             myTab.classList.remove('active');
         }
+    }
+
+    //stockCorpInfoCard.jsp에 있던 script
+    const ctx = '${pageContext.request.contextPath}';
+    function getSelectedCorpInfo(stockCode) {
+        //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
+        fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
+            .then(res =>
+                res.text() //html 값 요청, 다음 then으로 결과 토스
+            )
+            .then(html => {
+                //html 갈기(화면바꾸기)
+                document.getElementById('stockCorpInfo-container').innerHTML = html;
+                //시간찍기(html이랑 순서 바뀌면, 표시 X)
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('ko-KR', {hour12: false});
+                const timeEl = document.getElementById('update_time');
+                if(timeEl){
+                    timeEl.innerText = timeString;
+                }
+            })
+            .catch(error => {
+                console.error('기업정보로딩실패 : ', error);
+                document.getElementById('stockCorpInfo-container').innerHTML = '<p style="padding:10px;">정보를 불러오지 못했습니다.</p>';
+            });
     }
 </script>

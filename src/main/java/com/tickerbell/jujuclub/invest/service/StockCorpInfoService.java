@@ -1,10 +1,13 @@
 package com.tickerbell.jujuclub.invest.service;
 
+import com.tickerbell.jujuclub.invest.dto.DARTCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.KISCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.StockCorpInfoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 @Service
@@ -13,6 +16,7 @@ public class StockCorpInfoService {
     //JSP 화면에 보여질 JSON 데이터 포맷팅 하는 서비스
 
     private final KISApiService kisApiService;
+    private final DARTApiService dartApiService;
 
     //받아온 JSON 데이터를 담은 DTO에서 화면에 띄울 데이터를 담은 DTO클래스로 변환
     public StockCorpInfoDTO getConvertStockCorpInfoData(String stockCode) throws Exception {
@@ -30,8 +34,51 @@ public class StockCorpInfoService {
         //52주 최저
         String w52LwprData = formatComma(kisCorpInfoDTO.getW52Lwpr());
 
-        //배당수익률(Dart에서 가져오면 추가)
-        String dividendPriceRatioData = (("dummy" == null ? "0.0" : "dummy") + "%"); //변경필요
+        //PER
+        String per = (kisCorpInfoDTO.getPer() == null || kisCorpInfoDTO.getPer().isEmpty()) ? "-" : kisCorpInfoDTO.getPer();
+
+        //PBR
+        String pbr = (kisCorpInfoDTO.getPbr() == null || kisCorpInfoDTO.getPbr().isEmpty()) ? "-" : kisCorpInfoDTO.getPbr();
+
+        //EPS
+        String eps = formatComma(kisCorpInfoDTO.getEps());
+
+        //BPS
+        String bps = formatComma(kisCorpInfoDTO.getBps());
+
+        //다트 재무제표 가져오기
+        DARTCorpInfoDTO dartCorpInfoDTO = dartApiService.getDartCorpInfo(stockCode);
+
+        //ROE 자기자본이익률(%) : (당기 순이익 / 자본 총 계) * 100
+        String roe;
+        if(dartCorpInfoDTO.getRoe() == 0.0){
+            roe  = "roe 없음";
+        } else {
+            BigDecimal bd = BigDecimal.valueOf(dartCorpInfoDTO.getRoe());
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            roe = bd.toPlainString() + "%";
+        }
+
+        //부채비율(%) : (부채 총 계 / 자본 총 계) * 100
+        String debtRatio;
+        if(dartCorpInfoDTO.getDebtRatio() == 0.0){
+            debtRatio  = "debtRatio 없음";
+        } else {
+            BigDecimal bd = BigDecimal.valueOf(dartCorpInfoDTO.getDebtRatio());
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            debtRatio = bd.toPlainString() + "%";
+        }
+
+        //배당수익률
+        double data = dartApiService.getDividendPerShare(stockCode);
+        String dividendPriceRatio;
+        if(data == 0.0){
+            dividendPriceRatio = "배당금 없음";
+        } else{
+            BigDecimal bd = BigDecimal.valueOf(data); //소숫점 3번째 자리에서 반올림
+            bd = bd.setScale(2, RoundingMode.HALF_UP);
+            dividendPriceRatio = bd.toPlainString() + "%";
+        }
 
         //DTO리턴
         return StockCorpInfoDTO.builder()
@@ -39,7 +86,13 @@ public class StockCorpInfoService {
                 .w52HgprData(w52HgprData)
                 .w52LwprData(w52LwprData)
                 .listedStockCntData(listedStockCnt)
-                .dividendPriceRatio(dividendPriceRatioData)
+                .per(per)
+                .pbr(pbr)
+                .eps(eps)
+                .bps(bps)
+                .dividendPriceRatio(dividendPriceRatio)
+                .roe(roe)
+                .debtRatio(debtRatio)
                 .build();
     }
 

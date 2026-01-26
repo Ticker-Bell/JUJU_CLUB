@@ -1,6 +1,7 @@
 package com.tickerbell.jujuclub.invest.controller;
 
 import com.tickerbell.jujuclub.invest.dto.StockCorpInfoDTO;
+import com.tickerbell.jujuclub.invest.service.DARTApiService;
 import com.tickerbell.jujuclub.invest.service.StockCorpInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class StockCorpInfoController {
 
     private final StockCorpInfoService stockCorpInfoService;
+    private final DARTApiService dartApiService;
 
     @GetMapping("/corpInfo")
     public String corpInfoPage(@RequestParam("stockCode")String stockCode, Model model) throws Exception {

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <style>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<style>
         .corpo-info-wrapper {
             margin-top: 16px;
             display: grid;
@@ -113,20 +114,22 @@
         <div class="corpo-info-grid">
             <div class="corpo-info-item">
                 <div class="corpo-info-label">시가총액</div>
-                <div class="corpo-info-value highlight" id="hts_avls">${stockCorpInfo.marketCapData}</div>
+                <div class="corpo-info-value highlight" id="hts_avls">${stockCorpInfo.marketCapData} 원</div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">상장주식수</div>
-                <div class="corpo-info-value" id="lstn_stcn">${stockCorpInfo.listedStockCntData}</div>
+                <div class="corpo-info-value" id="lstn_stcn">${stockCorpInfo.listedStockCntData} 주</div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">52주 최고/최저</div>
-                <div class="corpo-info-value" id="w52_hgpr">${stockCorpInfo.w52HgprData}</div>
-                <div class="corpo-info-value" id="w52_lwpr">${stockCorpInfo.w52LwprData}</div>
+                <div class="corpo-info-value" id="w52_hgpr">${stockCorpInfo.w52HgprData} 원</div>
+                <div class="corpo-info-value" id="w52_lwpr">${stockCorpInfo.w52LwprData} 원</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">배당수익률(예시)</div>
-                <div class="corpo-info-value highlight" id="dummy">${stockCorpInfo.dividendPriceRatio}</div>
+                <div class="corpo-info-label">배당수익률(%)</div>
+                <div class="corpo-info-value highlight" id="yield">
+                    ${stockCorpInfo.dividendPriceRatio}
+                </div>
             </div>
         </div>
     </div>
@@ -135,47 +138,35 @@
     <div class="corpo-card">
         <div class="corpo-card-header">
             <h3 class="corpo-card-title">재무 스냅샷</h3>
-            <span class="corpo-card-badge gray">요약(예시)</span>
+            <span class="corpo-card-badge gray">마지막 갱신: <span id="update_time">-</span></span>
         </div>
         <div class="corpo-info-grid">
             <div class="corpo-info-item">
                 <div class="corpo-info-label">PER</div>
-                <div class="corpo-info-value highlight" id="perValue">-</div>
+                <div class="corpo-info-value highlight" id="perValue">${stockCorpInfo.per} 배</div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">PBR</div>
-                <div class="corpo-info-value highlight" id="pbrValue">-</div>
+                <div class="corpo-info-value highlight" id="pbrValue">${stockCorpInfo.pbr} 배</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">ROE(예시)</div>
-                <div class="corpo-info-value" id="roeValue">-</div>
+                <div class="corpo-info-label">ROE(%)</div>
+                <div class="corpo-info-value" id="roeValue">${stockCorpInfo.roe}</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">부채비율(예시)</div>
-                <div class="corpo-info-value" id="debtRatio">-</div>
+                <div class="corpo-info-label">부채비율(%)</div>
+                <div class="corpo-info-value" id="debtRatio">${stockCorpInfo.debtRatio}</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">EPS(예시)</div>
-                <div class="corpo-info-value" id="epsValue">-</div>
+                <div class="corpo-info-label">EPS</div>
+                <div class="corpo-info-value" id="epsValue">${stockCorpInfo.eps} 원</div>
             </div>
             <div class="corpo-info-item">
-                <div class="corpo-info-label">BPS(예시)</div>
-                <div class="corpo-info-value" id="bpsValue">-</div>
+                <div class="corpo-info-label">BPS</div>
+                <div class="corpo-info-value" id="bpsValue">${stockCorpInfo.bps} 원</div>
             </div>
         </div>
-        <p class="corpo-note">* 예시 데이터(연동 시 실제 재무/지표로 대체).</p>
+        <p class="corpo-note">KIS, DART API 데이터 반영</p>
     </div>
 
 </div>
-<script>
-    const ctx = '${pageContext.request.contextPath}';
-
-    function getSelectedCorpInfo(stockCode) {
-        fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('stockCorpInfo-container').innerHTML = html;
-            })
-            .catch(console.error);
-    }
-</script>

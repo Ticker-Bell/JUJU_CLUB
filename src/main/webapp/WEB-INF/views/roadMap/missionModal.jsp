@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
   Created by IntelliJ IDEA.
   User: 퍼스트존 아카데미02
@@ -76,7 +77,7 @@
                             <div class="flex items-center gap-1 flex-shrink-0">
                                 <img class="w-5 h-5 object-contain"
                                      src="${cpath}/resources/images/roadMapIcons/money1.png" alt="돈아이콘">
-                                <div class="text-sm font-extrabold text-gray-900">${m.reward}</div>
+                                <div class="text-sm font-extrabold text-gray-900"><fmt:formatNumber value="${m.reward}" type="number" /></div>
                             </div>
                         </div>
                         <div class="text-sm font-extrabold text-gray-500 flex-shrink-0">

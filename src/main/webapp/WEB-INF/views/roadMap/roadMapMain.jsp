@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%--
   Created by IntelliJ IDEA.
   User: 퍼스트존 아카데미02
@@ -249,8 +250,8 @@
 
             const infoDiv = document.getElementById('tip-info');
             if (isChapter) {
-                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testReward || 0) + '원</div></div>' +
-                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.testPay || 0) + '원</div></div>';
+                infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">보상금</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + Number(data.testReward).toLocaleString() + '원</div></div>' +
+                    '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">응시료</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + Number(data.testPay).toLocaleString() + '원</div></div>';
             } else {
                 infoDiv.innerHTML = '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">종류</div><div class="mt-1 text-xs font-extrabold text-gray-900">' + (data.type === 'THEORY' ? '이론' : '실습') + '</div></div>' +
                     '<div class="rounded-xl border border-gray-100 bg-gray-50 p-3"><div class="text-[10px] font-extrabold text-gray-400">예상 시간</div><div class="mt-1 text-xs font-extrabold text-gray-900">1~5분</div></div>';
@@ -626,8 +627,7 @@
             initRoadMapDropdowns();
             initChapterNavigation();
 
-            // 리사이즈 이벤트는 전역이므로, 기존 리스너가 있다면 제거하고 다시 등록하거나
-            // 간단하게 덮어씌우는 방식으로 처리 (메모리 누수 방지 노력)
+            // 리사이즈 이벤트는 전역이므로, 기존 리스너가 있다면 제거하고 다시 등록하거나 덮어씌움
             window.removeEventListener('resize', handleResize);
             window.addEventListener('resize', handleResize);
 
@@ -651,9 +651,6 @@
         // 스크립트가 로드되자마자 실행
         initialize();
 
-        /* (선택사항) 만약 HTMX로 인해 DOM 내에서 아이콘이 사라진다면
-           명시적으로 Lucide 아이콘을 다시 그려줍니다.
-        */
         if (window.lucide) {
             setTimeout(() => window.lucide.createIcons(), 50);
         }

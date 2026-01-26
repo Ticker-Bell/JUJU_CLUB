@@ -28,4 +28,8 @@ public interface LessonMapper {
 
   int countUserChapterRslt(LessonRequest lessonRequest);
   int updateChapterRslt(LessonRequest lessonRequest);
+
+  int updateChapterRwd(LessonRequest lessonRequest);
+
+  int updateChapterPay(LessonRequest lessonRequest);
 }

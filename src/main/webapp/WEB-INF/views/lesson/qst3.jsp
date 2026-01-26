@@ -91,20 +91,17 @@
 <script>
   updateActiveDot('${titles[2].questionId}');
 
-  const rawQuestion = `${qst[1].questionText}`;
-  const renderedQuestion = rawQuestion.replace(
-      '{{blank}}',
-      '<span id="targetBlank" class="blank-box">______</span>'
-  );
-
-  document.getElementById('questionText').innerHTML = renderedQuestion;
-
   (function () {
     lucide.createIcons();
 
     let selectedIdx = null;
     const CORRECT_IDX =  ${qst[1].answer};
     const EXPLANATION = `${fn:escapeXml(qst[1].explanation)}`;
+    const rawQuestion = `${qst[1].questionText}`;
+    document.getElementById('questionText').innerHTML = rawQuestion.replace(
+        '{{blank}}',
+        '<span id="targetBlank" class="blank-box">______</span>'
+    );
 
     function selectOption(el, idx, text) {
       document.querySelectorAll('.quiz-option')

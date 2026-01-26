@@ -50,6 +50,8 @@ public class LessonDTO {
     private String chapterName;
     private String lessonName;
     private String questionId;
+    private int rewardCash;
+    private int testPay;
   }
   @Alias("LessonQst")
   @Builder

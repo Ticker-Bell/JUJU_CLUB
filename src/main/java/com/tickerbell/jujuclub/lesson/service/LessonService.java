@@ -177,14 +177,19 @@ public class LessonService {
     if(countResult == 0){
       lessonMapper.insertChapterRslt(lessonRequest);
     }
+    // 챕터 테스트시 소모비용
+    lessonMapper.updateChapterPay(lessonRequest);
   }
 
   /**
    * 챕터테스트 테스트 결과 업데이트
    */
   public void updateChapterInfo(LessonDTO.LessonRequest lessonRequest){
-
+    //유저 테스트 결과 저장
     lessonMapper.updateChapterRslt(lessonRequest);
-
+    // 테스트 통과시, 유저 테스트 보상 저장
+    if (lessonRequest.getIsPass().equals("Y")){
+      lessonMapper.updateChapterRwd(lessonRequest);
+    }
   }
 }

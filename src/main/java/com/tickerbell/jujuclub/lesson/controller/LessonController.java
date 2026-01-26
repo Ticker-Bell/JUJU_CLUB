@@ -34,7 +34,7 @@ public class LessonController {
     String questionId = lessonId + "_Q001";
 
     // 레슨 시작 정보 등록
-    if(! lessonId.equals("LV1_CH001_LSN006")){
+    if(! lessonId.equals("LV1_CH001_LS006")){
 
       lessonService.insertLssnInfo(userSeq,lessonId);
     }
@@ -119,14 +119,17 @@ public class LessonController {
     int userSeq = (int) session.getAttribute("userSeq");
 
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+    lessonRequest.setUserSeq(userSeq);
     lessonRequest.setChapterId(chapterId);
     lessonRequest.setLessonId(lessonId);
 
     lessonService.insertChapterRslt(userSeq,chapterId);
 
+    List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
     List<LessonDTO.LessonQst> chapterQst = lessonService.getChapterTest(lessonRequest);
 
 
+    model.addAttribute("title",title);
     model.addAttribute("qst", chapterQst);
     model.addAttribute("userSeq",userSeq);
     //챕터 update시 필요한 chapterId값, html body dom에 저장해둠

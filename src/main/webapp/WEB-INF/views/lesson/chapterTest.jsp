@@ -655,7 +655,7 @@
 
   /* ---------------- 최종 제출 처리 ---------------- */
   function finalizeQuiz() {
-    const isPass = score >= 3 ? 'Y' : 'N';
+    const isPass = score >= 70 ? 'Y' : 'N';
     const successModal = document.getElementById('successModal');
     const failModal = document.getElementById('failModal');
 

@@ -34,7 +34,7 @@ public class LessonController {
     String questionId = lessonId + "_Q001";
 
     // 레슨 시작 정보 등록
-    if(! lessonId.equals("LV1_CH001_LSN006")){
+    if(! lessonId.equals("LV1_CH001_LS006")){
 
       lessonService.insertLssnInfo(userSeq,lessonId);
     }
@@ -119,6 +119,7 @@ public class LessonController {
     int userSeq = (int) session.getAttribute("userSeq");
 
     LessonDTO.LessonRequest lessonRequest = new LessonRequest();
+    lessonRequest.setUserSeq(userSeq);
     lessonRequest.setChapterId(chapterId);
     lessonRequest.setLessonId(lessonId);
 

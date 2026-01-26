@@ -37,6 +37,28 @@
       AND CHAPTER_ID = #{chapterId}
   </update>
 
+  <update id="updateChapterRwd" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_ACCOUNT UA
+      LEFT OUTER JOIN USER_TEST_RESULT UTR
+      ON UA.USER_SEQ = UTR.USER_SEQ
+      LEFT OUTER JOIN LEARNING_CHAPTER LC
+      ON UTR.CHAPTER_ID = LC.CHAPTER_ID
+    SET CASH_BALANCE = CASH_BALANCE + REWARD_CASH
+    WHERE UA.USER_SEQ = #{userSeq}
+      AND LC.chapter_id = #{chapterId}
+  </update>
+
+  <update id="updateChapterPay" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest" >
+    UPDATE USER_ACCOUNT UA
+      LEFT OUTER JOIN USER_TEST_RESULT UTR
+      ON UA.USER_SEQ = UTR.USER_SEQ
+      LEFT OUTER JOIN LEARNING_CHAPTER LC
+      ON UTR.CHAPTER_ID = LC.CHAPTER_ID
+    SET CASH_BALANCE = CASH_BALANCE - TEST_PAY
+    WHERE UA.USER_SEQ = #{userSeq}
+      AND LC.chapter_id = #{chapterId}
+  </update>
+
   <select id="selectQstChat" parameterType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO$QstChatMsgRequest"
     resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
     SELECT OPTIONS
@@ -93,7 +115,7 @@
            LEFT OUTER JOIN LEARNING_LESSON ON LEARNING_QUESTION.LESSON_ID = LEARNING_LESSON.LESSON_ID
            LEFT OUTER JOIN LEARNING_CHAPTER ON LEARNING_LESSON.CHAPTER_ID = LEARNING_CHAPTER.CHAPTER_ID
     WHERE LEARNING_LESSON.CHAPTER_ID = #{chapterId}
-      AND SUBSTRING(QUESTION_ID, 21) != '1';
+      AND SUBSTRING(QUESTION_ID, 20) != '1';
 
   </select>
   <select id="countUserChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"

@@ -379,6 +379,17 @@
 
             drawContinuousPath();
             if (window.lucide) window.lucide.createIcons();
+            preBtn.onclick = () => {
+                const vw = window.innerWidth - 220;
+                const currentScroll = scrollContainer.scrollLeft;
+                const currentChapter = Math.round(currentScroll / vw);
+                if (currentChapter > 0) {
+                    const targetIdx = currentChapter - 1;
+                    const targetX = targetIdx * vw;
+                    scrollContainer.scrollTo({left: targetX, behavior: 'smooth'});
+                    updateDropdownUI(targetIdx);
+                }
+            };
 
             // 초기 로딩일 때만 현재 위치로 스크롤 & 드롭다운 동기화
             if (isFirstLoad) {
@@ -387,9 +398,9 @@
                 // 만약 'current'가 없으면(다 깼거나 오류) 가장 마지막 완료된 곳이라도 찾음
                 const targetNode = currentNode || nodePositions[nodePositions.length - 1];
 
-                if (currentNode) {
-                    const screenCenter = window.innerWidth / 2;
-                    let targetScroll = currentNode.x - screenCenter;
+                if (targetNode) {
+                    const vw = window.innerWidth - 220;
+                    let targetScroll = targetNode.data.chapterIdx * vw;
                     if (targetScroll < 0) targetScroll = 0;
 
                     // 약간의 지연을 주어 렌더링 후 스크롤 보장

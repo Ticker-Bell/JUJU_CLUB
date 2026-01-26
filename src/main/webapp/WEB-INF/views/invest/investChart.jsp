@@ -41,7 +41,7 @@
                 <span id="header-stock"
                       class="px-2 rounded-md bg-[#D9D9D9] text-gray-500 text-sm font-medium">000000</span>
                 <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[#F4F4F4] text-sm font-medium">KOSPI</span>
-                <img id="header-stockLike" data-liked="false"
+                <img id="header-stockLike" data-liked="false" onclick="toggleLike()"
                      class="w-5 h-5 cursor-pointer" src="${cpath}/resources/images/stockIcons/heart.svg" alt="하트아이콘">
             </div>
             <div id="button-group"
@@ -95,7 +95,28 @@
         updateButtonUI('D');
     };
 
-    function toggleLike(likeEl) {
+    function initLikeStatus(stockCode){
+        const likeEl = document.getElementById('header-stockLike');
+
+        fetch(`${pageContext.request.contextPath}/stock/watchlist/isLiked?stockCode=`+stockCode)
+            .then(res => res.json())
+            .then(data=> {
+                updateLikeUI(likeEl, data);
+            })
+            .catch(err => console.error("초기 상태 로드 실패: ", err));
+    }
+
+    function updateLikeUI(likeEl, isLiked){
+        likeEl.src = isLiked
+            ? `${pageContext.request.contextPath}/resources/images/stockIcons/filled-heart.svg`
+            : `${pageContext.request.contextPath}/resources/images/stockIcons/heart.svg`;
+        likeEl.dataset.liked = isLiked.toString();
+
+        console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+    }
+
+    function toggleLike() {
+        const likeEl = document.getElementById('header-stockLike');
         const isLiked = likeEl.dataset.liked === "true";
 
         const url = `${pageContext.request.contextPath}/stock/watchlist`;
@@ -115,23 +136,12 @@
                 return res;
             })
             .then(() => {
-                likeEl.dataset.liked = (!isLiked).toString();
-                likeEl.src = isLiked
-                    ? `${pageContext.request.contextPath}/resources/images/stockIcons/heart.svg`
-                    : `${pageContext.request.contextPath}/resources/images/stockIcons/filled-heart.svg`;
-
-                console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+                updateLikeUI(likeEl, !isLiked);
             })
             .catch(err => {
                 console.error(err);
             });
     }
-
-    document.getElementById("header-stockLike")
-        .addEventListener("click", function () {
-            toggleLike(this);
-        });
-
 
     function getSelectedChart(stockCode, stockName) {
         //선택된 주식 리스트
@@ -140,7 +150,7 @@
 
         document.getElementById('header-stock').innerText = selectedStockState.stockCode;
         document.getElementById('header-stockName').innerText = selectedStockState.stockName;
-        console.log("받아온 차트 데이터: " + selectedStockState.stockCode + selectedStockState.stockName);
+
         loadChartData('D', selectedStockState.stockCode);
 
         //시장 타입 가져오기
@@ -155,6 +165,7 @@
     function loadChartData(periodCode, stockCode) {
         currentPeriod = periodCode;
         updateButtonUI(periodCode);
+        initLikeStatus(stockCode);
         //rest api 연결
         const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=`+periodCode+"&stockCode="+stockCode;
         fetch(url)

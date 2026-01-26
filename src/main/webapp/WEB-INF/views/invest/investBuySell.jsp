@@ -4,13 +4,13 @@
     <title>매도매수</title>
 </head>
 <body>
-<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[20px] outline outline-2 outline-[#E6E7EB]">
+<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
     <div id="tab-header" class="w-1/2 flex my-4 border-b border-[#E6E7EB] ">
-        <button onclick="switchTab(this, 'sell')"
+        <button onclick="switchTab(this, 'buy')"
                 class="tab-item active flex-1 py-2 px-1 border-b-[3px] border-[#5E45EB] border-xs text-[#2D14B8] font-medium text-base transition-all hover:text-[#3819E6]">
             매수
         </button>
-        <button onclick="switchTab(this, 'buy')"
+        <button onclick="switchTab(this, 'sell')"
                 class="tab-item flex-1 py-2 px-1 border-b-[3px] border-transparent border-xs text-[#666666] font-medium text-base transition-all hover:text-[#3819E6]">
             매도
         </button>
@@ -56,7 +56,7 @@
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-sm font-normal text-[#666666]">보유수량</label>
                 <div class="flex flex-row gap-2">
-                    <p id="hasStockQuantity" class="text-[#222222]">${hasStockQuantity}</p>
+                    <p id="hasStockQuantity" class="text-[#222222]"></p>
                 </div>
             </div>
             <div id="sell-form-item" class="flex justify-between">
@@ -111,12 +111,26 @@
         element.classList.remove('border-transparent', 'text-[#666666]');
 
         if (type !== 'sell') {
-            document.getElementById('sell-form').classList.remove('hidden');
-            document.getElementById('buy-form').classList.add('hidden');
-        } else {
             document.getElementById('sell-form').classList.add('hidden');
             document.getElementById('buy-form').classList.remove('hidden');
+        } else {
+            document.getElementById('sell-form').classList.remove('hidden');
+            document.getElementById('buy-form').classList.add('hidden');
+            hasQuantity("005930");
         }
+    }
+
+    function hasQuantity(stockCode){
+        fetch(`${pageContext.request.contextPath}/invest/hasStockQuantity?stockCode=`+stockCode)
+            .then(res => {
+                if (!res.ok) throw new Error("데이터 조회 실패");
+                return res.json();
+            })
+            .then(data=>{
+                console.log("받은 데이터: " + data);
+                document.getElementById('hasStockQuantity').innerText = data;
+            })
+            .catch(err=> console.error(err));
     }
 
     function buyExpectedPrice() {
@@ -146,7 +160,7 @@
         document.getElementById('sellExpectedPrice').innerText = total.toLocaleString();
     }
 
-    function trade() {
+    function trade(stockCode) {
         //매수, 매도 버튼 로직
         let price;
         let amount;
@@ -161,7 +175,7 @@
         }
 
         const data = {
-            stockSeq: 2,
+            stockCode: stockCode ,
             tradeType: tradeType,
             tradePrice: price,
             tradeQuantity: amount

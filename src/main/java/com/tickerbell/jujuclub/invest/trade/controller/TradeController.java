@@ -19,22 +19,19 @@ public class TradeController {
     @Autowired
     TradeService tradeService;
 
-    @GetMapping("/investBuySell.do")
-    public String TradePage(HttpSession session, Model model){
-        Integer userSeq = (Integer) session.getAttribute("userSeq") == null ? 4 : (Integer)session.getAttribute("userSeq");
-        Integer hasStockQuantity;
+    @GetMapping("/hasStockQuantity")
+    @ResponseBody
+    public Integer TradePage(@RequestParam String stockCode, HttpSession session) {
+        Object userSeqObj = session.getAttribute("userSeq");
+
+        int userSeq = (userSeqObj == null)
+                ? 4
+                : Integer.parseInt(userSeqObj.toString());
         TradeDTO tradeDTO = new TradeDTO();
         tradeDTO.setUserSeq(userSeq);
-        tradeDTO.setStockSeq(2);
-        if(tradeService.getStockQuantity(tradeDTO) == null){
-            hasStockQuantity =  0;
-        }else{
-            hasStockQuantity = tradeService.getStockQuantity(tradeDTO);
-        }
+        tradeDTO.setStockCode(stockCode);
 
-        model.addAttribute("hasStockQuantity", hasStockQuantity);
-
-        return "invest/investBuySell";
-
+        Integer quantity = tradeService.getStockQuantity(tradeDTO);
+        return (quantity == null) ? 0 : quantity;
     }
 }

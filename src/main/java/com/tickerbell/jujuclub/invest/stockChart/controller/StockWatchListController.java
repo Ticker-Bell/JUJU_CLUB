@@ -30,5 +30,15 @@ public class StockWatchListController {
         watchListDTO.setUserSeq(userSeq);
         stockChartDataService.deleteWatchList(watchListDTO);
     }
+
+    @GetMapping("/isLiked")
+    @ResponseBody
+    public boolean selectWatchList(WatchListDTO watchListDTO, HttpSession session) {
+        Integer userSeq = (session.getAttribute("userSeq") == null) ? 4 : (Integer) session.getAttribute("userSeq");
+        watchListDTO.setUserSeq(userSeq);
+        return stockChartDataService.selectWatchlist(watchListDTO);
+    }
+
+
 }
 

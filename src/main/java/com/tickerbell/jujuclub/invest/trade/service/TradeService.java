@@ -21,7 +21,8 @@ public class TradeService {
         int amountChange = "Y".equals(tradeDTO.getTradeType()) ? -totalAmount : totalAmount;
 
         int userBalance = tradeMapper.selectBalance(userSeq);
-        Integer userQuantity = tradeMapper.selectHoldings(tradeDTO.getStockSeq());
+        Integer userQuantity = tradeMapper.selectHoldings(tradeDTO);
+
         //예외처리
         if (tradeDTO.getTradeType().equals("Y")&& totalAmount>userBalance) {
             //예상 금액>현재 보유 자금
@@ -47,6 +48,6 @@ public class TradeService {
     }
 
     public Integer getStockQuantity(TradeDTO tradeDTO){
-        return  tradeMapper.selectHoldings(tradeDTO.getStockSeq());
+        return  tradeMapper.selectHoldings(tradeDTO);
     }
 }

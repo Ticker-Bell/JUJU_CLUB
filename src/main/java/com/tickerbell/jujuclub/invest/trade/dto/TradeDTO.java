@@ -15,4 +15,6 @@ public class TradeDTO {
     private int tradeQuantity;
     private int tradePrice;
     private int totalAmount;
+
+    private String stockCode;
 }

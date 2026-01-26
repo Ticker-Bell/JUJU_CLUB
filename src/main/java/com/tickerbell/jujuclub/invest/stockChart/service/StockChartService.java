@@ -25,7 +25,7 @@ public class StockChartService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartParser stockChartParser;
-    private final String APPROVAL_KEY = "5622cc60-8a75-4bbb-845a-9f70babcc1bd";
+    private final String APPROVAL_KEY = "79710f97-db46-45b3-b000-09307942994e";
 
     public synchronized void connectToStockChartApi(String trType, List<String> stockCodeList) {
         //세션이 없거나 닫혀있으면 연결

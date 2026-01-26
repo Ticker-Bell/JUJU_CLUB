@@ -18,10 +18,10 @@
     </update>
 
     <!--보유주식의 수량 select-->
-    <select id="selectHoldings" resultType="Integer" parameterType="int">
+    <select id="selectHoldings" resultType="Integer"  parameterType="com.tickerbell.jujuclub.invest.trade.dto.TradeDTO">
         SELECT quantity
-        FROM  mock_portfolio
-        WHERE stock_seq = #{stockSeq}
+        FROM  mock_portfolio JOIN stock_master ON mock_portfolio.stock_seq =stock_master.stock_seq
+        WHERE user_seq = #{userSeq} AND stock_code= #{stockCode}
     </select>
 
     <!--보유주식 insert and update-->

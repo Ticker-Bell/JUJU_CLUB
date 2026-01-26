@@ -106,11 +106,11 @@ public class StockListController {
 
     @GetMapping("/main/stock/list")
     @ResponseBody
-    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, @RequestParam(value = "page", defaultValue = "0") int page, HttpSession session, HttpServletRequest request) throws Exception {
+    public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, @RequestParam(value = "page", defaultValue = "0") int page, HttpSession session) throws Exception {
 
         List<RankingDTO> rankingDTOList = new ArrayList<>(); // 전체 리스트
 
-        String accessToken = getValidAccessToken.getValidToken(request);
+        String accessToken = getValidAccessToken.getValidToken();
 
         switch (sortType) {
             case "interest":  //관심종목

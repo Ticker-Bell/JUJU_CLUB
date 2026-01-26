@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
+import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import com.tickerbell.jujuclub.utils.RequestNewAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,7 @@ import java.net.URL;
 public class KISApiService {
 
     //토큰 재사용 로직
-    private final RequestNewAccessToken requestNewAccessToken;
+    private final GetValidAccessToken getValidAccessToken;
 
     //RestTemplate
     private final RestTemplate restTemplate;
@@ -40,7 +41,7 @@ public class KISApiService {
     public KISDataDTO getPriceData(String stockCode){
         try{
             //토큰 재사용하기
-            String token = requestNewAccessToken.getAccessToken();
+            String token = getValidAccessToken.getValidToken();
             //RestTemlplate으로 변경
             //주소 : (REST 주식현재가 시세[v1_국내주식-008] 사용)
             String url = BASE_URL
@@ -103,7 +104,7 @@ public class KISApiService {
 
         try {
             //토큰가져오기
-            String token = requestNewAccessToken.getAccessToken();
+            String token = getValidAccessToken.getValidToken();
 
             //URL만들기(REST 주식현재가 시세[v1_국내주식-008] 사용)
             String urlStr = BASE_URL
@@ -173,7 +174,7 @@ public class KISApiService {
         HttpURLConnection conn = null;
         try {
             //토큰얻기
-            String token = requestNewAccessToken.getAccessToken();
+            String token = getValidAccessToken.getValidToken();
             //주소 설정
             String urlStr = BASE_URL
                     + "/uapi/domestic-stock/v1/quotations/inquire-price"

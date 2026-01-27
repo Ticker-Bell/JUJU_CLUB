@@ -887,6 +887,16 @@
                 }
             }
         )
+
+        // 리스트 첫 번째 종목 클릭되도록
+        if(page === 0){
+            const $firstItem = $container.find('.stock-item').first();
+
+            // 요소가 존재하면 클릭 이벤트 강제 발생
+            if($firstItem.length > 0){
+                $firstItem.trigger('click');
+            }
+        }
     }
 </script>
 </body>

@@ -13,6 +13,9 @@
     }
 %>
 
+<c:set var="cpath" value="${pageContext.request.contextPath}" />
+<c:set var="defaultProfile" value="${cpath}/resources/images/default-profile.png" />
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>마이페이지 | JUJU CLUB</title>
@@ -26,30 +29,41 @@
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
 <script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        fontFamily: {sans: ['Pretendard', 'sans-serif']},
-        colors: {primary: '#5E45EB', secondary: '#F8FAFC'}
-      }
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {sans: ['Pretendard', 'sans-serif']},
+                colors: {primary: '#5E45EB', secondary: '#F8FAFC'}
+            }
+        }
     }
-  }
 </script>
-
 
 <div class="w-full max-w-[1600px] mx-auto h-full flex flex-col p-5">
 
     <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-5 min-h-0">
 
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative justify-center">
-            <div class="flex-1 flex flex-col items-center justify-center relative z-10">
-                <div class="w-24 h-24 rounded-full bg-white border-4 border-slate-50 flex items-center justify-center text-white shadow-xl mb-4 relative group cursor-pointer">
-                    <div class="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 opacity-90"></div>
-                    <i data-lucide="user" class="w-10 h-10 relative z-10"></i>
+            <div class="flex items-center justify-between mb-2 shrink-0">
+                <h3 class="text-lg font-extrabold text-gray-900">프로필</h3>
+            </div>
 
-                    <%-- 모달 호출용 HTMX 버튼 --%>
-                    <div class="absolute bottom-0 right-0 bg-gray-900 p-1.5 rounded-full border-2 border-white hover:bg-primary transition-colors cursor-pointer"
-                         hx-get="${pageContext.request.contextPath}/myPage/profile"
+            <div class="flex-1 flex flex-col items-center justify-center relative z-10">
+
+                <%-- ✅ 프로필 이미지: DB에 있으면 /member/profile-image 가 200, 없으면 404 -> onerror로 기본이미지 --%>
+                <div class="w-24 h-24 rounded-full bg-white border-4 border-slate-50 shadow-xl mb-4 relative group cursor-pointer overflow-hidden">
+                    <img
+                            id="mainProfileImg"
+                            src="${cpath}/member/profile-image?ts=<%=System.currentTimeMillis()%>"
+                            alt="profile"
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            onerror="this.onerror=null; this.src='${defaultProfile}';"
+                    />
+
+                    <!-- ✅ 설정 버튼 -->
+                    <div class="absolute bottom-1 right-1 bg-gray-900 p-1.5 rounded-full border-2 border-white hover:bg-primary transition-colors cursor-pointer z-20"
+                         hx-get="${cpath}/myPage/profile"
                          hx-target="body"
                          hx-swap="beforeend">
                         <i data-lucide="settings-2" class="w-4 h-4 text-white"></i>
@@ -61,7 +75,7 @@
 
                 <div class="flex items-center gap-2 mb-6">
                     <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
-                    Lv.${loginUser.userLevel}  ${loginUser.userLevel == 1 ? '초급': loginUser.userLevel == 2 ? '중급': loginUser.userLevel == 3 ? '고급' : '초급'}
+                        Lv.${loginUser.userLevel} ${loginUser.userLevel == 1 ? '초급': loginUser.userLevel == 2 ? '중급': loginUser.userLevel == 3 ? '고급' : '초급'}
                     </span>
                     <span class="w-1 h-1 rounded-full bg-gray-300"></span>
                     <p class="text-xs text-gray-500 font-bold">
@@ -87,13 +101,13 @@
                             <c:when test="${not empty userAsset and userAsset.totalReturnPct < 0}">
                                 <span class="text-xs font-bold text-blue-500 flex items-center">
                                     <i data-lucide="trending-down" class="w-3 h-3 mr-1"></i>
-                                    <fmt:formatNumber value="${userAsset.totalReturnPct}"
-                                                      pattern="#,##0.1"/>%
+                                    <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.1"/>%
                                 </span>
                             </c:when>
                         </c:choose>
                     </div>
                 </div>
+
                 <div class="flex-1 flex flex-col items-center justify-center">
                     <span class="text-sm font-bold text-gray-400 mb-1">예수금</span>
                     <p class="text-2xl font-black text-primary tracking-tight">
@@ -112,11 +126,14 @@
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-lg font-extrabold text-gray-900">내 포트폴리오</h3>
-                <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>
             </div>
-            <div id="chartContainer"
-                 class="flex-1 relative w-full min-h-0 flex items-center justify-center p-2">
-                <canvas id="stockChart"></canvas>
+            <div id="chartContainer" class="flex-1 relative w-full min-h-0 flex flex-col p-2">
+                <div class="flex justify-end mb-2">
+                    <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>
+                </div>
+                <div class="flex-1 min-h-0 flex items-center justify-center">
+                    <canvas id="stockChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -128,8 +145,7 @@
             </div>
             <div class="flex-1 flex flex-col items-center justify-center text-center pb-4">
                 <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-5 rotate-12 border border-slate-100 shadow-sm">
-                    <i data-lucide="message-circle-warning"
-                       class="w-10 h-10 text-slate-300 -rotate-12"></i>
+                    <i data-lucide="message-circle-warning" class="w-10 h-10 text-slate-300 -rotate-12"></i>
                 </div>
                 <p class="text-lg font-extrabold text-gray-500 mb-1">현재는 비어있습니다.</p>
                 <p class="text-sm font-medium text-gray-400">열심히 활동해서 뱃지를 모아보세요!</p>
@@ -140,102 +156,101 @@
 </div>
 
 <script>
-  // [중요] 즉시 실행 함수(IIFE)로 감싸서 변수 충돌 방지 및 즉시 실행 보장
-  (function () {
-    // 1. 아이콘 로드 (HTMX로 들어왔을 때 아이콘이 깨지는 현상 방지)
-    if (window.lucide) lucide.createIcons();
+    (function () {
+        if (window.lucide) lucide.createIcons();
+        drawStockChart();
 
-    drawStockChart();
+        function drawStockChart() {
+            const container = document.getElementById('chartContainer');
+            if (!container) return;
 
-    // 2. 차트 그리기 함수
-    function drawStockChart() {
-      // 차트 부모 컨테이너 찾기
-      const container = document.getElementById('chartContainer');
-      // 컨테이너가 없으면 실행 중단 (오류 방지)
-      if (!container) return;
+            container.innerHTML = '';
 
-      // [Nuclear Option]
-      // 캔버스 영역을 강제로 비우고 새로 만듭니다.
-      // HTMX로 페이지를 왔다 갔다 할 때 꼬이는 차트 문제를 100% 방지합니다.
-      container.innerHTML = '';
+            // ✅ 라벨 다시 추가 (innerHTML 비워서 사라짐 방지)
+            const labelRow = document.createElement('div');
+            labelRow.className = "flex justify-end mb-2";
+            labelRow.innerHTML = '<span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>';
+            container.appendChild(labelRow);
 
-      const newCanvas = document.createElement('canvas');
-      newCanvas.id = 'stockChart';
-      container.appendChild(newCanvas);
+            // ✅ 차트 래퍼
+            const chartWrap = document.createElement('div');
+            chartWrap.className = "flex-1 min-h-0 flex items-center justify-center";
+            container.appendChild(chartWrap);
 
-      const ctx = newCanvas.getContext('2d');
+            const newCanvas = document.createElement('canvas');
+            newCanvas.id = 'stockChart';
+            chartWrap.appendChild(newCanvas);
 
-      // 서버 데이터 로드 (JSP 변수 -> JS 변수)
-      const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
+            const ctx = newCanvas.getContext('2d');
+            const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
 
-      // 차트 옵션 설정
-      const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false, // 깜빡임 방지를 위해 애니메이션 끔
-        cutout: '65%',
-        layout: {padding: 10}
-      };
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                cutout: '65%',
+                layout: {padding: 10}
+            };
 
-      if (chartDataFromServer.length === 0) {
-        // 데이터 없음 (회색 도넛)
-        new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: ['데이터 없음'],
-            datasets: [{data: [100], backgroundColor: ['#F1F5F9'], borderWidth: 0}]
-          },
-          options: {
-            ...commonOptions,
-            cutout: '70%',
-            plugins: {legend: {display: false}, tooltip: {enabled: false}}
-          }
-        });
-      } else {
-        // 실제 데이터 차트 그리기
-        const labels = chartDataFromServer.map(item => item.stockName);
-        const data = chartDataFromServer.map(item => item.weightPct);
-        const colors = chartDataFromServer.map(item => item.color);
+            if (chartDataFromServer.length === 0) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['데이터 없음'],
+                        datasets: [{data: [100], backgroundColor: ['#F1F5F9'], borderWidth: 0}]
+                    },
+                    options: {
+                        ...commonOptions,
+                        cutout: '70%',
+                        plugins: {legend: {display: false}, tooltip: {enabled: false}}
+                    }
+                });
+            } else {
+                const labels = chartDataFromServer.map(item => item.stockName);
+                const data = chartDataFromServer.map(item => item.weightPct);
+                const colors = chartDataFromServer.map(item => item.color);
 
-        new Chart(ctx, {
-          type: 'doughnut',
-          data: {
-            labels: labels,
-            datasets: [{
-              data: data,
-              backgroundColor: colors,
-              borderWidth: 0,
-              hoverOffset: 15
-            }]
-          },
-          options: {
-            ...commonOptions,
-            plugins: {
-              legend: {
-                position: 'right',
-                labels: {
-                  font: {family: 'Pretendard', size: 12, weight: 'bold'},
-                  usePointStyle: true, boxWidth: 8, padding: 15, color: '#64748B'
-                }
-              },
-              tooltip: {
-                backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                padding: 12, cornerRadius: 8, displayColors: false,
-                bodyFont: {family: 'Pretendard', size: 14},
-                callbacks: {
-                  label: function (context) {
-                    return context.label + ': ' + context.raw + '%';
-                  }
-                }
-              }
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    font: {family: 'Pretendard', size: 12, weight: 'bold'},
+                                    usePointStyle: true, boxWidth: 8, padding: 15, color: '#64748B'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                                padding: 12, cornerRadius: 8, displayColors: false,
+                                bodyFont: {family: 'Pretendard', size: 14},
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.label + ': ' + context.raw + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
             }
-          }
+        }
+
+        //✅ (선택) 모달에서 이미지 업로드 후 메인 프로필도 즉시 갱신하고 싶으면:
+        document.body.addEventListener('profile-image-updated', function(){
+        const img = document.getElementById('mainProfileImg');
+        if (img) img.src = '${cpath}/member/profile-image?ts=' + Date.now();
         });
-      }
-    }
-
-    // [핵심 수정] 이벤트 리스너 없이 바로 실행!
-    // HTMX가 이 HTML을 화면에 끼워 넣자마자 이 코드가 실행되어 차트를 그립니다.
-
-  })(); // 함수 끝
+    })();
 </script>

@@ -51,7 +51,7 @@
     /* 트로피 섹션 */
     .trophy-wrap {
         display: flex; justify-content: center; align-items: flex-end;
-        gap: 50px; margin-top:6vh; margin-bottom: 18px;
+        gap: 50px; margin-top:16vh; margin-bottom: 18px;
     }
     .trophy {
         position: relative; width: clamp(110px, 12vw, 170px);

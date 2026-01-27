@@ -729,15 +729,23 @@
             loadStockList(sortType);
         });
 
-        // 처음 페이지 로딩시에는 삼성전자 코드 뿌리기
-        const code = "005930";
-        const name = "삼성전자";
+        const $firstItem = $('.stock-item').first();
 
-        //investChart 차트데이터 전달
-        getSelectedChart(code, name);
 
-        // 기업정보에 전달
-        getSelectedCorpInfo(code);
+        // 요소가 있다면 첫번째 종목 클릭처리
+        if($firstItem.length > 0){
+            // 요소가 존재하면 클릭 이벤트 강제 발생
+            $firstItem.trigger('click');
+        }else{ // 없다면 화면에 차트 띄우지 않음
+            const code = '';
+            const name = '';
+            //investChart 차트데이터 전달
+            getSelectedChart(code, name);
+            // 기업정보에 전달
+            getSelectedCorpInfo(code);
+        }
+
+
 
     });
 
@@ -811,10 +819,6 @@
 
         $.each(data, function (index, item) {
             // [중요 수정] JSP 태그(c:if)는 JS 문자열 안에서 작동 안 함 -> 자바스크립트 변수로 처리
-            let rankHtml = '';
-            if (item.rank) {
-                rankHtml = `<span class="rank">\${item.rank}</span>`;
-            }
 
             let colorClass = "color-gray";
             if (item.changePct && item.changePct.startsWith("+")) {
@@ -829,7 +833,6 @@
             html += `
                 <div class="stock-item" data-code="\${item.stockCode}" data-name="\${item.stockName}">
                     <div class="text-col">
-                        \${rankHtml}
                         <span class="txt-name">\${item.stockName}</span>
                         <span class="txt-code num-font">\${item.stockCode}</span>
                     </div>

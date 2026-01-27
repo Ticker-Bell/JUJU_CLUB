@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Slf4j
 public class RankingApiService {
 
     @Value("${kis.appkey}")

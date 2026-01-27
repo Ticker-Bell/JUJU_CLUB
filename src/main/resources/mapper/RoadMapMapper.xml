@@ -3,6 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 모든 레벨/챕터/레슨 조회 -->
 <mapper namespace="com.tickerbell.jujuclub.roadMap.mapper.RoadMapMapper">
+
     <select id="allLearningList" resultType="com.tickerbell.jujuclub.roadMap.dto.LevelChapterLessonDTO">
         SELECT
             lv.level_seq AS levelId,
@@ -54,14 +55,31 @@
         where user_seq = #{user_seq}
         order by levelId desc, chapterId desc, lessonId desc
     </select>
+
+
+    <insert id="insertInitUserMission">
+        insert into user_mission (user_seq, mission_seq, is_completed, is_rewarded, started_at, progress)
+        select
+            #{user_seq},
+            mission_seq,
+            'N', 'N', Now(), 0
+        from mission
+        where mission_seq in (1,2,3,4);
+    </insert>
+
     <select id="missionList" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionDTO">
         select
-            mission_seq AS missionId,
+            ms.mission_seq as missionId,
             mission_type AS type,
             mission_title AS content,
             mission_reward AS reward,
-            target_value AS count
-            from mission
+            ms.target_value AS count,
+            um.progress,
+            um.is_rewarded AS isRewarded,
+            um.is_completed AS isSuccess
+        from mission ms join user_mission um
+        on ms.mission_seq = um.mission_seq
+        where um.user_seq = #{user_seq}
     </select>
 
     <select id="missionCheck" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionCheckDTO">
@@ -84,6 +102,16 @@
         FROM DUAL
     </select>
 
+    <update id="missionReward">
+        update user_account join user_mission
+        on user_account.user_seq = user_mission.user_seq
+            join mission on user_mission.mission_seq  = mission.mission_seq
+            set cash_balance = cash_balance + mission_reward,
+                user_mission.is_completed = 'Y',
+                user_mission.is_rewarded = 'Y'
+        where user_account.user_seq = #{user_seq} and mission.mission_seq = #{mission_seq}
+    </update>
+
     <select id="chapterTestResult" resultType="com.tickerbell.jujuclub.roadMap.dto.ChapterResultDTO">
         select test_result_seq as resultSeq,
                user_seq as userSeq,
@@ -92,7 +120,7 @@
                is_pass as isPass,
                tested_at as testDate
         from user_test_result
-        where user_seq = ${user_seq}
+        where user_seq = #{user_seq}
     </select>
 
 </mapper>

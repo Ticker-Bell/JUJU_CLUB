@@ -20,12 +20,18 @@ public interface RoadMapMapper {
     // 전체 level, chapter, lesson 조회
     List<LevelChapterLessonDTO> allLearningList();
 
+    // chapter test 전부 조회
+    List<ChapterResultDTO> chapterTestResult(@Param("user_seq") Integer userSeq);
+
     // mission 조회
-    List<MissionDTO> missionList();
+    List<MissionDTO> missionList(@Param("user_seq") Integer userSeq);
+
+    // user_mission insert
+    void insertInitUserMission(@Param("user_seq") Integer userSeq);
 
     // mission 진행 횟수 조회
     MissionCheckDTO missionCheck(@Param("user_seq") Integer userSeq);
 
-    // chapter test 전부 조회
-    List<ChapterResultDTO> chapterTestResult(@Param("user_seq") Integer userSeq);
+    // mission 보상금 지급
+    boolean missionReward(@Param("user_seq") Integer userSeq, @Param("mission_seq") Integer reward);
 }

@@ -33,12 +33,17 @@ public class RoadMapService {
         return roadMapMapper.allLearningList();
     }
 
-    // 미션 모두 조회
+    // 유저 미션 삽입
+    public void insertInitUserMission(Integer userSeq) {
+        roadMapMapper.insertInitUserMission(userSeq);
+    }
+    // 유저 미션 모두 조회
     public List<MissionDTO> missionList(Integer userSeq) {
-        List<MissionDTO> list = roadMapMapper.missionList();
+        List<MissionDTO> list = roadMapMapper.missionList(userSeq);
         MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
 
         for(MissionDTO mission: list) {
+            // 미션타입에 따라 진행횟수 저장
             switch (mission.getType()) {
                 case "lesson":
                     mission.setProgress(check.getLesson());
@@ -57,7 +62,21 @@ public class RoadMapService {
                     break;
             }
 
+            // 미션성공여부, 보상금 지급여부 저장
+            if(mission.getProgress() >= mission.getCount()) {
+                if("N".equals(mission.getIsSuccess())) {
+                    mission.setIsSuccess("Y");
+                    boolean rewardSuccess = roadMapMapper.missionReward(userSeq, mission.getMissionId());
+                    if(rewardSuccess) {
+                        System.out.println("미션 보상금 지급 완료");
+                        mission.setIsRewarded("Y");
+                    } else {
+                        System.out.println("미션 보상금 지급 실패");
+                    }
+                }
+            }
         }
+
         return list;
     }
 

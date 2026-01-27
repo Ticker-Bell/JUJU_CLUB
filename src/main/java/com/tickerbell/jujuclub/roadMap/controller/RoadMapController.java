@@ -36,12 +36,9 @@ public class RoadMapController {
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
         List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
         List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
-
-        // 미션 확인용
         List<MissionDTO> missionList = roadMapService.missionList(userSeq);
-        int successCount = (int) missionList.stream()
-                .filter(mission -> mission.getCount() <= (mission.getProgress() == null ? 0 : mission.getProgress()))
-                .count();
+
+        int successCount = (int) missionList.stream().filter(mission -> mission.getIsSuccess().equals("Y")).count();
 
         // 유저 레슨 진행 상황 저장
         Map<String, UserLessonDTO> userMap = new HashMap<>();
@@ -118,7 +115,7 @@ public class RoadMapController {
         Integer userSeq = loginUser.getUserSeq();
 
         List<MissionDTO> missionList = roadMapService.missionList(userSeq);
-        int successCount = (int) missionList.stream().filter(mission -> mission.getCount() <= mission.getProgress()).count();
+        int successCount = (int) missionList.stream().filter(mission -> mission.getIsSuccess().equals("Y")).count();
 
         model.addAttribute("mission", missionList);
         model.addAttribute("successCount", successCount);

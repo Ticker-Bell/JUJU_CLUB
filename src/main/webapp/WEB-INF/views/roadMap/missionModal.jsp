@@ -18,7 +18,7 @@
                         class="w-2 h-2 rounded-full bg-primary"></span> 일일 미션
                 </div>
                 <div class="mt-1 text-base font-extrabold text-gray-900">오늘의 미션 <span id="missionCountText"
-                                                                                      class="text-gray-400 text-sm font-extrabold">(${successCount}/${mission.size()})</span>
+                                                                                      class="text-gray-400 text-sm font-extrabold">(${successCount}/4)</span>
                 </div>
             </div>
             <button id="closeMissionBtn"
@@ -32,7 +32,7 @@
                 <div class="text-sm font-extrabold text-gray-900">진행도</div>
                 <%-- id 유지 --%>
                 <div class="text-sm font-extrabold text-primary num-font" id="missionTopProgress">
-                    ${successCount}/${mission.size()}
+                    ${successCount}/4
                 </div>
             </div>
             <div class="mt-3 h-2 rounded-full bg-primary/20 overflow-hidden">
@@ -47,7 +47,7 @@
                     <div class="flex items-center gap-3 w-full">
 
                             <%-- 완료 상태 --%>
-                        <c:if test="${m.count <= m.progress}">
+                        <c:if test="${m.isSuccess == 'Y'}">
                             <input type="hidden" name="completedOne" value="1">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 border border-primary/20 flex-shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -59,7 +59,7 @@
                         </c:if>
 
                             <%-- 미완료 상태 --%>
-                        <c:if test="${m.count > m.progress}">
+                        <c:if test="${m.isSuccess == 'N'}">
                             <div class="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center bg-gray-100 border border-gray-200">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"

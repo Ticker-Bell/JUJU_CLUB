@@ -10,4 +10,6 @@ public class MissionDTO {
     private Integer reward; //mission_reward
     private Integer count; // target_value
     private Integer progress; // 현재진행 횟수 저장
+    private String isSuccess; // 미션 완료여부 확인
+    private String isRewarded; // 보상금 지급여부 확인
 }

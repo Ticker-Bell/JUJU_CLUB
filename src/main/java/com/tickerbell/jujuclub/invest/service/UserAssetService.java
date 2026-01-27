@@ -30,15 +30,16 @@ public class UserAssetService {
         long totalStockValue = 0L;
 
         List<PortfolioAllocationItemDTO> portfolioList = portfolioService.getPortfolioAllocationItems(userSeq);
-
-        for(PortfolioAllocationItemDTO data : portfolioList){
-            totalStockValue += (long)data.getQuantity() * data.getCurrentPrice();
+        if(portfolioList != null) {
+            for(PortfolioAllocationItemDTO data : portfolioList){
+                totalStockValue += (long)data.getQuantity() * data.getCurrentPrice();
+            }
         }
 
         //3.총 평가자산
         long totalAsset = cashBalance + totalStockValue;
 
-        //4.원금(초기자금 + 보상금)
+        //4.원금(초기자금 + 보상금 - 미션, 테스트 등)
 //        Long totalReward = userAssetMapper.selectChapTestReward(userSeq) + userAssetMapper.selectMissionReward(userSeq);
         Long totalReward = userAssetMapper.selectUserTotalReward(userSeq);
         if(totalReward == null){
@@ -46,12 +47,15 @@ public class UserAssetService {
         }
         long totalPrincipal = initial_cash + totalReward;
 
-        //5.총 수익률
+        //5.총 수익률(총 평가자산 - 원금)
         long totalProfit = totalAsset - totalPrincipal; //총 수익금
         double totalReturnProfit = 0.0;
         if(totalPrincipal > 0){
             totalReturnProfit = ((double) totalProfit / totalPrincipal) * 100;
         }
+
+        System.out.println("실제 계산된 자산: " + totalAsset);
+        System.out.println("실제 계산된 수익률: " + totalReturnProfit);
 
         return UserInvestSummeryDTO.builder()
                 .totalAsset(totalAsset) //총 평가자산

@@ -8,6 +8,7 @@ const StockSocket = {
     isConnected: false,
     //구독한 주식 코드 , 구독 해지를 위해 객체를 저장할 Map 형태 (종목코드:구독객체)
     subscribeCodes: new Map(),
+    listeners: {},
     updateTimer: null,
 
     connect: function (contextPath, stockCodes, onMessageCallback) {
@@ -61,17 +62,39 @@ const StockSocket = {
 
     //구독
     subscribeStock: function (stockCode) {
-        if (this.subscribeCodes.has(stockCode)) return;
+        if (this.subscribeCodes.has(stockCode)) return ;
 
         const subscription = this.stompClient.subscribe(`/topic/stock/${stockCode}`, (response) => {
             const stockData = JSON.parse(response.body);
             console.log("웹소켓 원본 데이터 수신:", stockData);
             this.lastestData[stockData.stockCode] = stockData;
+            const fns =  this.listeners[stockData.stockCode] || [];
+            fns.forEach(fn => fn(stockData));
         });
 
         //구독 객체를 저장
         this.subscribeCodes.set(stockCode, subscription);
         console.log(`${stockCode} 구독 완료`);
+    },
+
+    addListener(stockCode, fn){
+        //리스너 등록
+        if (!this.listeners[stockCode]) {
+            this.listeners[stockCode] = [];
+        }
+        this.listeners[stockCode].push(fn);
+
+        return () => {
+            this.removeListener(stockCode, fn);
+        }
+    },
+
+    removeListener(stockCode, fn) {
+        //리스너 해제
+        if (!this.listeners[stockCode]) return;
+
+        this.listeners[stockCode] =
+            this.listeners[stockCode].filter(l => l !== fn);
     },
 
     //구독 해제
@@ -89,6 +112,7 @@ const StockSocket = {
 
                 this.subscribeCodes.delete(stockCode); //구독 리스트에서 제거
                 delete this.lastestData[stockCode]; //화면에 업데이트할 대상에서 제거
+                delete this.listeners[stockCode]; //리스너 제거
 
                 //구독 해제 요청
                 const payload = {stockCodes: [stockCode], tr_type: "2"};

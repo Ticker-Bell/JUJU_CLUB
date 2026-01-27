@@ -40,57 +40,85 @@
             </div>
         </c:if>
         <!-- 로그인 후 -->
+        <!-- 로그인 후 -->
         <c:if test="${not empty sessionScope.user}">
+
+            <%-- 기본 프로필 경로 --%>
+            <c:set var="defaultProfile" value="${cpath}/resources/images/default-profile.png" />
+
             <div class="flex items-center gap-6">
+
+                <!-- 보유자산 -->
                 <div class="text-right">
                     <div class="text-[10px] font-extrabold text-gray-500">보유자산</div>
                     <div class="text-sm font-extrabold num-font text-gray-900">
                         ₩ <fmt:formatNumber value="${sessionScope.user.cashBalance}" type="number" />
                     </div>
                 </div>
-                <div class="flex items-center">
-        <span id="userLevelBadge"
-              class="px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-extrabold border border-primary/20">
-          <c:choose>
-              <c:when test="${sessionScope.user.userLevel == 1}">
-                  <%-- 초급: 기본 테마 --%>
-                  <c:set var="levelClass" value="bg-primary/10 text-primary border-primary/20"/>
-                  초급
-              </c:when>
-              <c:when test="${sessionScope.user.userLevel == 2}">
-                  <%-- 중급: 녹색 계열 (예시) --%>
-                  <c:set var="levelClass" value="bg-green-100 text-green-600 border-green-200"/>
-                  중급
-              </c:when>
-              <c:when test="${sessionScope.user.userLevel == 3}">
-                  <%-- 고급: 주황/금색 계열 (예시) --%>
-                  <c:set var="levelClass" value="bg-orange-100 text-orange-600 border-orange-200"/>
-                  고급
-              </c:when>
-              <c:otherwise>
-                  <%-- 예외 케이스 --%>
-                  <c:set var="levelClass" value="bg-gray-100 text-gray-600 border-gray-200"/>
-                  일반
-              </c:otherwise>
-          </c:choose>
-        </span>
-                </div>
 
-                <div class="text-right">
-                    <span class="block text-sm font-extrabold text-text">${sessionScope.user.userName} 님</span>
+                <!-- 사용자 영역: (프로필 이미지 + 닉네임) + (레벨 뱃지) -->
+                <div class="flex items-center gap-3">
+
+                    <!-- ✅ 프로필 이미지 (닉네임 왼쪽) -->
+                    <div class="w-9 h-9 rounded-full overflow-hidden border border-white shadow-sm bg-white">
+                        <img
+                                src="${cpath}/member/profile-image?ts=<%=System.currentTimeMillis()%>"
+                                alt="profile"
+                                class="w-full h-full object-cover"
+                                loading="lazy"
+                                onerror="this.onerror=null; this.src='${defaultProfile}';"
+                        />
+                    </div>
+
+                    <!-- 닉네임 -->
+                    <div class="text-right">
+                <span class="block text-sm font-extrabold text-text">
+                    ${sessionScope.user.userName} 님
+                </span>
+                    </div>
+
+                    <!-- ✅ 레벨 뱃지 (닉네임 오른쪽) -->
+                    <c:choose>
+                        <c:when test="${sessionScope.user.userLevel == 1}">
+                    <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-extrabold border border-primary/20">
+                        초급
+                    </span>
+                        </c:when>
+
+                        <c:when test="${sessionScope.user.userLevel == 2}">
+                    <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-[11px] font-extrabold border border-green-200">
+                        중급
+                    </span>
+                        </c:when>
+
+                        <c:when test="${sessionScope.user.userLevel == 3}">
+                    <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-[11px] font-extrabold border border-orange-200">
+                        고급
+                    </span>
+                        </c:when>
+
+                        <c:otherwise>
+                    <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-extrabold border border-gray-200">
+                        일반
+                    </span>
+                        </c:otherwise>
+                    </c:choose>
+
                 </div>
             </div>
 
             <!-- 구분선 -->
             <div class="w-[1px] h-4 bg-primary/20"></div>
 
-            <%-- TODO: 로그아웃 경로로 수정 필요 --%>
-            <button onclick="location.href='${cpath}/auth/logout'" class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
+            <!-- 로그아웃 -->
+            <button onclick="location.href='${cpath}/auth/logout'"
+                    class="flex items-center gap-2 text-gray-500 hover:text-red-500 transition-colors group">
                 <span class="text-xs font-bold">로그아웃</span>
                 <div class="w-8 h-8 rounded-full flex items-center justify-center bg-white group-hover:bg-red-50 transition-colors shadow-sm">
                     <img src="${cpath}/resources/images/navIcons/exit-outline.svg" alt="나가기아이콘" class="w-4 h-4">
                 </div>
             </button>
+
         </c:if>
     </header>
 </div>

@@ -1,8 +1,8 @@
 package com.tickerbell.jujuclub.auth.controller;
 
 import com.tickerbell.jujuclub.auth.dto.MemberDTO;
-import com.tickerbell.jujuclub.auth.dto.SigninDTO;
 import com.tickerbell.jujuclub.auth.service.AccountService;
+import com.tickerbell.jujuclub.roadMap.service.RoadMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +19,7 @@ import java.util.Map;
 public class AccountController {
 
     private final AccountService accountService;
+    private final RoadMapService roadMapService;
 
     @PostMapping("/create.ajax")
     @ResponseBody
@@ -41,6 +42,7 @@ public class AccountController {
                 res.put("ok", true);
                 res.put("message", "계좌가 생성되었습니다.");
                 res.put("accountNo", createdAccountNo); // [추가] 클라이언트로 전달
+                roadMapService.insertInitUserMission(loginUser.getUserSeq());
             } else {
                 res.put("ok", false);
                 res.put("message", "이미 계좌가 존재합니다.");

@@ -20,13 +20,10 @@
         <div id="buy-form" class="flex flex-col gap-6">
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">가격</label>
-                <input
+                <label
                         class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        type="number"
-                        id="buyPriceInput"
-                        alt="가격 입력창"
-                        oninput="buyExpectedPrice()"
-                />
+                        id="buyPrice"
+                ></label>
             </div>
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">수량</label>
@@ -61,13 +58,10 @@
             </div>
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">가격</label>
-                <input
+                <label
                         class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        type="number"
-                        id="sellPriceInput"
-                        alt="가격 입력창"
-                        oninput="sellExpectedPrice()"
-                />
+                        id="sellPrice"
+                ></label>
             </div>
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">수량</label>
@@ -116,26 +110,32 @@
         } else {
             document.getElementById('sell-form').classList.remove('hidden');
             document.getElementById('buy-form').classList.add('hidden');
-            hasQuantity("005930");
+            hasQuantity(selectedStockState.stockCode);
         }
     }
 
-    function hasQuantity(stockCode){
-        fetch(`${pageContext.request.contextPath}/invest/hasStockQuantity?stockCode=`+stockCode)
+    function tradePrice(currentPrice) {
+        document.getElementById('buyPrice').innerText = currentPrice;
+        document.getElementById('sellPrice').innerText = currentPrice;
+    }
+
+    function hasQuantity(stockCode) {
+        //보유 수량
+        fetch(`${pageContext.request.contextPath}/invest/hasStockQuantity?stockCode=` + stockCode)
             .then(res => {
                 if (!res.ok) throw new Error("데이터 조회 실패");
                 return res.json();
             })
-            .then(data=>{
+            .then(data => {
                 console.log("받은 데이터: " + data);
                 document.getElementById('hasStockQuantity').innerText = data;
             })
-            .catch(err=> console.error(err));
+            .catch(err => console.error(err));
     }
 
     function buyExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('buyPriceInput').value);
+        const price = Number(document.getElementById('buyPrice').value);
         const amount = Number(document.getElementById('buyAmountInput').value);
         const total = price * amount;
 
@@ -148,7 +148,7 @@
 
     function sellExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('sellPriceInput').value);
+        const price = Number(document.getElementById('sellPrice').value);
         const amount = Number(document.getElementById('sellAmountInput').value);
         const total = price * amount;
 
@@ -166,16 +166,16 @@
         let amount;
         const tradeType = document.querySelector('.tab-item.active').innerText.trim() === '매수' ? 'Y' : 'N';
 
-        if(tradeType === 'Y'){
-             price = Number(document.getElementById('buyPriceInput').value);
-             amount = Number(document.getElementById('buyAmountInput').value);
-        } else{
-            price = Number(document.getElementById('sellPriceInput').value);
+        if (tradeType === 'Y') {
+            price = Number(document.getElementById('buyPrice').value);
+            amount = Number(document.getElementById('buyAmountInput').value);
+        } else {
+            price = Number(document.getElementById('sellPrice').value);
             amount = Number(document.getElementById('sellAmountInput').value);
         }
 
         const data = {
-            stockCode: stockCode ,
+            stockCode: stockCode,
             tradeType: tradeType,
             tradePrice: price,
             tradeQuantity: amount
@@ -192,7 +192,7 @@
                     alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
                     location.reload();
                 } else {
-                    if(tradeType === 'Y') {
+                    if (tradeType === 'Y') {
                         document.getElementById('buyErrorMessage').innerText = result.message;
                     } else {
                         document.getElementById('sellErrorMessage').innerText = result.message;

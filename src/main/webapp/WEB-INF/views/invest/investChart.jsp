@@ -95,18 +95,18 @@
         updateButtonUI('D');
     };
 
-    function initLikeStatus(stockCode){
+    function initLikeStatus(stockCode) {
         const likeEl = document.getElementById('header-stockLike');
 
-        fetch(`${pageContext.request.contextPath}/stock/watchlist/isLiked?stockCode=`+stockCode)
+        fetch(`${pageContext.request.contextPath}/stock/watchlist/isLiked?stockCode=` + stockCode)
             .then(res => res.json())
-            .then(data=> {
+            .then(data => {
                 updateLikeUI(likeEl, data);
             })
             .catch(err => console.error("초기 상태 로드 실패: ", err));
     }
 
-    function updateLikeUI(likeEl, isLiked){
+    function updateLikeUI(likeEl, isLiked) {
         likeEl.src = isLiked
             ? `${pageContext.request.contextPath}/resources/images/stockIcons/filled-heart.svg`
             : `${pageContext.request.contextPath}/resources/images/stockIcons/heart.svg`;
@@ -145,29 +145,28 @@
 
     function getSelectedChart(stockCode, stockName) {
         //선택된 주식 리스트
-        selectedStockState.stockName =stockName;
-        selectedStockState.stockCode =stockCode;
+        selectedStockState.stockName = stockName;
+        selectedStockState.stockCode = stockCode;
 
-        document.getElementById('header-stock').innerText = selectedStockState.stockCode;
-        document.getElementById('header-stockName').innerText = selectedStockState.stockName;
+        document.getElementById('header-stock').innerText = stockCode;
+        document.getElementById('header-stockName').innerText = stockName;
 
-        loadChartData('D', selectedStockState.stockCode);
+        loadChartData('D', stockCode);
 
         //시장 타입 가져오기
-        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=`+stockCode)
+        fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=` + stockCode)
             .then(res => res.text())
             .then(marketType => {
                 document.getElementById('header-marketType').innerText = marketType;
             });
     }
 
-
     function loadChartData(periodCode, stockCode) {
         currentPeriod = periodCode;
         updateButtonUI(periodCode);
         initLikeStatus(stockCode);
         //rest api 연결
-        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=`+periodCode+"&stockCode="+stockCode;
+        const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=` + periodCode + "&stockCode=" + stockCode;
         fetch(url)
             .then(response => response.json())
             .then(data => {
@@ -181,7 +180,7 @@
                 myChartInstance = renderStockChart('myChart', formattedData, periodCode);
 
                 if (periodCode === 'D') {
-                    initSocket(myChartInstance, stockCode); //배열 형태의 stockCode가 들어가야함
+                    initSocket(myChartInstance, [stockCode]); //배열 형태의 stockCode가 들어가야함
                 }
                 updateButtonUI(periodCode);
             })
@@ -215,26 +214,40 @@
         changeEl.style.color = color;
     }
 
-    function initSocket(targetChart, stockCodes) {
-        //웹소켓 연결
-        if (!Array.isArray(stockCodes)) {
-            stockCodes = [stockCodes];
+    let prevStockCode = null;
+    let unsubscribeFn = null;
+
+    function initSocket(targetChart, stockCode) {
+        const dataArray = targetChart.data.datasets[0].data;
+        const lastIdx = dataArray.length - 1;
+        //웹소켓 리스너 연결
+
+        if (prevStockCode === stockCode) return;
+
+        //이전 리스너를 해제
+        if (unsubscribeFn) {
+            unsubscribeFn();
+            unsubscribeFn = null;
         }
 
-        StockSocket.connect(
-            "${pageContext.request.contextPath}",
-            stockCodes,
-            function (stockData) {
-                console.log("실시간 업데이트 수신:", stockData.stockCode, stockData.currentPrice);
-                const dataArray = targetChart.data.datasets[0].data;
-                const lastIdx = dataArray.length - 1;
+        //리스너 등록
+        unsubscribeFn = StockSocket.addListener(stockCode, (stockData) => {
+            dataArray[lastIdx] = stockData.currentPrice;
+            updateHeaderStock(stockData);
+            tradePrice(stockData.currentPrice);
+            targetChart.update('none');
+        });
+        prevStockCode = stockCode;
 
-                dataArray[lastIdx] = stockData.currentPrice;
-                updateHeaderStock(stockData);
-                targetChart.update('none');
+        const last = StockSocket.lastestData[stockCode];
+        if (last) {
+            dataArray[lastIdx] = last.currentPrice;
+            updateHeaderStock(last);
+            tradePrice(last.currentPrice);
+            targetChart.update('none');
+        }
 
-            }
-        );
+
     }
 </script>
 </body>

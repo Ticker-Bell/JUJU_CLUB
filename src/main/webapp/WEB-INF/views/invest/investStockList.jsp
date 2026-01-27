@@ -3,13 +3,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-
-<%--<link rel="stylesheet" as="style" crossorigin--%>
-<%--      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>--%>
-
 <style>
     * {
         box-sizing: border-box;
@@ -344,7 +337,7 @@
 </div>
 
 
-<script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
+
 <script>
     (function () {
         const contextPath = "${pageContext.request.contextPath}";
@@ -890,6 +883,172 @@
                     $firstItem.trigger('click');
                 }
             }
+        }
+
+        let myChartInstance;
+        let currentPeriod = 'D';
+        let selectedStockState = {
+            stockCode: null,
+            stockName: null
+        };
+
+        window.onload = function () {
+            updateButtonUI('D');
+        };
+
+        function initLikeStatus(stockCode) {
+            const likeEl = document.getElementById('header-stockLike');
+
+            fetch(`${pageContext.request.contextPath}/stock/watchlist/isLiked?stockCode=` + stockCode)
+                .then(res => res.json())
+                .then(data => {
+                    updateLikeUI(likeEl, data);
+                })
+                .catch(err => console.error("초기 상태 로드 실패: ", err));
+        }
+
+        function updateLikeUI(likeEl, isLiked) {
+            likeEl.src = isLiked
+                ? `${pageContext.request.contextPath}/resources/images/stockIcons/filled-heart.svg`
+                : `${pageContext.request.contextPath}/resources/images/stockIcons/heart.svg`;
+            likeEl.dataset.liked = isLiked.toString();
+
+            console.log(isLiked ? "좋아요 해제됨" : "좋아요 설정 됨");
+        }
+
+        function toggleLike() {
+            const likeEl = document.getElementById('header-stockLike');
+            const isLiked = likeEl.dataset.liked === "true";
+
+            const url = `${pageContext.request.contextPath}/stock/watchlist`;
+            const method = isLiked ? "DELETE" : "POST";
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    stockCode: selectedStockState.stockCode
+                })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("서버 오류");
+                    return res;
+                })
+                .then(() => {
+                    updateLikeUI(likeEl, !isLiked);
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+
+        function getSelectedChart(stockCode, stockName) {
+            //선택된 주식 리스트
+            selectedStockState.stockName = stockName;
+            selectedStockState.stockCode = stockCode;
+
+            document.getElementById('header-stock').innerText = stockCode;
+            document.getElementById('header-stockName').innerText = stockName;
+
+            loadChartData('D', stockCode);
+
+            //시장 타입 가져오기
+            fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=` + stockCode)
+                .then(res => res.text())
+                .then(marketType => {
+                    document.getElementById('header-marketType').innerText = marketType;
+                });
+        }
+
+        function loadChartData(periodCode, stockCode) {
+            currentPeriod = periodCode;
+            updateButtonUI(periodCode);
+            initLikeStatus(stockCode);
+            //rest api 연결
+            const url = `${pageContext.request.contextPath}/api/invest/chartData?periodCode=` + periodCode + "&stockCode=" + stockCode;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const formattedData = data.map(item => ({
+                        date: item.displayDate,
+                        price: parseFloat(item.displayPrice.replace(/,/g, ''))
+                    }));
+                    if (myChartInstance) {
+                        myChartInstance.destroy();
+                    }
+                    myChartInstance = renderStockChart('myChart', formattedData, periodCode);
+
+                    if (periodCode === 'D') {
+                        initSocket(myChartInstance, [stockCode]); //배열 형태의 stockCode가 들어가야함
+                    }
+                    updateButtonUI(periodCode);
+                })
+                .catch(error => console.error('Error fetching chart data:', error));
+        }
+
+        function updateButtonUI(periodCode) {
+            const buttons = document.querySelectorAll('.period-btn');
+
+            buttons.forEach(btn => btn.classList.remove('btn-active'));
+
+            const activeBtn = document.getElementById('btn-' + periodCode);
+            if (activeBtn) {
+                activeBtn.classList.add('btn-active');
+            }
+        }
+
+        function updateHeaderStock(stock) {
+            if (!stock) return;
+            const priceEl = document.getElementById('header-price');
+            const changeEl = document.getElementById('header-change');
+            if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
+            if (stock.displayChange) changeEl.innerText = stock.displayChange;
+
+
+            const sign = stock.dayOverDaySign;
+            let color = "#666"; // 보합
+            if (sign === "1" || sign === "2") color = "#bf0f06"; // 빨강
+            if (sign === "4" || sign === "5") color = "#0051af"; // 파랑
+
+            changeEl.style.color = color;
+        }
+
+        let prevStockCode = null;
+        let unsubscribeFn = null;
+
+        function initSocket(targetChart, stockCode) {
+            const dataArray = targetChart.data.datasets[0].data;
+            const lastIdx = dataArray.length - 1;
+            //웹소켓 리스너 연결
+
+            if (prevStockCode === stockCode) return;
+
+            //이전 리스너를 해제
+            if (unsubscribeFn) {
+                unsubscribeFn();
+                unsubscribeFn = null;
+            }
+
+            //리스너 등록
+            unsubscribeFn = StockSocket.addListener(stockCode, (stockData) => {
+                dataArray[lastIdx] = stockData.currentPrice;
+                updateHeaderStock(stockData);
+                tradePrice(stockData.currentPrice);
+                targetChart.update('none');
+            });
+            prevStockCode = stockCode;
+
+            const last = StockSocket.lastestData[stockCode];
+            if (last) {
+                dataArray[lastIdx] = last.currentPrice;
+                updateHeaderStock(last);
+                tradePrice(last.currentPrice);
+                targetChart.update('none');
+            }
+
+
         }
     })();
 </script>

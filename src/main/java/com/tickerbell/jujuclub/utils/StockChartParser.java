@@ -3,8 +3,8 @@ package com.tickerbell.jujuclub.utils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartDTO;
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.invest.dto.StockChartDTO;
+import com.tickerbell.jujuclub.invest.dto.StockChartRestDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

@@ -1,6 +1,6 @@
-package com.tickerbell.jujuclub.invest.trade.mapper;
+package com.tickerbell.jujuclub.invest.mapper;
 
-import com.tickerbell.jujuclub.invest.trade.dto.TradeDTO;
+import com.tickerbell.jujuclub.invest.dto.TradeDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

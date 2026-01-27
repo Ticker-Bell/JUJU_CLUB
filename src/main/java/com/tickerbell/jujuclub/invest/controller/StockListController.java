@@ -1,4 +1,4 @@
-package com.tickerbell.jujuclub.invest.stockList.controller;
+package com.tickerbell.jujuclub.invest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
@@ -8,18 +8,17 @@ import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
 import com.tickerbell.jujuclub.invest.service.WatchlistService;
-import com.tickerbell.jujuclub.invest.stockList.dto.RankingDTO;
-import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
-import com.tickerbell.jujuclub.invest.stockList.service.RankingApiService;
-import com.tickerbell.jujuclub.invest.stockList.service.StockService;
-import com.tickerbell.jujuclub.invest.util.ColorUtil;
+import com.tickerbell.jujuclub.invest.dto.RankingDTO;
+import com.tickerbell.jujuclub.invest.dto.StockDTO;
+import com.tickerbell.jujuclub.invest.service.RankingApiService;
+import com.tickerbell.jujuclub.invest.service.StockService;
+import com.tickerbell.jujuclub.utils.ColorUtil;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;

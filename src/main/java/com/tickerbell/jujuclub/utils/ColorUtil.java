@@ -1,4 +1,4 @@
-package com.tickerbell.jujuclub.invest.util;
+package com.tickerbell.jujuclub.utils;
 
 import java.awt.Color;
 

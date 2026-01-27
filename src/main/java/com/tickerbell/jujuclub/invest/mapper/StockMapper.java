@@ -1,6 +1,6 @@
-package com.tickerbell.jujuclub.invest.stockList.mapper;
+package com.tickerbell.jujuclub.invest.mapper;
 
-import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
+import com.tickerbell.jujuclub.invest.dto.StockDTO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;

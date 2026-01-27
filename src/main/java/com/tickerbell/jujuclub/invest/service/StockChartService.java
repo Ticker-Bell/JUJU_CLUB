@@ -1,7 +1,7 @@
-package com.tickerbell.jujuclub.invest.stockChart.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartDTO;
-import com.tickerbell.jujuclub.utils.StockChartFormatter;
+import com.tickerbell.jujuclub.invest.dto.StockChartDTO;
+import com.tickerbell.jujuclub.utils.GetValidApprovalKey;
 import com.tickerbell.jujuclub.utils.StockChartParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +25,11 @@ public class StockChartService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final StockChartParser stockChartParser;
-    private final String APPROVAL_KEY = "3076cd7a-648f-48d4-bc9a-91470254e167";
+    private final GetValidApprovalKey getValidApprovalKey;
 
-    public synchronized void connectToStockChartApi(String trType, List<String> stockCodeList) {
+    private String approvalKey = null;
+
+    public synchronized void connectToStockChartApi(String trType, List<String> stockCodeList) throws Exception {
         //세션이 없거나 닫혀있으면 연결
         if (externalSession == null || !externalSession.isOpen()) {
             initConnection(stockCodeList);
@@ -95,11 +97,12 @@ public class StockChartService {
 
     }
 
-    private void sendSubscribeMessage(WebSocketSession session, String stockCode) {
+    private void sendSubscribeMessage(WebSocketSession session, String stockCode) throws Exception {
+        approvalKey = getValidApprovalKey.getValidApprovalKey();
         try {
             String subscribeMessage = String.format(
                     "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"utf-8\"}," +
-                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", APPROVAL_KEY, stockCode);
+                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", approvalKey, stockCode);
 
 
             session.sendMessage(new TextMessage(subscribeMessage));
@@ -113,11 +116,13 @@ public class StockChartService {
         }
     }
 
-    private void sendUnsubscribeMessage(WebSocketSession session, String stockCode) {
+    private void sendUnsubscribeMessage(WebSocketSession session, String stockCode) throws Exception {
+
+        approvalKey = getValidApprovalKey.getValidApprovalKey();
         try {
             String subscribeMessage = String.format(
                     "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"2\",\"content-type\":\"utf-8\"}," +
-                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", APPROVAL_KEY, stockCode);
+                            "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", approvalKey, stockCode);
 
 
             session.sendMessage(new TextMessage(subscribeMessage));

@@ -1,7 +1,7 @@
-package com.tickerbell.jujuclub.invest.stockChart.controller;
+package com.tickerbell.jujuclub.invest.controller;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO;
-import com.tickerbell.jujuclub.invest.stockChart.service.StockChartDataService;
+import com.tickerbell.jujuclub.invest.dto.WatchListDTO;
+import com.tickerbell.jujuclub.invest.service.StockChartDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

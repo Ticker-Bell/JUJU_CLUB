@@ -1,10 +1,9 @@
-package com.tickerbell.jujuclub.invest.stockChart.controller;
+package com.tickerbell.jujuclub.invest.controller;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.SelectedStockDTO;
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
-import com.tickerbell.jujuclub.invest.stockChart.service.StockChartDataService;
-import com.tickerbell.jujuclub.invest.stockChart.service.StockChartRestService;
-import com.tickerbell.jujuclub.invest.stockChart.service.StockChartService;
+import com.tickerbell.jujuclub.invest.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.invest.service.StockChartDataService;
+import com.tickerbell.jujuclub.invest.service.StockChartRestService;
+import com.tickerbell.jujuclub.invest.service.StockChartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @Controller
@@ -45,7 +43,7 @@ public class StockChartController {
 
 
     @MessageMapping("/invest/request/chartData")
-    public void handleStockRequest(@Payload Map<String, Object> message) {
+    public void handleStockRequest(@Payload Map<String, Object> message) throws Exception {
         String trType = (String) message.get("tr_type");
 
         List<String> stockCodes = new ArrayList<>();

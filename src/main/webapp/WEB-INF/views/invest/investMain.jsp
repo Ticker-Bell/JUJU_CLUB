@@ -65,10 +65,6 @@
             <div id="stock" class="flex flex-row justify-between w-full gap-16">
                 <div id="investComponents" class="flex flex-col gap-16">
                     <jsp:include page="investStockList.jsp"></jsp:include>
-                    <div id="investBuySell">
-                        <jsp:include page="investBuySell.jsp"></jsp:include>
-
-                    </div>
                 </div>
                 <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
                     <jsp:include page="investChart.jsp" ></jsp:include>
@@ -98,7 +94,6 @@
         }
     }
     //stockCorpInfoCard.jsp에 있던 script
-    const ctx = '${pageContext.request.contextPath}';
     function getSelectedCorpInfo(stockCode) {
         //stockCode에 빈문자열이 들어올 경우
         // document.getElementById('stockCorpInfo-container').innerHTML = '';
@@ -111,7 +106,7 @@
         // }
 
         //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
-        fetch(ctx + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
+        fetch('${cpath}' + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
             .then(res =>
                 res.text() //html 값 요청, 다음 then으로 결과 토스
             )

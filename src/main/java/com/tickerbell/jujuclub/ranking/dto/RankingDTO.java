@@ -18,10 +18,10 @@ public class RankingDTO {
     private int userSeq;
     private String userId;
     private String userName;
+    private int cashBalance;
     private int userAssetRank;
-    private int userRevenueRank;
-    private int totalAsset;
-    private double totalRevenueRate;
+    private int userLssnCnt;
+    private int userLssnRank;
     private int totUserCnt;
     List<RankingListOBA> RankingBorardListOBA;
     List<RankingListOBR> RankingBorardListOBR;
@@ -45,23 +45,29 @@ public class RankingDTO {
     private int userSeq;
     private String userId;
     private String userName;
+    private int cashBalance;
+    private int userLssnCnt;
     private int userAssetRank;
-    private int totalAsset;
-    private double totalRevenueRate;
   }
+
   @Alias("RankingListOBR")
   @Builder
   @Data
   @NoArgsConstructor
   @AllArgsConstructor
-  public static class RankingListOBR{
+  public static class RankingListOBR {
 
+    //    private int userSeq;
+//    private String userId;
+//    private String userName;
+//    private int userRevenueRank;
+//    private int totalAsset;
+//    private double totalRevenueRate;
     private int userSeq;
-    private String userId;
     private String userName;
-    private int userRevenueRank;
-    private int totalAsset;
-    private double totalRevenueRate;
+    private int cashBalance;
+    private int userLssnCnt;
+    private int userLssnRank;
   }
 
 }

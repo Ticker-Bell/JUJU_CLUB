@@ -11,12 +11,15 @@
     <%--도넛차트--%>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <%-- 주식 차트 js --%>
+    <script src="${pageContext.request.contextPath}/resources/js/invest/stockLineChart.js"></script>
+
     <%-- jQuery --%>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <%-- 웹소켓 js --%>
+    <%-- 웹소켓js --%>
     <script src="${pageContext.request.contextPath}/resources/js/invest/stockSocket.js"></script>
-    <%-- 주식 차트 js--%>
-    <script src="${pageContext.request.contextPath}/resources/js/invest/stockLineChart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 
     <%--레슨 공통 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">

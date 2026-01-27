@@ -59,7 +59,7 @@
     </nav>
     <div class="tab-container">
         <div id="myJsp" class="tab-content active">
-            <jsp:include page="my.jsp"></jsp:include>
+            <jsp:include page="investMy.jsp"></jsp:include>
         </div>
         <div id="investJsp" class="tab-content">
             <div id="stock" class="flex flex-row justify-between w-full gap-16">
@@ -95,16 +95,6 @@
     }
     //stockCorpInfoCard.jsp에 있던 script
     function getSelectedCorpInfo(stockCode) {
-        //stockCode에 빈문자열이 들어올 경우
-        // document.getElementById('stockCorpInfo-container').innerHTML = '';
-        // const timeEl = document.getElementById('update_time');
-        // if(stockCode.trim() === "" || !stockCode){
-        //     if(timeEl){
-        //         timeEl.innerText = '';
-        //     }
-        //     return;
-        // }
-
         //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
         fetch('${cpath}' + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
             .then(res =>

@@ -45,7 +45,7 @@ public class StockChartController {
 
 
     @MessageMapping("/invest/request/chartData")
-    public void handleStockRequest(@Payload Map<String, Object> message) {
+    public void handleStockRequest(@Payload Map<String, Object> message) throws Exception {
         String trType = (String) message.get("tr_type");
 
         List<String> stockCodes = new ArrayList<>();

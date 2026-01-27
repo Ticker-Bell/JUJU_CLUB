@@ -69,7 +69,7 @@ public class StockMyController {
         UserInvestSummeryDTO userAssetSummary = userAssetService.getUserInvestSummary(userSeq);
         model.addAttribute("userAsset", userAssetSummary);
 
-        return "invest/my"; //my.jsp
+        return "invest/investMy";
     }
 
 }

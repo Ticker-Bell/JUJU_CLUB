@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.tickerbell.jujuclub.invest.stockChart.mapper.StockChartDataMapper">
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.StockChartDataMapper">
 
     <!--시장 타입 select-->
     <select id="selectMarketType" resultType="String" parameterType="String">
@@ -10,7 +10,7 @@
     </select>
 
     <!--관심종목 insert-->
-    <insert id="insertWatchList" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+    <insert id="insertWatchList" parameterType="com.tickerbell.jujuclub.invest.dto.WatchListDTO">
         INSERT INTO user_watchlist (user_seq, stock_seq)
         VALUES (
                    #{userSeq},
@@ -23,7 +23,7 @@
     </insert>
 
 <!-- 관심 종목 삭제   -->
-    <delete id="deleteWatchList" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+    <delete id="deleteWatchList" parameterType="com.tickerbell.jujuclub.invest.dto.WatchListDTO">
         DELETE FROM user_watchlist
         WHERE user_seq = #{userSeq}
           AND stock_seq = (
@@ -34,7 +34,7 @@
     </delete>
 
     <!--관심 종목 찾기 user_seq, stock_seqs-->
-    <select id="selectWatchListByUserStock" resultType="boolean" parameterType="com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO">
+    <select id="selectWatchListByUserStock" resultType="boolean" parameterType="com.tickerbell.jujuclub.invest.dto.WatchListDTO">
         SELECT count(*)>0
         FROM user_watchlist join stock_master on user_watchlist.stock_seq = stock_master.stock_seq
         WHERE user_seq = #{userSeq} AND stock_code=#{stockCode}

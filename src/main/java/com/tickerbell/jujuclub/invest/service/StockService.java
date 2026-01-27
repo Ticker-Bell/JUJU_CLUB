@@ -1,7 +1,7 @@
-package com.tickerbell.jujuclub.invest.stockList.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.stockList.dto.StockDTO;
-import com.tickerbell.jujuclub.invest.stockList.mapper.StockMapper;
+import com.tickerbell.jujuclub.invest.dto.StockDTO;
+import com.tickerbell.jujuclub.invest.mapper.StockMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,9 +1,7 @@
-package com.tickerbell.jujuclub.invest.stockChart.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartDTO;
-import com.tickerbell.jujuclub.utils.GetValidAccessToken;
+import com.tickerbell.jujuclub.invest.dto.StockChartDTO;
 import com.tickerbell.jujuclub.utils.GetValidApprovalKey;
-import com.tickerbell.jujuclub.utils.StockChartFormatter;
 import com.tickerbell.jujuclub.utils.StockChartParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

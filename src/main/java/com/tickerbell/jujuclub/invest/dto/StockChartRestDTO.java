@@ -1,4 +1,4 @@
-package com.tickerbell.jujuclub.invest.stockChart.dto;
+package com.tickerbell.jujuclub.invest.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

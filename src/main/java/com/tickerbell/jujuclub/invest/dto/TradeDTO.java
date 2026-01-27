@@ -1,4 +1,4 @@
-package com.tickerbell.jujuclub.invest.trade.dto;
+package com.tickerbell.jujuclub.invest.dto;
 
 import lombok.*;
 import org.apache.ibatis.type.Alias;

@@ -1,8 +1,7 @@
-package com.tickerbell.jujuclub.invest.stockChart.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.StockChartRestDTO;
+import com.tickerbell.jujuclub.invest.dto.StockChartRestDTO;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
-import com.tickerbell.jujuclub.utils.RequestNewAccessToken;
 import com.tickerbell.jujuclub.utils.StockChartParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 

@@ -1,7 +1,7 @@
-package com.tickerbell.jujuclub.invest.trade.controller;
+package com.tickerbell.jujuclub.invest.controller;
 
-import com.tickerbell.jujuclub.invest.trade.dto.TradeDTO;
-import com.tickerbell.jujuclub.invest.trade.service.TradeService;
+import com.tickerbell.jujuclub.invest.dto.TradeDTO;
+import com.tickerbell.jujuclub.invest.service.TradeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

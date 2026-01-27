@@ -1,4 +1,4 @@
-package com.tickerbell.jujuclub.invest.stockList.dto;
+package com.tickerbell.jujuclub.invest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

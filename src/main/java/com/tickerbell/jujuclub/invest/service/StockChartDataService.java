@@ -1,10 +1,9 @@
-package com.tickerbell.jujuclub.invest.stockChart.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.stockChart.dto.WatchListDTO;
-import com.tickerbell.jujuclub.invest.stockChart.mapper.StockChartDataMapper;
+import com.tickerbell.jujuclub.invest.dto.WatchListDTO;
+import com.tickerbell.jujuclub.invest.mapper.StockChartDataMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

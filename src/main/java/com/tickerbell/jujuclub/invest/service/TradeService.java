@@ -1,7 +1,7 @@
-package com.tickerbell.jujuclub.invest.trade.service;
+package com.tickerbell.jujuclub.invest.service;
 
-import com.tickerbell.jujuclub.invest.trade.dto.TradeDTO;
-import com.tickerbell.jujuclub.invest.trade.mapper.TradeMapper;
+import com.tickerbell.jujuclub.invest.dto.TradeDTO;
+import com.tickerbell.jujuclub.invest.mapper.TradeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

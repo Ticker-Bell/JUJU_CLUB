@@ -64,7 +64,7 @@
             mission_seq,
             'N', 'N', Now(), 0
         from mission
-        where mission_seq in (1,2,3,4);
+        where mission_seq in (1,2,3,4)
     </insert>
 
     <select id="missionList" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionDTO">

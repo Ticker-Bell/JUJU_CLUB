@@ -379,17 +379,6 @@
 
             drawContinuousPath();
             if (window.lucide) window.lucide.createIcons();
-            preBtn.onclick = () => {
-                const vw = window.innerWidth - 220;
-                const currentScroll = scrollContainer.scrollLeft;
-                const currentChapter = Math.round(currentScroll / vw);
-                if (currentChapter > 0) {
-                    const targetIdx = currentChapter - 1;
-                    const targetX = targetIdx * vw;
-                    scrollContainer.scrollTo({left: targetX, behavior: 'smooth'});
-                    updateDropdownUI(targetIdx);
-                }
-            };
 
             // 초기 로딩일 때만 현재 위치로 스크롤 & 드롭다운 동기화
             if (isFirstLoad) {

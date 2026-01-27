@@ -1,447 +1,440 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JUJU CLUB</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-        }
+    body {
+        font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-        /* 탭 네비게이션 */
-        .tab-nav {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
-        }
+    /* 탭 네비게이션 */
+    .tab-nav {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+    }
 
-        .tab-nav a {
-            text-decoration: none;
-            color: #999;
-            font-size: 18px;
-            font-weight: 500;
-            padding-bottom: 10px;
-            position: relative;
-        }
+    .tab-nav a {
+        text-decoration: none;
+        color: #999;
+        font-size: 18px;
+        font-weight: 500;
+        padding-bottom: 10px;
+        position: relative;
+    }
 
-        .tab-nav a.active {
-            color: #0046ff;
-            font-weight: 800;
-        }
+    .tab-nav a.active {
+        color: #0046ff;
+        font-weight: 800;
+    }
 
-        .tab-nav a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -12px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background-color: #ffc107;
-        }
+    .tab-nav a.active::after {
+        content: '';
+        position: absolute;
+        bottom: -12px;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background-color: #ffc107;
+    }
 
-        /* 단위 */
-        /*.unit {*/
-        /*    font-size: 16px;*/
-        /*    font-weight: 500;*/
-        /*    color: #777;*/
-        /*    margin-left: 4px;*/
-        /*}*/
+    /* 단위 */
+    /*.unit {*/
+    /*    font-size: 16px;*/
+    /*    font-weight: 500;*/
+    /*    color: #777;*/
+    /*    margin-left: 4px;*/
+    /*}*/
 
-        /* ===== SUMMARY WRAPPER (전체 큰 박스) ===== */
-        .summary-wrapper {
-            background: #fff;
-            border: 1px solid #e8e8e8;
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
+    /* ===== SUMMARY WRAPPER (전체 큰 박스) ===== */
+    .summary-wrapper {
+        background: #fff;
+        border: 1px solid #e8e8e8;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+    }
 
-        /* 왼쪽(총평가자산 텍스트 영역) + 오른쪽(3카드) */
+    /* 왼쪽(총평가자산 텍스트 영역) + 오른쪽(3카드) */
+    .summary-cards {
+        display: grid;
+        grid-template-columns: 1.2fr 2.8fr; /* 예시처럼 오른쪽이 더 넓게 */
+        gap: 24px;
+        align-items: stretch;
+    }
+
+    /* 왼쪽 총평가자산은 "박스 없음" */
+    .summary-left {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    /* 총평가자산 텍스트 블록 */
+    .summary-total {
+        width: 100%;
+        padding: 6px 0; /* 살짝만 여백 */
+    }
+
+    .summary-total-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 18px;
+    }
+
+    /* 타이틀 앞 점 */
+    .summary-total-title .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #6b5bff; /* 필요하면 #333으로 통일 가능 */
+        display: inline-block;
+    }
+
+    /* 총평가자산 숫자 */
+    .summary-total-value {
+        font-size: 52px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        line-height: 1;
+        color: #333;
+    }
+
+    /* 단위 */
+    .unit {
+        margin-left: 0; /* gap으로 spacing 주기 */
+        padding: 0; /* 혹시 들어가있다면 제거 */
+        line-height: 1; /* 높이 딱 맞추기 */
+        display: inline; /* 박스화 방지 */
+        font-size: 18px;
+        font-weight: 600;
+        color: #777;
+    }
+
+    /* ===== RIGHT: 작은 카드 3개 ===== */
+    .summary-right {
+        display: grid !important;
+        gap: 16px !important;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+    }
+
+    /* 작은 카드 공통 */
+    .summary-right .summary-card {
+        background: #fff;
+        border: 1px solid #ededed;
+        border-radius: 14px;
+        padding: 18px;
+        height: 100%;
+    }
+
+    /* 작은 카드 텍스트(예시처럼 좌측정렬) */
+    .summary-right .summary-card .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 12px;
+    }
+
+    .summary-right .summary-card .value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #333;
+    }
+
+    /* 수익률 색상 */
+    .summary-right .summary-card .value.positive {
+        color: #e53935;
+    }
+
+    .summary-right .summary-card .value.negative {
+        color: #1e88e5;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
         .summary-cards {
-            display: grid;
-            grid-template-columns: 1.2fr 2.8fr; /* 예시처럼 오른쪽이 더 넓게 */
-            gap: 24px;
-            align-items: stretch;
+            grid-template-columns: 1fr;
         }
 
-        /* 왼쪽 총평가자산은 "박스 없음" */
-        .summary-left {
-            display: flex;
-            align-items: flex-start;
-        }
-
-        /* 총평가자산 텍스트 블록 */
-        .summary-total {
-            width: 100%;
-            padding: 6px 0; /* 살짝만 여백 */
-        }
-
-        .summary-total-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 18px;
-        }
-
-        /* 타이틀 앞 점 */
-        .summary-total-title .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #6b5bff; /* 필요하면 #333으로 통일 가능 */
-            display: inline-block;
-        }
-
-        /* 총평가자산 숫자 */
-        .summary-total-value {
-            font-size: 52px;
-            font-weight: 800;
-            letter-spacing: -0.8px;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            line-height: 1;
-            color: #333;
-        }
-
-        /* 단위 */
-        .unit {
-            margin-left: 0; /* gap으로 spacing 주기 */
-            padding: 0; /* 혹시 들어가있다면 제거 */
-            line-height: 1; /* 높이 딱 맞추기 */
-            display: inline; /* 박스화 방지 */
-            font-size: 18px;
-            font-weight: 600;
-            color: #777;
-        }
-
-        /* ===== RIGHT: 작은 카드 3개 ===== */
         .summary-right {
-            display: grid !important;
-            gap: 16px !important;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+            grid-template-columns: repeat(3, 1fr);
         }
 
-        /* 작은 카드 공통 */
-        .summary-right .summary-card {
-            background: #fff;
-            border: 1px solid #ededed;
-            border-radius: 14px;
-            padding: 18px;
-            height: 100%;
+        .summary-total-value {
+            font-size: 44px;
+        }
+    }
+
+    @media (max-width: 700px) {
+        .summary-right {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .summary-right {
+            grid-template-columns: 1fr;
         }
 
-        /* 작은 카드 텍스트(예시처럼 좌측정렬) */
-        .summary-right .summary-card .label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #666;
-            margin-bottom: 12px;
+        .summary-total-value {
+            font-size: 38px;
         }
+    }
 
-        .summary-right .summary-card .value {
-            font-size: 24px;
-            font-weight: 800;
-            color: #333;
-        }
+    /* =========================
+       DASHBOARD (보유리스트 / 차트+관심)
+       ========================= */
 
-        /* 수익률 색상 */
-        .summary-right .summary-card .value.positive {
-            color: #e53935;
-        }
+    .dashboard {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 20px;
+        align-items: start;
+        grid-template-rows: auto auto; /* 2행 */
 
-        .summary-right .summary-card .value.negative {
-            color: #1e88e5;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 1100px) {
-            .summary-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-right {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .summary-total-value {
-                font-size: 44px;
-            }
-        }
-
-        @media (max-width: 700px) {
-            .summary-right {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .summary-right {
-                grid-template-columns: 1fr;
-            }
-
-            .summary-total-value {
-                font-size: 38px;
-            }
-        }
-
-        /* =========================
-           DASHBOARD (보유리스트 / 차트+관심)
-           ========================= */
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 20px;
-            align-items: start;
-            grid-template-rows: auto auto; /* 2행 */
-
-            grid-template-areas:
+        grid-template-areas:
                 "hold chart"
                 "hold watch";
-        }
+    }
 
-        /* 각 카드의 위치 지정 */
-        .holdings-card {
-            grid-area: hold;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
+    /* 각 카드의 위치 지정 */
+    .holdings-card {
+        grid-area: hold;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
 
-        .chart-card {
-            grid-area: chart;
-        }
+    .chart-card {
+        grid-area: chart;
+    }
 
-        .watch-card {
-            grid-area: watch;
-        }
+    .watch-card {
+        grid-area: watch;
+    }
 
-        @media (max-width: 992px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-                grid-template-rows: auto auto auto;
-                grid-template-areas:
+    @media (max-width: 992px) {
+        .dashboard {
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            grid-template-areas:
                   "hold"
                   "chart"
                   "watch";
-            }
         }
+    }
 
-        /* 카드 공통 */
-        .card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 25px;
-        }
+    /* 카드 공통 */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px;
+    }
 
-        .card-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #333;
-        }
+    .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+    }
 
-        /* 관심 종목 리스트 */
-        .watchlist-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
+    /* 관심 종목 리스트 */
+    .watchlist-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
 
-        .watchlist-item:last-child {
-            border-bottom: none;
-        }
+    .watchlist-item:last-child {
+        border-bottom: none;
+    }
 
-        .stock-info .stock-name {
-            font-size: 15px;
-            font-weight: 500;
-            color: #333;
-        }
+    .stock-info .stock-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: #333;
+    }
 
-        .stock-info .stock-code {
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
+    .stock-info .stock-code {
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+    }
 
-        .stock-price {
-            text-align: right;
-            padding-right: 5px;
-        }
+    .stock-price {
+        text-align: right;
+        padding-right: 5px;
+    }
 
-        .stock-price .price {
-            font-size: 15px;
-            font-weight: 600;
-        }
+    .stock-price .price {
+        font-size: 15px;
+        font-weight: 600;
+    }
 
-        .stock-price .change {
-            font-size: 12px;
-            margin-top: 2px;
-        }
+    .stock-price .change {
+        font-size: 12px;
+        margin-top: 2px;
+    }
 
-        .stock-price .change.positive {
-            color: #e53935;
-        }
+    .stock-price .change.positive {
+        color: #e53935;
+    }
 
-        .stock-price .change.negative {
-            color: #1e88e5;
-        }
+    .stock-price .change.negative {
+        color: #1e88e5;
+    }
 
-        /* 차트 영역 */
-        .chart-container {
-            width: 100%;
-            height: 280px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #fafafa;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
+    /* 차트 영역 */
+    .chart-container {
+        width: 100%;
+        height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fafafa;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
 
-        /* 차트 범례 */
-        .chart-legend {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+    /* 차트 범례 */
+    .chart-legend {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-        }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+    }
 
-        .legend-color {
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-        }
+    .legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+    }
 
-        /* 보유 종목 리스트 테이블 */
-        .holdings-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    /* 보유 종목 리스트 테이블 */
+    .holdings-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .holdings-table th {
-            text-align: left;
-            padding: 12px 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #999;
-            border-bottom: 1px solid #e0e0e0;
-        }
+    .holdings-table th {
+        text-align: left;
+        padding: 12px 8px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #999;
+        border-bottom: 1px solid #e0e0e0;
+    }
 
-        .holdings-table td {
-            padding: 15px 8px;
-            font-size: 14px;
-            border-bottom: 1px solid #f0f0f0;
-        }
+    .holdings-table td {
+        padding: 15px 8px;
+        font-size: 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
 
-        .holdings-table .stock-name-cell .name {
-            font-weight: 500;
-        }
+    .holdings-table .stock-name-cell .name {
+        font-weight: 500;
+    }
 
-        .holdings-table .stock-name-cell .code {
-            font-size: 12px;
-            color: #999;
-            margin-top: 2px;
-        }
+    .holdings-table .stock-name-cell .code {
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+    }
 
-        .holdings-table .profit.positive {
-            color: #e53935;
-        }
+    .holdings-table .profit.positive {
+        color: #e53935;
+    }
 
-        .holdings-table .profit.negative {
-            color: #1e88e5;
-        }
+    .holdings-table .profit.negative {
+        color: #1e88e5;
+    }
 
-        .holdings-scroll {
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-            padding-right: 14px; /* 스크롤바 여유 */
-        }
+    .holdings-scroll {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+        padding-right: 14px; /* 스크롤바 여유 */
+    }
 
-        /* 빈 상태 메시지 */
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
+    /* 빈 상태 메시지 */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+    }
 
-        /* 차트 빈 상태 */
-        .empty-chart-message {
-            text-align: center;
-            color: #888;
-        }
+    /* 차트 빈 상태 */
+    .empty-chart-message {
+        text-align: center;
+        color: #888;
+    }
 
-        .empty-chart-message .icon {
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
+    .empty-chart-message .icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
 
-        .empty-chart-message .message {
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+    .empty-chart-message .message {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
 
-        .empty-chart-message .sub-message {
-            font-size: 12px;
-            color: #aaa;
-        }
+    .empty-chart-message .sub-message {
+        font-size: 12px;
+        color: #aaa;
+    }
 
-        /* 숫자 포맷팅 */
-        .text-right {
-            text-align: right;
-        }
+    /* 숫자 포맷팅 */
+    .text-right {
+        text-align: right;
+    }
 
-        /*스크롤*/
-        .watchlist-scroll {
-            max-height: calc(60px * 5); /* 5개 높이 */
-            overflow-y: auto;
-            padding-right: 14px; /* 스크롤바랑 내용 간격 */
-            scrollbar-gutter: stable; /* 가능 브라우저에서 레이아웃 흔들림 방지 */
-        }
+    /*스크롤*/
+    .watchlist-scroll {
+        max-height: calc(60px * 5); /* 5개 높이 */
+        overflow-y: auto;
+        padding-right: 14px; /* 스크롤바랑 내용 간격 */
+        scrollbar-gutter: stable; /* 가능 브라우저에서 레이아웃 흔들림 방지 */
+    }
 
-    </style>
-</head>
-<body>
+</style>
+
 <div class="container">
     <!-- 탭 네비게이션 -->
-<%--    <nav class="tab-nav">--%>
-<%--        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>--%>
-<%--        <a href="${pageContext.request.contextPath}/invest/main.do">투자</a>--%>
-<%--    </nav>--%>
+    <%--    <nav class="tab-nav">--%>
+    <%--        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>--%>
+    <%--        <a href="${pageContext.request.contextPath}/invest/main.do">투자</a>--%>
+    <%--    </nav>--%>
 
     <!-- 상단 요약 카드 -->
     <div class="summary-wrapper">
@@ -466,7 +459,7 @@
             <!-- RIGHT: 작은 카드 3개 묶음 -->
             <div class="summary-right">
                 <div class="summary-card">
-                    <div class="label">보유 현금</div>
+                    <div class="label">예수금</div>
                     <div class="value">
                         <span id="cashBalance">
                         <fmt:formatNumber value="${userAsset.cashBalance}" pattern="#,###"/>
@@ -476,7 +469,7 @@
                 </div>
 
                 <div class="summary-card">
-                    <div class="label">투자금</div>
+                    <div class="label">총 평가금액</div>
                     <div class="value ">
                         <span id="totalStockValue">
                         <fmt:formatNumber value="${userAsset.totalStockValue}" pattern="#,###"/>
@@ -610,11 +603,9 @@
     </div>
 
 </div>
-
-<!-- Chart.js CDN -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/invest/portfolioDonutChart.js"></script>
 <script>
+    //페이지를 바꿔도 전역변수가 안없어져서 감싸기
     //보유 종목 없을 경우 차트 메세지 토글
     function setChartEmptyState(isEmpty) {
         const message = document.getElementById("emptyChartMessage");
@@ -780,7 +771,7 @@
 
                         pnlEl.classList.remove("positive", "negative");
                         pnlEl.classList.add(pnl >= 0 ? "positive" : "negative");
-                        pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.trunc(pnl).toLocaleString("ko-KR");
+                        pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
                     }
                 });
             }
@@ -796,5 +787,3 @@
         }
     }
 </script>
-</body>
-</html>

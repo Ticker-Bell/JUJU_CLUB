@@ -42,6 +42,15 @@ public class MemberService {
         }
     }
 
+    /** ✅ user_image(MEDIUMBLOB) 저장(업데이트) */
+    @Transactional
+    public void updateProfileImage(String userId, byte[] imageBytes) {
+        MemberDTO updateDto = new MemberDTO();
+        updateDto.setUserId(userId);
+        updateDto.setUserImage(imageBytes);
+        memberMapper.updateUser(updateDto);
+    }
+
     // 기존 탈퇴 로직 유지
     public void withdraw(String userId, String inputPassword) {
         MemberDTO user = memberMapper.selectUserById(userId);

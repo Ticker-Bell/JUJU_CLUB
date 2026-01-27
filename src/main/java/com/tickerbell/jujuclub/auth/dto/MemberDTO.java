@@ -18,4 +18,5 @@ public class MemberDTO {
     private String userName;
     private Date createdAt;
     private Integer userLevel;
+    private byte[] userImage;
 }

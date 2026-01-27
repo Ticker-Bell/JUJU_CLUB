@@ -15,6 +15,13 @@ public class TradeService {
     @Transactional(rollbackFor = Exception.class)
     public String processTrade(TradeDTO tradeDTO) {
         int userSeq = tradeDTO.getUserSeq();
+        Integer stockSeq = tradeMapper.selectStockSeq(tradeDTO.getStockCode().trim());
+        if (stockSeq == null) {
+            throw new IllegalArgumentException("존재하지 않는 종목입니다.");
+        }
+
+
+        tradeDTO.setStockSeq(stockSeq);
         int tradeQuantity = tradeDTO.getTradeQuantity();
 
         int totalAmount = tradeDTO.getTradePrice() * tradeQuantity;

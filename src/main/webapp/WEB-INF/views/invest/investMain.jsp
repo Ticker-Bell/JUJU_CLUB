@@ -61,7 +61,10 @@
             <div id="stock" class="flex flex-row justify-between w-full gap-16">
                 <div id="investComponents" class="flex flex-col gap-16">
                     <jsp:include page="investStockList.jsp"></jsp:include>
-                    <jsp:include page="investBuySell.jsp"></jsp:include>
+                    <div id="investBuySell">
+                        <jsp:include page="investBuySell.jsp"></jsp:include>
+
+                    </div>
                 </div>
                 <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
                     <jsp:include page="investChart.jsp" ></jsp:include>

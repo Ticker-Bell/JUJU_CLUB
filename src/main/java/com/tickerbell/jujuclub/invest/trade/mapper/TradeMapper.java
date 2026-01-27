@@ -17,4 +17,6 @@ public interface TradeMapper {
     void deleteHoldings();
 
     void insertTradeHistory(TradeDTO tradeDTO);
+
+    int selectStockSeq(String stockCode);
 }

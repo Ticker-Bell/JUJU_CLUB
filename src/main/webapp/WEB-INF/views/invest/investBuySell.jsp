@@ -20,10 +20,10 @@
         <div id="buy-form" class="flex flex-col gap-6">
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">가격</label>
-                <label
-                        class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        id="buyPrice"
-                ></label>
+                <div class="flex flex-row gap-2">
+                    <p id="buyPrice" class="text-[#222222]">-</p>
+                    <p class="text-[#666666]">원</p>
+                </div>
             </div>
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">수량</label>
@@ -38,12 +38,12 @@
             <div id="buy-form-item" class="flex justify-between">
                 <label class="text-sm font-normal text-[#666666]">예상금액</label>
                 <div class="flex flex-row gap-2">
-                    <p id="buyExpectedPrice" class="text-[#222222]">0</p>
+                    <p id="buyExpectedPrice" class="text-[#222222]">-</p>
                     <p class="text-[#666666]">원</p>
                 </div>
             </div>
             <p id="buyErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
-            <button id="buyButton" onclick="trade()"
+            <button id="buyButton" onclick="trade(tradeStockCode)"
                     class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매수하기
             </button>
@@ -58,10 +58,10 @@
             </div>
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">가격</label>
-                <label
-                        class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        id="sellPrice"
-                ></label>
+                <div class="flex flex-row gap-2">
+                    <p id="sellPrice" class="text-[#222222]">-</p>
+                    <p class="text-[#666666]">원</p>
+                </div>
             </div>
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-base font-medium text-[#666666]">수량</label>
@@ -76,14 +76,14 @@
             <div id="sell-form-item" class="flex justify-between">
                 <label class="text-sm font-normal text-[#666666]">예상금액</label>
                 <div class="flex flex-row gap-2">
-                    <p id="sellExpectedPrice" class="text-[#222222]">0</p>
+                    <p id="sellExpectedPrice" class="text-[#222222]">-</p>
                     <p class="text-[#666666]">원</p>
                 </div>
             </div>
 
             <p id="sellErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
 
-            <button id="sellButton" onclick="trade()"
+            <button id="sellButton" onclick="trade(tradeStockCode)"
                     class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
                 매도하기
             </button>
@@ -91,8 +91,10 @@
         </div>
     </div>
 </div>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <script>
+    let currentTradePrice = null;
+    let tradeStockCode = null;
+
     function switchTab(element, type) {
         //매수 매도 탭 전환
         const tabs = document.querySelectorAll('.tab-item');
@@ -115,8 +117,13 @@
     }
 
     function tradePrice(currentPrice) {
+        if (currentPrice === undefined) currentPrice = '-';
+        currentTradePrice = currentPrice;
         document.getElementById('buyPrice').innerText = currentPrice;
         document.getElementById('sellPrice').innerText = currentPrice;
+
+        buyExpectedPrice();
+        sellExpectedPrice();
     }
 
     function hasQuantity(stockCode) {
@@ -135,11 +142,14 @@
 
     function buyExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('buyPrice').value);
+        const price = currentTradePrice;
         const amount = Number(document.getElementById('buyAmountInput').value);
-        const total = price * amount;
+        let total = price * amount;
 
-        if (total !== 0 && total !== null) {
+        if (isNaN(total)) {
+            document.getElementById('buyExpectedPrice').innerText = '-';
+            return ;
+        } else if (total !== 0 && total !== null) {
             document.getElementById('buyButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
             document.getElementById('buyButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
         }
@@ -148,11 +158,13 @@
 
     function sellExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('sellPrice').value);
+        const price = currentTradePrice;
         const amount = Number(document.getElementById('sellAmountInput').value);
         const total = price * amount;
-
-        if (total !== 0 && total !== null) {
+        if (isNaN(total)) {
+            document.getElementById('sellExpectedPrice').innerText = '-';
+            return;
+        } else if (total !== 0 && total !== null) {
 
             document.getElementById('sellButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
             document.getElementById('sellButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
@@ -162,26 +174,25 @@
 
     function trade(stockCode) {
         //매수, 매도 버튼 로직
-        let price;
         let amount;
+        tradeStockCode = stockCode;
         const tradeType = document.querySelector('.tab-item.active').innerText.trim() === '매수' ? 'Y' : 'N';
 
         if (tradeType === 'Y') {
-            price = Number(document.getElementById('buyPrice').value);
             amount = Number(document.getElementById('buyAmountInput').value);
         } else {
-            price = Number(document.getElementById('sellPrice').value);
             amount = Number(document.getElementById('sellAmountInput').value);
         }
 
         const data = {
-            stockCode: stockCode,
+            stockCode: String(stockCode),
             tradeType: tradeType,
-            tradePrice: price,
+            tradePrice: currentTradePrice,
             tradeQuantity: amount
         };
+        console.log("매수매도 데이터: {}", data);
 
-        fetch('${pageContext.request.contextPath}/trade/BuySell', {
+        fetch(`${pageContext.request.contextPath}/trade/BuySell`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -190,7 +201,7 @@
             .then(result => {
                 if (result.success) {
                     alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
-                    location.reload();
+                    $("#investBuySell").load(location.href + " #investBuySell > *");
                 } else {
                     if (tradeType === 'Y') {
                         document.getElementById('buyErrorMessage').innerText = result.message;

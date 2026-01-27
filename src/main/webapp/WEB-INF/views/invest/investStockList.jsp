@@ -741,6 +741,8 @@
             const name = '';
             //investChart 차트데이터 전달
             getSelectedChart(code, name);
+            trade(code);
+            hasQuantity(code);
             // 기업정보에 전달
             getSelectedCorpInfo(code);
         }

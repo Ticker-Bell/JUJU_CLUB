@@ -57,4 +57,8 @@
         INSERT INTO mock_trade(user_seq, stock_seq, trade_type, trade_price, trade_quantity)
         VALUES (#{userSeq}, #{stockSeq}, #{tradeType}, #{tradePrice}, #{tradeQuantity})
     </insert>
+
+    <select id="selectStockSeq" resultType="int" parameterType="string">
+        SELECT stock_seq FROM stock_master WHERE stock_code = #{stockCode}
+    </select>
 </mapper>

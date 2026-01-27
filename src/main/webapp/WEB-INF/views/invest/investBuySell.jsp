@@ -91,8 +91,8 @@
         </div>
     </div>
 </div>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <script>
+    let currentTradePrice = null;
     function switchTab(element, type) {
         //매수 매도 탭 전환
         const tabs = document.querySelectorAll('.tab-item');
@@ -115,8 +115,13 @@
     }
 
     function tradePrice(currentPrice) {
+        if(currentPrice === undefined) currentPrice='-';
+        currentTradePrice=currentPrice;
         document.getElementById('buyPrice').innerText = currentPrice;
         document.getElementById('sellPrice').innerText = currentPrice;
+
+        buyExpectedPrice();
+        sellExpectedPrice();
     }
 
     function hasQuantity(stockCode) {
@@ -135,9 +140,10 @@
 
     function buyExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('buyPrice').value);
+        const price =currentTradePrice;
         const amount = Number(document.getElementById('buyAmountInput').value);
-        const total = price * amount;
+        let total = price * amount;
+
 
         if (total !== 0 && total !== null) {
             document.getElementById('buyButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
@@ -148,7 +154,7 @@
 
     function sellExpectedPrice() {
         //예상 금액 계산
-        const price = Number(document.getElementById('sellPrice').value);
+        const price = currentTradePrice;
         const amount = Number(document.getElementById('sellAmountInput').value);
         const total = price * amount;
 
@@ -162,26 +168,25 @@
 
     function trade(stockCode) {
         //매수, 매도 버튼 로직
-        let price;
+        let tradeStockCode = stockCode;
         let amount;
         const tradeType = document.querySelector('.tab-item.active').innerText.trim() === '매수' ? 'Y' : 'N';
 
         if (tradeType === 'Y') {
-            price = Number(document.getElementById('buyPrice').value);
             amount = Number(document.getElementById('buyAmountInput').value);
         } else {
-            price = Number(document.getElementById('sellPrice').value);
             amount = Number(document.getElementById('sellAmountInput').value);
         }
+console.log("tradestockCode"+ tradeStockCode);
 
         const data = {
-            stockCode: stockCode,
+            stockCode: String(tradeStockCode),
             tradeType: tradeType,
-            tradePrice: price,
+            tradePrice: currentTradePrice,
             tradeQuantity: amount
         };
 
-        fetch('${pageContext.request.contextPath}/trade/BuySell', {
+        fetch(`${pageContext.request.contextPath}/trade/BuySell`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)

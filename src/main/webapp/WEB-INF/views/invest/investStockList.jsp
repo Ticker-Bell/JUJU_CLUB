@@ -1409,8 +1409,8 @@
                     type: 'success',
                     title: tradeType === 'Y' ? '매수 완료 🎉' : '매도 완료 🎉',
                     desc: tradeType === 'Y'
-                        ? '매수 주문이 정상적으로 체결되었습니다.'
-                        : '매도 주문이 정상적으로 체결되었습니다.',
+                        ? `${data.tradePrice}원\n`+`${data.tradeQuantity}주\n`+'매수 주문이 정상적으로 체결되었습니다.'
+                        : `${data.tradePrice}원\n`+`${data.tradeQuantity}주\n`+'매도 주문이 정상적으로 체결되었습니다.',
                     buttonText: '확인'
                 });
 

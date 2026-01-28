@@ -10,7 +10,7 @@
 
 <div class="stage-controls-left">
     <div class="select-wrapper">
-        <button id="levelSelect" class="control-item w-[100px]" type="button" aria-label="레벨 선택">
+        <button id="levelSelect" class="control-item w-[100px]" type="button">
             <span class="btn-text">${userLesson.getLevelName()}</span>
         </button>
         <ul class="optionList">

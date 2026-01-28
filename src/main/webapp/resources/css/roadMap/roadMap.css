@@ -11,62 +11,71 @@
     display: none; /* Chrome/Safari */
 }
 
+
+
 /* SVG Styles */
-#roadBorder {
-    fill: none;
-    stroke: #312E81;
-    stroke-width: 100px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.1;
+#roadmapSvg {
+    overflow: visible;
 }
+
+/*#roadBorder {*/
+/*    fill: none;*/
+/*    stroke: #FFFFFF;*/
+/*    stroke-width: 100px;*/
+/*    stroke-linecap: round;*/
+/*    stroke-linejoin: round;*/
+/*    opacity: 0.1;*/
+/*}*/
 
 #roadPath {
     fill: none;
-    stroke: #4F46E5;
-    stroke-width: 6px;
+    stroke: #ffffff;
+    stroke-width: 20px;
     stroke-linecap: round;
+    stroke-dasharray: 35px 10px;
     stroke-linejoin: round;
 }
 
-#roadDashed {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.4);
-    stroke-width: 2px;
-    stroke-dasharray: 10 15;
-    stroke-linecap: round;
-    pointer-events: none;
-}
+/*#roadDashed {*/
+/*    fill: none;*/
+/*    stroke: rgba(255, 255, 255, 0.4);*/
+/*    stroke-width: 2px;*/
+/*    stroke-dasharray: 10 15;*/
+/*    stroke-linecap: round;*/
+/*    pointer-events: none;*/
+/*}*/
 
-#roadPathActive {
-    fill: none;
-    stroke: #818CF8;
-    stroke-width: 6px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.8));
-    transition: d 0.8s ease-in-out;
-}
+/*#roadPathActive {*/
+/*    fill: none;*/
+/*    stroke: #818CF8;*/
+/*    stroke-width: 6px;*/
+/*    stroke-linecap: round;*/
+/*    stroke-linejoin: round;*/
+/*    filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.8));*/
+/*    transition: d 0.8s ease-in-out;*/
+/*}*/
 
 /* Orb (노드) 스타일 */
 .orb {
     position: absolute;
-    width: 72px;
-    height: 72px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    border: 4px solid #E0E7FF;
     z-index: 30;
+    background: #fff;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     transition: transform .18s ease, box-shadow .18s ease;
     user-select: none;
     cursor: pointer;
     pointer-events: auto !important;
 }
-
+.orb .chapter {
+    width: 80px;
+    height: 80px;
+}
 .orb:hover {
     transform: scale(1.15) translateY(-5px);
     box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
@@ -74,23 +83,21 @@
 
 /* 상태별 스타일 */
 .orb.completed {
-    border-color: #4F46E5;
     background: #fff;
     color: #4F46E5;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .orb.current {
-    border-color: #4F46E5;
     background: #4F46E5;
-    color: #fff;
+    /*color: #fff;*/
     box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.25);
     animation: pulse 2s infinite;
 }
 
 .orb.locked {
     background: #F3F4F6;
-    border-color: #E5E7EB;
-    color: #9CA3AF;
+    /*color: #9CA3AF;*/
     cursor: not-allowed;
     opacity: 0.9;
 }
@@ -184,4 +191,10 @@
 
 
 /*  ----- 로드맵 배경 ----- */
+#space-bg {
+    background-image: url("/resources/images/roadMapIcons/roadMap-bg.png");
+}
 
+#bg-img {
+    background-repeat: repeat;
+}

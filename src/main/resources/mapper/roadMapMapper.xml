@@ -107,7 +107,7 @@
 
             (SELECT COUNT(*)
              FROM user_test_result
-             WHERE user_seq = #{user_seq} and DATE_FORMAT(tested_at, '%Y-%m-%d') = CURDATE())   AS chapterTest,
+             WHERE user_seq = #{user_seq} and DATE_FORMAT(tested_at, '%Y-%m-%d') = CURDATE()) and is_pass = 'Y' AS chapterTest,
 
             (SELECT COUNT(*)
              FROM mock_trade

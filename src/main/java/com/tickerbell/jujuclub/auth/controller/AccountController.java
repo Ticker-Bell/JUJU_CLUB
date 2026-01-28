@@ -42,7 +42,17 @@ public class AccountController {
                 res.put("ok", true);
                 res.put("message", "계좌가 생성되었습니다.");
                 res.put("accountNo", createdAccountNo); // [추가] 클라이언트로 전달
-                roadMapService.insertInitUserMission(loginUser.getUserSeq());
+
+
+                try {
+                    // 유저 일일미션 insert
+                    roadMapService.insertInitUserMission(loginUser.getUserSeq());
+                    // 계급에 맞춰 레슨 insert
+                    if (loginUser.getUserLevel() > 1)
+                        roadMapService.insertInitUserLesson(loginUser.getUserSeq(), loginUser.getUserLevel());
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 res.put("ok", false);
                 res.put("message", "이미 계좌가 존재합니다.");

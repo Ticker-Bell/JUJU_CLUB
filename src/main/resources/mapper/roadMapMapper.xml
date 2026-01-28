@@ -66,6 +66,23 @@
         from mission
         where mission_seq in (1,2,3,4)
     </insert>
+    <insert id="insertInitUserLesson">
+    insert into user_question_result (user_seq, lesson_id, started_at, finished_at)
+    select #{user_seq},
+            ls.lesson_id,
+           date_add(current_timestamp, interval -1 day),
+           date_add(current_timestamp, interval -1 day)
+            from learning_lesson ls
+            where ls.chapter_id like 'LV1%'
+            or (#{user_level} > 2 and ls.chapter_id like 'LV2%')
+
+    </insert>
+
+    <insert id="insertInitCurrentUserLesson">
+        insert into user_question_result (user_seq, lesson_id)
+        select #{user_seq},
+               if(#{user_level} = 2, 'LV2_CH001_LS001', 'LV3_CH001_LS001')
+    </insert>
 
     <select id="missionList" resultType="com.tickerbell.jujuclub.roadMap.dto.MissionDTO">
         select

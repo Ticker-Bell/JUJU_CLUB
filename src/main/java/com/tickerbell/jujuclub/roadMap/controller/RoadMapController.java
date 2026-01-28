@@ -31,6 +31,8 @@ public class RoadMapController {
         
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
+        Boolean isFirstObj = (Boolean) session.getAttribute("isFirst");
+        boolean isFirst = (isFirstObj != null && isFirstObj);
 
         List<LevelDTO> levelList = roadMapService.levelList();
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
@@ -59,8 +61,8 @@ public class RoadMapController {
             UserLessonDTO user = userMap.get(lesson.getLessonId());
             ChapterResultDTO result = resultMap.get(lesson.getChapterId());
 
-            boolean isLssnFinished = user != null && user.getEndDate() != null
-                    && !user.getEndDate().toString().isEmpty();
+            boolean isLssnFinished = user != null && user.getEndDate() != null && !user.getEndDate().toString().isEmpty();
+            boolean isLssnCurrent = user != null && user.getStartDate() != null && user.getEndDate() == null;
 
             boolean isChptFinished = result != null && "Y".equals(result.getIsPass());
 
@@ -73,7 +75,7 @@ public class RoadMapController {
                         lesson.setStatus("current");
                         isUnlocked = false;
                     } else {
-                        lesson.setStatus("locked");
+                        lesson.setStatus(isLssnCurrent ? "current" : "locked");
                     }
                 }
             } else {

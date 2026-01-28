@@ -1138,7 +1138,7 @@
             const priceEl = document.getElementById('header-price');
             const changeEl = document.getElementById('header-change');
             //현재 장 시간이 아닐 때
-            if (!stock && isOutOfMarketTime()) {
+            if (isOutOfMarketTime()) {
                 priceEl.innerText = "현재 장 시간이 아닙니다\n" +
                     "(09:00-15:30)";
                 changeEl.innerText = '';
@@ -1344,6 +1344,40 @@
             document.getElementById('sellExpectedPrice').innerText = total.toLocaleString();
         }
 
+        function openResultModal({type, title, desc, buttonText}) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDesc = document.getElementById('modalDesc');
+            const actionBtn = document.getElementById('modalActionBtn');
+            const bar = document.getElementById('modalBar');
+
+            // 초기화
+            icon.className = 'w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg';
+            icon.innerHTML = '';
+
+            if (type === 'success') {
+                icon.classList.add('bg-green-100', 'text-green-600');
+                icon.innerHTML = '✔';
+                bar.classList.add('bg-green-500');
+            } else {
+                icon.classList.add('bg-red-100', 'text-red-600');
+                icon.innerHTML = '✖';
+                bar.classList.add('bg-red-500');
+            }
+
+            modalTitle.innerText = title;
+            modalDesc.innerText = desc;
+            actionBtn.innerText = buttonText;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+        }
+
+
         function trade(stockCode) {
             //매수, 매도 버튼 로직
             let amount;
@@ -1369,19 +1403,35 @@
                 body: JSON.stringify(data)
             })
                 .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
-                        $("#investBuySell").load(location.href + " #investBuySell > *");
-                    } else {
-                        if (tradeType === 'Y') {
-                            document.getElementById('buyErrorMessage').innerText = result.message;
-                        } else {
-                            document.getElementById('sellErrorMessage').innerText = result.message;
-                        }
-                    }
-                })
-                .catch(error => console.log('Error: ' + error));
-        }
-    })();
+                .then(result =>{
+            if (result.success) {
+                openResultModal({
+                    type: 'success',
+                    title: tradeType === 'Y' ? '매수 완료 🎉' : '매도 완료 🎉',
+                    desc: tradeType === 'Y'
+                        ? `${data.tradePrice}원\n`+`${data.tradeQuantity}주\n`+'매수 주문이 정상적으로 체결되었습니다.'
+                        : `${data.tradePrice}원\n`+`${data.tradeQuantity}주\n`+'매도 주문이 정상적으로 체결되었습니다.',
+                    buttonText: '확인'
+                });
+
+                document.getElementById('modalActionBtn').onclick = () => {
+                    closeModal();
+                    $("#investBuySell").load(location.href + " #investBuySell > *");
+                };
+
+            } else {
+                openResultModal({
+                    type: 'error',
+                    title: '거래 실패',
+                    desc: result.message,
+                    buttonText: '다시 시도'
+                });
+            }
+        } )
+
+
+        .catch(error => console.log('Error: ' + error));
+    }
+    })
+    ();
 </script>

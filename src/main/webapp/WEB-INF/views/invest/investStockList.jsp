@@ -850,6 +850,14 @@
                 }, // 파라미터 전달
                 dataType: 'json', // 응답을 JSON으로 기대함
                 success: function (data) {
+                    if (!data || data.length === 0) {
+                        if (sortType === 'interest') {
+                            $('#stockList').html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
+                        } else {
+                            $('#stockList').html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+                        }
+                    }
+
                     if (data && data.length > 0) {
                         renderStockList(data, sortType, page);
 
@@ -875,15 +883,6 @@
         // 리스트 렌더링 함수
         function renderStockList(data, sortType, page) {
             const $container = $('#stockList');
-
-            if (!data || data.length === 0) {
-                if (sortType === 'interest') {
-                    $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
-                } else {
-                    $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
-                }
-                return;
-            }
 
             let html = '';
 

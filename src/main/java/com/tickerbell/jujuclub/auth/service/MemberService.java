@@ -33,6 +33,11 @@ public class MemberService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public MemberDTO selectUserBySeq(int userSeq) {
+        return memberMapper.selectUserBySeq(userSeq);
+    }
+
     @Transactional
     public void updateProfileImage(String userId, byte[] imageBytes) {
         MemberDTO updateDto = new MemberDTO();

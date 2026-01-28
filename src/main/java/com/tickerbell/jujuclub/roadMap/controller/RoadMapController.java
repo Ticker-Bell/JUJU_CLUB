@@ -70,11 +70,11 @@ public class RoadMapController {
                     lesson.setStatus("completed");
                     isUnlocked = true;
                 } else {
-                    if (isUnlocked) {
+                    if (isUnlocked || isLssnCurrent) {
                         lesson.setStatus("current");
                         isUnlocked = false;
                     } else {
-                        lesson.setStatus(isLssnCurrent ? "current" : "locked");
+                        lesson.setStatus("locked");
                     }
                 }
             } else {

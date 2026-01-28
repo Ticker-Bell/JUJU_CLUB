@@ -26,8 +26,8 @@
 
     .stock-app-container {
         width: 360px;
-        height: 600px;
-        background-color: #ffffff;
+        height: 400px;
+        background-color: #fbfbfb;
         border: 1px solid #E5E7EB;
         border-radius: 12px;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -37,9 +37,14 @@
         overflow: hidden;
     }
 
-    .search-wrapper {
-        position: relative;
-        flex-shrink: 0;
+    .tab-search-container {
+        width: 360px;
+        height: fit-content;
+        background-color: #F9FAFB;
+        display: flex;
+        flex-direction: column;
+        padding: 5px;
+        overflow: visible;
     }
 
     .search-icon {
@@ -57,7 +62,7 @@
         border: none;
         border-bottom: 1px solid #E5E7EB;
         padding: 8px 8px 8px 40px;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 800;
         color: #111827;
         outline: none;
@@ -92,7 +97,7 @@
         border: none;
         padding-bottom: 10px;
         font-weight: 900;
-        font-size: 12px;
+        font-size: 14px;
         color: #9CA3AF;
         cursor: pointer;
         position: relative;
@@ -208,8 +213,8 @@
     /* 검색창 감싸는 wrapper */
     .search-wrapper {
         position: relative;
-        width: 300px;
-        margin: 20px auto 10px auto;
+        width: 100%;
+        margin: 20px auto 5px auto;
         flex-shrink: 0;
     }
 
@@ -272,68 +277,70 @@
 
 
 </style>
-
-<div class="stock-app-container">
-
-    <div class="tab-wrapper">
-        <div class="tab-list">
-            <button class="tab-btn active" data-sort="interest">관심종목</button>
-            <button class="tab-btn" data-sort="volume">거래량</button>
-            <button class="tab-btn" data-sort="rising">상승률</button>
-            <button class="tab-btn" data-sort="falling">하락률</button>
-            <button class="tab-btn" data-sort="marketCap">시가총액</button>
+<div class="tab-list-total-container">
+    <div class="tab-search-container">
+        <div class="tab-wrapper">
+            <div class="tab-list">
+                <button class="tab-btn active" data-sort="interest">관심종목</button>
+                <button class="tab-btn" data-sort="volume">거래량</button>
+                <button class="tab-btn" data-sort="rising">상승률</button>
+                <button class="tab-btn" data-sort="falling">하락률</button>
+                <button class="tab-btn" data-sort="marketCap">시가총액</button>
+            </div>
+            <div id="left-tab-slider"></div>
         </div>
-        <div id="left-tab-slider"></div>
+
+        <div class="search-wrapper">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" placeholder="종목명/코드 검색" class="search-input">
+            <div class="search-result"></div>
+        </div>
     </div>
 
-    <div class="search-wrapper">
-        <i data-lucide="search" class="search-icon"></i>
-        <input type="text" placeholder="종목명/코드 검색" class="search-input">
-        <div class="search-result"></div>
-    </div>
-
-    <div class="stock-list-container">
-        <div class="stock-scroll-area" id="stockList">
-            <c:if test="${empty stockDTOList}">
-                <div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>
-            </c:if>
-            <c:if test="${not empty stockDTOList}">
-                <c:forEach items="${stockDTOList}" var="stock">
-                    <div class="stock-item" data-code="${stock.stockCode}" data-name="${stock.stockName}">
-                        <div class="text-col">
-                            <c:catch var="e">
-                                <c:if test="${not empty stock.rank}">
-                                    <span class="rank">${stock.rank}</span>
-                                </c:if>
-                            </c:catch>
-                            <span class="txt-name">${stock.stockName}</span>
-                            <span class="txt-code num-font">${stock.stockCode}</span>
+    <div class="stock-app-container">
+        <div class="stock-list-container">
+            <div class="stock-scroll-area" id="stockList">
+                <c:if test="${empty stockDTOList}">
+                    <div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>
+                </c:if>
+                <c:if test="${not empty stockDTOList}">
+                    <c:forEach items="${stockDTOList}" var="stock">
+                        <div class="stock-item" data-code="${stock.stockCode}" data-name="${stock.stockName}">
+                            <div class="text-col">
+                                <c:catch var="e">
+                                    <c:if test="${not empty stock.rank}">
+                                        <span class="rank">${stock.rank}</span>
+                                    </c:if>
+                                </c:catch>
+                                <span class="txt-name">${stock.stockName}</span>
+                                <span class="txt-code num-font">${stock.stockCode}</span>
+                            </div>
+                            <div class="text-col items-end">
+                                <c:choose>
+                                    <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '+')}">
+                                        <span class="txt-price color-red num-font"><fmt:formatNumber
+                                                value="${codeKISDataMap[stock.stockCode].currentPrice}"
+                                                type="number"/></span>
+                                        <span class="txt-rate color-red num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                    </c:when>
+                                    <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '-')}">
+                                        <span class="txt-price color-blue num-font"><fmt:formatNumber
+                                                value="${codeKISDataMap[stock.stockCode].currentPrice}"
+                                                type="number"/></span>
+                                        <span class="txt-rate color-blue num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="txt-price color-gray num-font"><fmt:formatNumber
+                                                value="${codeKISDataMap[stock.stockCode].currentPrice}"
+                                                type="number"/></span>
+                                        <span class="txt-rate color-gray num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
-                        <div class="text-col items-end">
-                            <c:choose>
-                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '+')}">
-                                    <span class="txt-price color-red num-font"><fmt:formatNumber
-                                            value="${codeKISDataMap[stock.stockCode].currentPrice}"
-                                            type="number"/></span>
-                                    <span class="txt-rate color-red num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
-                                </c:when>
-                                <c:when test="${fn:startsWith(codeKISDataMap[stock.stockCode].changePct, '-')}">
-                                    <span class="txt-price color-blue num-font"><fmt:formatNumber
-                                            value="${codeKISDataMap[stock.stockCode].currentPrice}"
-                                            type="number"/></span>
-                                    <span class="txt-rate color-blue num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
-                                </c:when>
-                                <c:otherwise>
-                                    <span class="txt-price color-gray num-font"><fmt:formatNumber
-                                            value="${codeKISDataMap[stock.stockCode].currentPrice}"
-                                            type="number"/></span>
-                                    <span class="txt-rate color-gray num-font">${codeKISDataMap[stock.stockCode].changePct}%</span>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
-                </c:forEach>
-            </c:if>
+                    </c:forEach>
+                </c:if>
+            </div>
         </div>
     </div>
 </div>

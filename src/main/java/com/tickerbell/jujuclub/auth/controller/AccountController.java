@@ -43,7 +43,6 @@ public class AccountController {
                 res.put("message", "계좌가 생성되었습니다.");
                 res.put("accountNo", createdAccountNo); // [추가] 클라이언트로 전달
 
-
                 try {
                     // 유저 일일미션 insert
                     roadMapService.insertInitUserMission(loginUser.getUserSeq());

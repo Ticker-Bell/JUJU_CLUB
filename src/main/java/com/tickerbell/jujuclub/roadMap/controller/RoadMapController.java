@@ -31,8 +31,7 @@ public class RoadMapController {
         
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
-        Boolean isFirstObj = (Boolean) session.getAttribute("isFirst");
-        boolean isFirst = (isFirstObj != null && isFirstObj);
+
 
         List<LevelDTO> levelList = roadMapService.levelList();
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
@@ -96,7 +95,7 @@ public class RoadMapController {
 
         // 현재 진행하고 있는 유저 레슨/챕터 정보 전달
         LevelChapterLessonDTO userLesson = allLearningList.stream()
-                .filter(lesson -> "current".equals(lesson.getStatus()))
+                .filter(lesson -> !"TEST".equals(lesson.getLessonType()) && "current".equals(lesson.getStatus()))
                 .findFirst()
                 .orElse(allLearningList.get(0));
 

@@ -258,6 +258,7 @@
     }
 
     .stock-item.selected {
+        border-radius: 12px;
         background-color: #F5F3FF;
         box-shadow: inset 0 0 0 2px #5E45EB;
     }
@@ -847,6 +848,7 @@
         function fetchStockBatch(sortType, page) {
             // URL 생성
             const url = contextPath + '/invest/main/stock/list';
+            const $container = $('#stockList');
 
             $.ajax({
                 url: url,
@@ -856,6 +858,8 @@
                     page: page  //0,1,2
                 }, // 파라미터 전달
                 dataType: 'json', // 응답을 JSON으로 기대함
+
+
                 success: function (data) {
                     if (data && data.length > 0) {
                         renderStockList(data, sortType, page);
@@ -873,7 +877,7 @@
                 },
                 error: function (xhr, status, error) {
                     console.error("AJAX Error:", error);
-                    $('#stockList').html('<div style="padding:20px; text-align:center;">데이터를 불러오지 못했습니다.</div>');
+                    $container.html('<div style="padding:20px; text-align:center;">데이터를 불러오지 못했습니다.</div>');
                     unlockTabs();
                 }
             });

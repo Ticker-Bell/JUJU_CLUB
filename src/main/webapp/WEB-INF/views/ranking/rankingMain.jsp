@@ -3,6 +3,14 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
+<%-- ✅ cache buster (HTMX/브라우저 캐시로 첫 이미지가 복붙되는 현상 방지) --%>
+<%
+    request.setAttribute("imgBust", System.currentTimeMillis());
+%>
+
+<%-- ✅ HTMX 부분 로드에서도 항상 기본이미지 경로가 잡히도록, 여기서 절대경로로 강제 세팅 --%>
+<c:set var="defaultProfile" value="${pageContext.request.contextPath}/resources/images/default-profile.png"/>
+
 <c:set var="topAsset" value="${rankingInfo.rankingBorardListOBA}"/>
 <c:set var="topLssn" value="${rankingInfo.rankingBorardListOBR}"/>
 <c:set var="listSize" value="${topAsset != null ? fn:length(topAsset) : 0}"/>
@@ -58,7 +66,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <button type="button" class="nav-btn next" id="nextBtn"><i data-lucide="chevron-right"></i></button>
         </div>
@@ -75,15 +82,17 @@
                         <div class="text-[11px] font-bold text-gray-400 mb-1">나의 랭킹</div>
                         <div class="flex items-baseline gap-1">
                             <span id="my-rank-val" class="text-3xl font-black text-gray-900 leading-none">${rankingInfo.userAssetRank}</span>
-                            <span class="text-[12px] font-bold text-gray-300">/ <fmt:formatNumber value="${rankingInfo.totUserCnt}"/></span>
+                            <span class="text-[12px] font-bold text-gray-300">/
+                                <fmt:formatNumber value="${rankingInfo.totUserCnt}"/>
+                            </span>
                         </div>
                     </div>
                 </div>
                 <div class="h-10 w-[1px] bg-gray-100"></div>
                 <div class="flex-1 pl-2">
                     <div id="my-main-label" class="text-[11px] font-bold text-gray-400 mb-1">총 보유자금</div>
-                    <div id="my-main-val" class="text-2xl font-black text-indigo-600 leading-none">
-                        ₩ <fmt:formatNumber value="${rankingInfo.cashBalance}"/>
+                    <div id="my-main-val" class="text-2xl font-black text-indigo-600 leading-none">₩
+                        <fmt:formatNumber value="${rankingInfo.cashBalance}"/>
                     </div>
                 </div>
             </div>
@@ -100,6 +109,7 @@
             </div>
 
             <div class="flex-1 overflow-y-auto relative">
+
                 <table id="table-asset" class="rank-table w-full text-left transition-opacity duration-300">
                     <colgroup>
                         <col style="width: 88px;"/>
@@ -124,13 +134,11 @@
 
                             <td class="py-2.5 px-4 font-black text-sm">
                                 <div class="rank-user">
-                                        <%-- ✅ 변경: userSeq로 DB 이미지 내려받기 (없으면 onerror로 default) --%>
                                     <img class="rank-avatar"
-                                         src="${pageContext.request.contextPath}/member/profile-image?userSeq=${row.userSeq}&v=${row.userSeq}"
+                                         src="${pageContext.request.contextPath}/member/profile-image?userSeq=${row.userSeq}&v=${row.userSeq}_${imgBust}"
                                          alt="profile"
                                          loading="lazy"
                                          onerror="this.onerror=null; this.src='${defaultProfile}';"/>
-
                                     <div class="rank-avatar-fallback" style="display:none;">?</div>
                                     <span>${row.userName}</span>
                                 </div>
@@ -170,13 +178,11 @@
 
                                 <td class="py-2.5 px-4 font-black text-sm">
                                     <div class="rank-user">
-                                            <%-- ✅ 변경: userSeq로 DB 이미지 내려받기 (없으면 onerror로 default) --%>
                                         <img class="rank-avatar"
-                                             src="${pageContext.request.contextPath}/member/profile-image?userSeq=${row.userSeq}&v=${row.userSeq}"
+                                             src="${pageContext.request.contextPath}/member/profile-image?userSeq=${row.userSeq}&v=${row.userSeq}_${imgBust}"
                                              alt="profile"
                                              loading="lazy"
                                              onerror="this.onerror=null; this.src='${defaultProfile}';"/>
-
                                         <div class="rank-avatar-fallback" style="display:none;">?</div>
                                         <span>${row.userName}</span>
                                     </div>
@@ -190,6 +196,7 @@
                     </c:if>
                     </tbody>
                 </table>
+
             </div>
         </section>
     </div>
@@ -197,7 +204,6 @@
 
 <script>
     (function () {
-        // ⭐ HTMX로 로드될 때 바로 실행되도록 즉시 실행
         window.RANKING_DATA = {
             asset: {
                 myRank: "${rankingInfo.userAssetRank}",
@@ -240,21 +246,17 @@
             if(!cardTitle || !cardRank || !cardAsset || !cardLesson) return;
 
             const data = window.RANKING_DATA[currentRankType]?.top3?.[currentSlideIndex];
-            console.log('data', data);
             if(!data) return;
 
-            // 카드 제목/랭크 업데이트
             cardTitle.textContent = (data.name ?? '-') + '님의 투자 현황';
             cardRank.textContent = "RANK #" + (currentSlideIndex + 1);
             cardAsset.textContent = data.mainVal ?? '-';
             cardLesson.textContent = data.lessonVal ?? '-';
 
-            // 트로피 활성화
             document.querySelectorAll('.trophy').forEach(t => t.classList.remove('active'));
             const activeTrophy = document.getElementById('trophy-' + currentSlideIndex);
             if(activeTrophy) activeTrophy.classList.add('active');
 
-            // 트로피 이름 업데이트
             const list = window.RANKING_DATA[currentRankType]?.top3 || [];
             list.forEach((user, idx) => {
                 const el = document.getElementById('trophy-name-' + idx);
@@ -306,17 +308,13 @@
             document.getElementById('my-main-val').innerText = data.myVal;
         };
 
-        // 버튼 이벤트 연결
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         if(prevBtn) prevBtn.onclick = () => moveSlide(-1);
         if(nextBtn) nextBtn.onclick = () => moveSlide(1);
 
-        // 첫 화면 asset으로
         switchRankTab('asset');
 
-        // lucide 아이콘 생성
         if(typeof lucide !== 'undefined') lucide.createIcons();
-
     })();
 </script>

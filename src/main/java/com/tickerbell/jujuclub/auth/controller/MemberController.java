@@ -74,7 +74,6 @@ public class MemberController {
                 return res;
             }
 
-            // ✅ 2MB 제한
             long maxBytes = 2L * 1024 * 1024;
             if (userImage.getSize() > maxBytes) {
                 res.put("ok", false);
@@ -82,7 +81,6 @@ public class MemberController {
                 return res;
             }
 
-            // ✅ 간단 타입 체크(권장)
             String ct = userImage.getContentType();
             if (ct == null || !ct.startsWith("image/")) {
                 res.put("ok", false);
@@ -102,43 +100,57 @@ public class MemberController {
         return res;
     }
 
-    /** ✅ DB에 저장된 user_image를 그대로 내려줌 (없으면 404 -> onerror로 기본이미지) */
+    /** ✅ (내 프로필) DB에 저장된 user_image를 내려줌 */
     @GetMapping("/profile-image")
-    public ResponseEntity<byte[]> profileImage(HttpSession session, HttpServletRequest request) {
+    public ResponseEntity<byte[]> profileImageMine(HttpSession session, HttpServletRequest request) {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        byte[] img = null;
-
-        // 1) DB 이미지 조회
         MemberDTO dbUser = memberService.selectUserById(loginUser.getUserId());
-        if (dbUser != null && dbUser.getUserImage() != null && dbUser.getUserImage().length > 0) {
-            img = dbUser.getUserImage();
-        }
+        byte[] img = (dbUser != null) ? dbUser.getUserImage() : null;
 
-        // 2) 없으면 default 이미지 로드
-        MediaType mediaType = MediaType.IMAGE_PNG; // 기본이미지는 png라 가정
-        if (img == null) {
+        return buildImageResponse(img, request);
+    }
+
+    /** ✅ (랭킹/타유저) userSeq로 이미지 내려줌 */
+    @GetMapping(value = "/profile-image", params = "userSeq")
+    public ResponseEntity<byte[]> profileImageBySeq(@RequestParam("userSeq") int userSeq,
+                                                    HttpSession session,
+                                                    HttpServletRequest request) {
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        MemberDTO dbUser = memberService.selectUserBySeq(userSeq);
+        byte[] img = (dbUser != null) ? dbUser.getUserImage() : null;
+
+        return buildImageResponse(img, request);
+    }
+
+    /** ✅ 공통: 이미지 응답 + default fallback + 캐시 방지 */
+    private ResponseEntity<byte[]> buildImageResponse(byte[] img, HttpServletRequest request) {
+        byte[] out = img;
+
+        MediaType mediaType = MediaType.IMAGE_PNG;
+        if (out == null || out.length == 0) {
             try (InputStream is = request.getServletContext()
                     .getResourceAsStream("/resources/images/default-profile.png")) {
-
                 if (is == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                img = is.readAllBytes();
+                out = is.readAllBytes();
+                mediaType = MediaType.IMAGE_PNG;
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         } else {
-            // (선택) DB 이미지면 JPEG/PNG 시그니처로 타입 추정
-            if (img.length >= 4
-                    && (img[0] & 0xFF) == 0x89
-                    && (img[1] & 0xFF) == 0x50
-                    && (img[2] & 0xFF) == 0x4E
-                    && (img[3] & 0xFF) == 0x47) {
+            if (out.length >= 4
+                    && (out[0] & 0xFF) == 0x89
+                    && (out[1] & 0xFF) == 0x50
+                    && (out[2] & 0xFF) == 0x4E
+                    && (out[3] & 0xFF) == 0x47) {
                 mediaType = MediaType.IMAGE_PNG;
-            } else if (img.length >= 2
-                    && (img[0] & 0xFF) == 0xFF
-                    && (img[1] & 0xFF) == 0xD8) {
+            } else if (out.length >= 2
+                    && (out[0] & 0xFF) == 0xFF
+                    && (out[1] & 0xFF) == 0xD8) {
                 mediaType = MediaType.IMAGE_JPEG;
             } else {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;
@@ -147,8 +159,12 @@ public class MemberController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(mediaType);
-        headers.setCacheControl(CacheControl.noStore()); // 캐시 꼬임 방지
 
-        return new ResponseEntity<>(img, headers, HttpStatus.OK);
+        // ✅ 캐시로 인해 첫 번째 이미지가 다른 이미지에 “복붙”되는 현상 방지
+        headers.setCacheControl("no-store, no-cache, must-revalidate, max-age=0");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+
+        return new ResponseEntity<>(out, headers, HttpStatus.OK);
     }
 }

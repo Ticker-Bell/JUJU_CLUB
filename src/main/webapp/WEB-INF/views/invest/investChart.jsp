@@ -29,7 +29,6 @@
 <div class="flex flex-col w-full gap-4">
     <div class="p-6 border-bottom border-gray-100 stock-info-header">
         <div class="flex flex-row justify-between">
-
             <div class="flex items-center gap-4">
                 <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">---</h2>
                 <span id="header-stock"

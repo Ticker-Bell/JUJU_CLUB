@@ -264,7 +264,7 @@
     }
 
     /* 탭 버튼이 잠겼을 때 적용할 클래스 */
-    .tab-btn.locked{
+    .tab-btn.locked {
         cursor: not-allowed;
         opacity: 0.5;
         pointer-events: none;
@@ -338,94 +338,93 @@
     </div>
 </div>
 <div id="investBuySell">
-<div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
-    <div id="tab-header" class="w-1/2 flex my-4 border-b border-[#E6E7EB] ">
-        <button id="buy-button"
-                class="tab-item active flex-1 py-2 px-1 border-b-[3px] border-[#5E45EB] border-xs text-[#2D14B8] font-medium text-base transition-all hover:text-[#3819E6]">
-            매수
-        </button>
-        <button id = "sell-button"
-                class="tab-item flex-1 py-2 px-1 border-b-[3px] border-transparent border-xs text-[#666666] font-medium text-base transition-all hover:text-[#3819E6]">
-            매도
-        </button>
-    </div>
-
-    <div id="tab-content" class="p-4">
-        <div id="buy-form" class="flex flex-col gap-6">
-            <div id="buy-form-item" class="flex justify-between">
-                <label class="text-base font-medium text-[#666666]">가격</label>
-                <div class="flex flex-row gap-2">
-                    <p id="buyPrice" class="text-[#222222]">-</p>
-                    <p class="text-[#666666]">원</p>
-                </div>
-            </div>
-            <div id="buy-form-item" class="flex justify-between">
-                <label class="text-base font-medium text-[#666666]">수량</label>
-                <input
-                        class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        type="number"
-                        id="buyAmountInput"
-                        alt="수량 입력창"
-                        oninput="buyExpectedPrice()"
-                />
-            </div>
-            <div id="buy-form-item" class="flex justify-between">
-                <label class="text-sm font-normal text-[#666666]">예상금액</label>
-                <div class="flex flex-row gap-2">
-                    <p id="buyExpectedPrice" class="text-[#222222]">-</p>
-                    <p class="text-[#666666]">원</p>
-                </div>
-            </div>
-            <p id="buyErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
-            <button id="doBuyButton"
-                    class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
-                매수하기
+    <div class="min-w-[320px] w-full  min-h-[400px] p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
+        <div id="tab-header" class="w-1/2 flex my-4 border-b border-[#E6E7EB] ">
+            <button id="buy-button" type="button"
+                    class="tab-item active flex-1 py-2 px-1 border-b-[3px] border-[#5E45EB] border-xs text-[#2D14B8] font-medium text-base transition-all hover:text-[#3819E6]">
+                매수
+            </button>
+            <button id="sell-button" type="button"
+                    class="tab-item flex-1 py-2 px-1 border-b-[3px] border-transparent border-xs text-[#666666] font-medium text-base transition-all hover:text-[#3819E6]">
+                매도
             </button>
         </div>
 
-        <div id="sell-form" class="hidden flex flex-col gap-6">
-            <div id="sell-form-item" class="flex justify-between">
-                <label class="text-sm font-normal text-[#666666]">보유수량</label>
-                <div class="flex flex-row gap-2">
-                    <p id="hasStockQuantity" class="text-[#222222]"></p>
+        <div id="tab-content" class="p-4">
+            <div id="buy-form" class="flex flex-col gap-6">
+                <div id="buy-form-item" class="flex justify-between">
+                    <label class="text-base font-medium text-[#666666]">가격</label>
+                    <div class="flex flex-row gap-2">
+                        <p id="buyPrice" class="text-[#222222]">-</p>
+                        <p class="text-[#666666]">원</p>
+                    </div>
                 </div>
-            </div>
-            <div id="sell-form-item" class="flex justify-between">
-                <label class="text-base font-medium text-[#666666]">가격</label>
-                <div class="flex flex-row gap-2">
-                    <p id="sellPrice" class="text-[#222222]">-</p>
-                    <p class="text-[#666666]">원</p>
+                <div id="buy-form-item" class="flex justify-between">
+                    <label class="text-base font-medium text-[#666666]">수량</label>
+                    <input
+                            class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
+                            type="number"
+                            id="buyAmountInput"
+                            alt="수량 입력창"
+                    />
                 </div>
-            </div>
-            <div id="sell-form-item" class="flex justify-between">
-                <label class="text-base font-medium text-[#666666]">수량</label>
-                <input
-                        class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
-                        type="number"
-                        id="sellAmountInput"
-                        alt="수량 입력창"
-                        oninput="sellExpectedPrice()"
-                />
-            </div>
-            <div id="sell-form-item" class="flex justify-between">
-                <label class="text-sm font-normal text-[#666666]">예상금액</label>
-                <div class="flex flex-row gap-2">
-                    <p id="sellExpectedPrice" class="text-[#222222]">-</p>
-                    <p class="text-[#666666]">원</p>
+                <div id="buy-form-item" class="flex justify-between">
+                    <label class="text-sm font-normal text-[#666666]">예상금액</label>
+                    <div class="flex flex-row gap-2">
+                        <p id="buyExpectedPrice" class="text-[#222222]">-</p>
+                        <p class="text-[#666666]">원</p>
+                    </div>
                 </div>
+                <p id="buyErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
+                <button id="doBuyButton"
+                        class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
+                    매수하기
+                </button>
             </div>
 
-            <p id="sellErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
+            <div id="sell-form" class="hidden flex flex-col gap-6">
+                <div id="sell-form-item" class="flex justify-between">
+                    <label class="text-sm font-normal text-[#666666]">보유수량</label>
+                    <div class="flex flex-row gap-2">
+                        <p id="hasStockQuantity" class="text-[#222222]"></p>
+                    </div>
+                </div>
+                <div id="sell-form-item" class="flex justify-between">
+                    <label class="text-base font-medium text-[#666666]">가격</label>
+                    <div class="flex flex-row gap-2">
+                        <p id="sellPrice" class="text-[#222222]">-</p>
+                        <p class="text-[#666666]">원</p>
+                    </div>
+                </div>
+                <div id="sell-form-item" class="flex justify-between">
+                    <label class="text-base font-medium text-[#666666]">수량</label>
+                    <input
+                            class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
+                            type="number"
+                            id="sellAmountInput"
+                            alt="수량 입력창" `
+                    />
+                </div>
+                <div id="sell-form-item" class="flex justify-between">
+                    <label class="text-sm font-normal text-[#666666]">예상금액</label>
+                    <div class="flex flex-row gap-2">
+                        <p id="sellExpectedPrice" class="text-[#222222]">-</p>
+                        <p class="text-[#666666]">원</p>
+                    </div>
+                </div>
 
-            <button id="doSellButton"
-                    class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
-                매도하기
-            </button>
+                <p id="sellErrorMessage" class="text-[#EB3A3E] text-sm font-normal"></p>
 
+                <button id="doSellButton"
+                        class="mt-6 mb-6 py-2 border-2 rounded-[20px] bg-[#E6E7EB] text-[#999999] text-base font-medium">
+                    매도하기
+                </button>
+
+            </div>
         </div>
     </div>
 </div>
-</div>
+
 <script>
     (function () {
         const contextPath = "${pageContext.request.contextPath}";
@@ -742,8 +741,8 @@
         let isTabLocked = false;
 
         // 탭 잠금 해제 함수 (공통 사용)
-        function unlockTabs(){
-            setTimeout(function (){
+        function unlockTabs() {
+            setTimeout(function () {
                 isTabLocked = false;
                 $('.tab-btn').removeClass('locked');
             }, 2000);
@@ -774,7 +773,7 @@
             $('.tab-btn').on('click', function () {
 
                 // 락이 걸려있으면 (true) 클릭 이벤트를여기서 중단
-                if(isTabLocked){
+                if (isTabLocked) {
                     return;
                 }
 
@@ -787,7 +786,7 @@
                 const sortType = $this.data('sort'); // data-sort 값 가져오기
 
                 // 이미 활성화된 탭을 눌렀을 때도 락
-                if($this.hasClass('active')) return;
+                if ($this.hasClass('active')) return;
 
                 // 슬라이더 다시 보이기 (검색으로 숨겨졌을 수 있으므로)
                 $('#left-tab-slider').show();
@@ -805,10 +804,10 @@
 
 
             // 요소가 있다면 첫번째 종목 클릭처리
-            if($firstItem.length > 0){
+            if ($firstItem.length > 0) {
                 // 요소가 존재하면 클릭 이벤트 강제 발생
                 $firstItem.trigger('click');
-            }else{ // 없다면 화면에 차트 띄우지 않음
+            } else { // 없다면 화면에 차트 띄우지 않음
                 const code = '';
                 const name = '';
                 //investChart 차트데이터 전달
@@ -832,13 +831,13 @@
         }
 
         // 페이지 로드 시 또는 탭 클릭 시 호출
-        function loadStockList(sortType){
+        function loadStockList(sortType) {
             $('#stockList').empty(); //초기화
             fetchStockBatch(sortType, 0); //0페이지부터 시작
         }
 
         // AJAX 데이터 요청 함수 (jQuery $.ajax 사용)
-        function fetchStockBatch(sortType, page){
+        function fetchStockBatch(sortType, page) {
             // URL 생성
             const url = contextPath + '/invest/main/stock/list';
 
@@ -851,17 +850,17 @@
                 }, // 파라미터 전달
                 dataType: 'json', // 응답을 JSON으로 기대함
                 success: function (data) {
-                    if(data && data.length > 0){
-                        renderStockList(data,sortType, page);
+                    if (data && data.length > 0) {
+                        renderStockList(data, sortType, page);
 
-                        if( data.length === 10 && page < 2){
-                            setTimeout(()=>{
-                                fetchStockBatch(sortType, page+1);
+                        if (data.length === 10 && page < 2) {
+                            setTimeout(() => {
+                                fetchStockBatch(sortType, page + 1);
                             }, 200);
-                        }else{
+                        } else {
                             unlockTabs();
                         }
-                    }else{
+                    } else {
                         unlockTabs();
                     }
                 },
@@ -918,7 +917,7 @@
             // DOM 업데이트
             $container.append(html);
 
-            if(page === 0){
+            if (page === 0) {
                 // 기존 subscribe 모두 unsubscribe
                 const currentSubscribedCodes = Array.from(StockSocket.subscribeCodes.keys());
                 StockSocket.unsubscribe(currentSubscribedCodes);
@@ -963,11 +962,11 @@
             )
 
             // 리스트 첫 번째 종목 클릭되도록
-            if(page === 0){
+            if (page === 0) {
                 const $firstItem = $container.find('.stock-item').first();
 
                 // 요소가 존재하면 클릭 이벤트 강제 발생
-                if($firstItem.length > 0){
+                if ($firstItem.length > 0) {
                     $firstItem.trigger('click');
                 }
             }
@@ -985,6 +984,22 @@
         window.onload = function () {
             updateButtonUI('D');
         };
+
+        function isOutOfMarketTime() {
+            const now = new Date();
+
+            const hours = now.getHours();     // 0~23
+            const minutes = now.getMinutes(); // 0~59
+
+            // 분 단위로 변환
+            const currentMinutes = hours * 60 + minutes;
+
+            const marketStart = 9 * 60;        // 09:00 → 540
+            const marketEnd = 15 * 60 + 30;    // 15:30 → 930
+
+            return currentMinutes < marketStart || currentMinutes > marketEnd;
+        }
+
 
         function initLikeStatus(stockCode) {
             const likeEl = document.getElementById('header-stockLike');
@@ -1076,6 +1091,7 @@
                 .catch(error => console.error('Error fetching chart data:', error));
         }
 
+
         function updateButtonUI(periodCode) {
             const buttons = document.querySelectorAll('.period-btn');
 
@@ -1091,10 +1107,14 @@
             if (!stock) return;
             const priceEl = document.getElementById('header-price');
             const changeEl = document.getElementById('header-change');
+            //현재 장 시간이 아닐 때
+            if (!stock.displayChange && isOutOfMarketTime()) {
+                priceEl.innerText = "현재 장 시간이 아닙니다. ";
+                return;
+            }
+            //현재가와 변동값이 있으면 보여줌
             if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
             if (stock.displayChange) changeEl.innerText = stock.displayChange;
-
-
             const sign = stock.dayOverDaySign;
             let color = "#666"; // 보합
             if (sign === "1" || sign === "2") color = "#bf0f06"; // 빨강
@@ -1139,22 +1159,51 @@
 
         }
 
+        document.addEventListener('input', (e) => {
+            if (e.target.id === 'buyAmountInput') {
+                buyExpectedPrice();
+            } else if (e.target.id === 'sellAmountInput') {
+                sellExpectedPrice();
+            }
+        })
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'header-stockLike') {
+                toggleLike();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'btn-D') {
+                loadChartData('D', selectedStockState.stockCode);
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'btn-W') {
+                loadChartData('W', selectedStockState.stockCode);
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'btn-M') {
+                loadChartData('M', selectedStockState.stockCode);
+            }
+        });
+
 
         // investBuySell
         let currentTradePrice = null;
         let tradeStockCode = null;
 
-        const buyBtn = document.getElementById('buy-button');
-        const sellBtn = document.getElementById('sell-button');
-
         function switchTab(type) {
+
+            const buyBtn = document.getElementById('buy-button');
+            const sellBtn = document.getElementById('sell-button');
             //매수 매도 탭 전환
-            if(type === 'buy'){
+            if (type === 'buy') {
                 buyBtn.classList.add('border-[#5E45EB]', 'text-[#2D14B8]', 'active');
                 sellBtn.classList.remove('border-[#5E45EB]', 'text-[#2D14B8]', 'active');
                 sellBtn.classList.add('border-transparent', 'text-[#666666]');
                 buyBtn.classList.remove('border-transparent', 'text-[#666666]');
-            }else {
+            } else {
                 sellBtn.classList.add('border-[#5E45EB]', 'text-[#2D14B8]', 'active');
                 buyBtn.classList.remove('border-[#5E45EB]', 'text-[#2D14B8]', 'active');
                 buyBtn.classList.add('border-transparent', 'text-[#666666]');
@@ -1171,12 +1220,27 @@
             }
 
         }
-        buyBtn.addEventListener('click', () => switchTab('buy'));
-        sellBtn.addEventListener('click', () => switchTab('sell'));
 
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'buy-button') {
+                switchTab('buy');
+            }
+            if (e.target.id === 'sell-button') {
+                switchTab('sell');
+            }
+        });
 
-        document.getElementById('doBuyButton').addEventListener('click', ()=>trade(code));
-        document.getElementById('doSellButton').addEventListener('click', ()=>trade(code));
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'doBuyButton') {
+                trade(code);
+            }
+            if (e.target.id === 'doSellButton') {
+                trade(code);
+            }
+        });
+
+        document.getElementById('doBuyButton').addEventListener('click', () => trade(code));
+        document.getElementById('doSellButton').addEventListener('click', () => trade(code));
 
         function tradePrice(currentPrice) {
             if (currentPrice === undefined) currentPrice = '-';
@@ -1201,6 +1265,11 @@
                 .catch(err => console.error(err));
         }
 
+        function isInvestTabActive() {
+            return document.getElementById('investJsp')?.classList.contains('active');
+        }
+
+
         function buyExpectedPrice() {
             //예상 금액 계산
             const price = currentTradePrice;
@@ -1209,10 +1278,10 @@
 
             if (isNaN(total)) {
                 document.getElementById('buyExpectedPrice').innerText = '-';
-                return ;
-            } else if (total !== 0 && total !== null) {
-                document.getElementById('buyButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
-                document.getElementById('buyButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
+                return;
+            } else if (isInvestTabActive() && total !== 0 && total !== null) {
+                document.getElementById('doBuyButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
+                document.getElementById('doBuyButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             }
             document.getElementById('buyExpectedPrice').innerText = total.toLocaleString();
         }
@@ -1225,10 +1294,10 @@
             if (isNaN(total)) {
                 document.getElementById('sellExpectedPrice').innerText = '-';
                 return;
-            } else if (total !== 0 && total !== null) {
+            } else if (isInvestTabActive() && total !== 0 && total !== null) {
 
-                document.getElementById('sellButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
-                document.getElementById('sellButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
+                document.getElementById('doSellButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
+                document.getElementById('doSellButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             }
             document.getElementById('sellExpectedPrice').innerText = total.toLocaleString();
         }

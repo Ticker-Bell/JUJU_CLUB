@@ -31,26 +31,26 @@
         <div class="flex flex-row justify-between">
 
             <div class="flex items-center gap-4">
-                <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">기업이름</h2>
+                <h2 id="header-stockName" class="text-lg font-extrabold tracking-tight text-gray-900 ">---</h2>
                 <span id="header-stock"
-                      class="px-2 rounded-md bg-[#D9D9D9] text-gray-500 text-sm font-medium">000000</span>
-                <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[#F4F4F4] text-sm font-medium">KOSPI</span>
-                <img id="header-stockLike" data-liked="false" onclick="toggleLike()"
+                      class="px-2 rounded-md bg-[#D9D9D9] text-gray-500 text-sm font-medium">-</span>
+                <span id="header-marketType" class="px-2 rounded-md bg-[#5E45EB] text-[#F4F4F4] text-sm font-medium">-</span>
+                <img id="header-stockLike" data-liked="false"
                      class="w-5 h-5 cursor-pointer" src="${cpath}/resources/images/stockIcons/heart.svg" alt="하트아이콘">
             </div>
             <div id="button-group"
                  class="flex justify-end gap-2 p-4 bg-gray-50/50 border-y border-gray-100 period-buttons">
-                <button id="btn-D" onclick="loadChartData('D',selectedStockState.stockCode)"
+                <button id="btn-D"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     일별
                 </button>
 
-                <button id="btn-W" onclick="loadChartData('W',selectedStockState.stockCode)"
+                <button id="btn-W"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     주별
                 </button>
 
-                <button id="btn-M" onclick="loadChartData('M',selectedStockState.stockCode)"
+                <button id="btn-M"
                         class="period-btn px-4 py-1.5 rounded-full border text-sm transition-all duration-200 shadow-sm">
                     월별
                 </button>
@@ -60,9 +60,9 @@
         </div>
 
         <div class="flex items-baseline gap-4 mt-4">
-            <h2 id="header-price" class="text-2xl font-extrabold tracking-tight text-gray-900">0원</h2>
+            <h2 id="header-price" class="text-2xl font-extrabold tracking-tight text-gray-900">- 원</h2>
             <div class="change-info">
-                <span id="header-change" class="text-sm font-semibold">0</span>
+                <span id="header-change" class="text-sm font-semibold">-</span>
             </div>
         </div>
     </div>

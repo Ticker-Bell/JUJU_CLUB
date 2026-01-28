@@ -55,6 +55,7 @@
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
         <button id="myTab" class="active" onclick="changeJsp(this, 'my')">마이</button>
+<%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
         <button id="investTab" onclick="changeJsp(this, 'invest')">투자</button>
     </nav>
     <div class="tab-container">
@@ -79,6 +80,10 @@
 <script>
     function changeJsp(element, type) {
 
+        const myJsp = document.getElementById('myJsp');
+        const myTab = document.getElementById('myTab');
+
+        //탭 전환
         if (type === 'my') {
             myJsp.classList.add('active');
             investJsp.classList.remove('active');

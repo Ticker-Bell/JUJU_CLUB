@@ -30,7 +30,7 @@ public class StockMyController {
     private final PortfolioService portfolioService;
     private final UserAssetService userAssetService;
 
-    @GetMapping("/my")
+    @GetMapping("/investMy")
     public String stockMyPage(HttpSession session, Model model){
         //세션에서 유저 시퀀스 가져오기
         Integer userSeq = (Integer)session.getAttribute("userSeq");

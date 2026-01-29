@@ -531,7 +531,7 @@
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: ${item.color};"></div>
                         <span>${item.stockName}</span>
-                        <span><fmt:formatNumber value="${item.weightPct}" pattern="#,##0"/>%</span>
+                        <span><fmt:formatNumber value="${item.weightPct}" pattern="#,##0.00"/>%</span>
                     </div>
                 </c:forEach>
             </div>
@@ -758,7 +758,7 @@
                 }
 
                 //마지막 갱신 표시
-                const testEl = document.getElementById("test");
+                const testEl = document.getElementById("test_time");
                 if (testEl) testEl.textContent = new Date().toLocaleTimeString();
 
             } catch (error) {

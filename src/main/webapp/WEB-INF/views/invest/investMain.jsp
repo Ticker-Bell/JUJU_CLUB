@@ -57,6 +57,7 @@
         <button id="myTab" class="active" onclick="changeJsp(this, 'my')">마이</button>
 <%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
         <button id="investTab" onclick="changeJsp(this, 'invest')">투자</button>
+        <button id="assetDetailTab" onclick="changeJsp(this, 'asset')">거래 내역</button>
     </nav>
     <div class="tab-container">
         <div id="myJsp" class="tab-content active">
@@ -75,6 +76,9 @@
                 </div>
             </div>
         </div>
+        <div id="assetDetailJsp" class="tab-content">
+            <jsp:include page="assetDetail.jsp"></jsp:include>
+        </div>
     </div>
 </div>
 <script>
@@ -82,19 +86,35 @@
 
         const myJsp = document.getElementById('myJsp');
         const myTab = document.getElementById('myTab');
+        const investJsp = document.getElementById('investJsp');
+        const investTab = document.getElementById('investTab');
+        const assetDetailJsp = document.getElementById('assetDetailJsp');
+        const assetDetailTab = document.getElementById('assetDetailTab');
 
         //탭 전환
         if (type === 'my') {
             myJsp.classList.add('active');
             investJsp.classList.remove('active');
+            assetDetailJsp.classList.remove('active');
 
             myTab.classList.add('active');
             investTab.classList.remove('active');
-        } else {
+            assetDetailTab.classList.remove('active');
+        } else if (type === 'invest') {
             investJsp.classList.add('active');
             myJsp.classList.remove('active');
+            assetDetailJsp.classList.remove('active');
 
             investTab.classList.add('active');
+            myTab.classList.remove('active');
+            assetDetailTab.classList.remove('active');
+        } else{
+            assetDetailJsp.classList.add('active');
+            investJsp.classList.remove('active');
+            myJsp.classList.remove('active');
+
+            assetDetailTab.classList.add('active');
+            investTab.classList.remove('active');
             myTab.classList.remove('active');
         }
     }

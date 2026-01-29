@@ -1,17 +1,9 @@
 package com.tickerbell.jujuclub.invest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
-import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
-import com.tickerbell.jujuclub.invest.service.KISApiService;
-import com.tickerbell.jujuclub.invest.service.PortfolioService;
-import com.tickerbell.jujuclub.invest.service.UserAssetService;
-import com.tickerbell.jujuclub.invest.service.WatchlistService;
-import com.tickerbell.jujuclub.invest.dto.RankingDTO;
-import com.tickerbell.jujuclub.invest.dto.StockDTO;
-import com.tickerbell.jujuclub.invest.service.RankingApiService;
-import com.tickerbell.jujuclub.invest.service.StockService;
+import com.tickerbell.jujuclub.invest.dto.*;
+import com.tickerbell.jujuclub.invest.mapper.AssetDetailMapper;
+import com.tickerbell.jujuclub.invest.service.*;
 import com.tickerbell.jujuclub.utils.ColorUtil;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +34,9 @@ public class StockListController {
     private final PortfolioService portfolioService;
     private final WatchlistService watchlistService;
     private final UserAssetService userAssetService;
+
+    //자산 상세 내용
+    private final AssetDetailService assetDetailService;
 
     @GetMapping("main.do")
     public String investMain(Model model, HttpSession session){
@@ -98,6 +96,42 @@ public class StockListController {
             //5. 사용자 자산 요약
             UserInvestSummeryDTO userAssetSummary = userAssetService.getUserInvestSummary(userSeq);
             model.addAttribute("userAsset", userAssetSummary);
+        }
+
+        // 자산 상세내역에 들어갈 내용
+        if(userSeq != null){
+            List<AssetDetailDTO> assetDetailDTOList = new ArrayList<>();
+
+            List<MockTradeDTO> mockTradeDTOList = assetDetailService.findUserTrades(userSeq);
+
+            String typeDetail = null;
+            String price = null;
+
+            // 받아온 MockTradeDTO를 화면에 표시할 형식인 assetDetailDTO로 변경
+            for(MockTradeDTO mockTradeDTO : mockTradeDTOList){
+                if(mockTradeDTO.getTradeType() == 'Y'){
+                    typeDetail = "매수";
+                    price = "-" + mockTradeDTO.getTradePrice();
+                }else{
+                    typeDetail = "매도";
+                    price = "+" + mockTradeDTO.getTradePrice();
+                }
+
+                LocalDate localDate = mockTradeDTO.getTradedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                AssetDetailDTO assetDetailDTO =  AssetDetailDTO.builder()
+                        .type("주식")
+                        .typeDetail(typeDetail)
+                        .detail(mockTradeDTO.getStockName())
+                        .price(price)
+                        .date(localDate.format(formatter))
+                        .build();
+                assetDetailDTOList.add(assetDetailDTO);
+            }
+
+            model.addAttribute("assetDetailDTOList", assetDetailDTOList);
+            System.out.println("assetDetailDTOList" + assetDetailDTOList);
         }
 
         return "invest/investMain";

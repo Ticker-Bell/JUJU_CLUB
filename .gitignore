@@ -76,6 +76,7 @@ bin/
 logs/
 work/
 temp/
+.smarttomcat/
 
 ################################
 # JSP / Frontend cache

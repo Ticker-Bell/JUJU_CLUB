@@ -36,14 +36,4 @@
         DELETE FROM USERS WHERE user_id = #{userId}
     </delete>
 
-    <select id="selectUserBySeq" parameterType="int" resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
-        SELECT
-            user_seq   as userSeq,
-            user_id    as userId,
-            user_name  as userName,
-            user_image as userImage
-        FROM USERS
-        WHERE user_seq = #{userSeq}
-    </select>
-
 </mapper>

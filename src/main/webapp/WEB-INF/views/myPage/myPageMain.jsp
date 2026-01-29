@@ -13,8 +13,8 @@
     }
 %>
 
-<c:set var="cpath" value="${pageContext.request.contextPath}"/>
-<c:set var="defaultProfile" value="${cpath}/resources/images/default-profile.png"/>
+<c:set var="cpath" value="${pageContext.request.contextPath}" />
+<c:set var="defaultProfile" value="${cpath}/resources/images/default-profile.png" />
 
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -36,109 +36,87 @@
                 colors: {primary: '#5E45EB', secondary: '#F8FAFC'}
             }
         }
-    };
+    }
 </script>
 
 <div class="w-full max-w-[1600px] mx-auto h-full flex flex-col p-5">
     <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-5 min-h-0">
 
-        <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative">
+        <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative justify-center">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-lg font-extrabold text-gray-900">프로필</h3>
             </div>
 
-            <div class="flex-1 flex flex-col items-center justify-center relative z-10 min-h-0">
-                <div class="relative mb-4">
-                    <div class="w-24 h-24 rounded-full relative overflow-visible bg-transparent">
-                        <div class="w-full h-full rounded-full overflow-hidden bg-transparent">
-                            <img id="mainProfileImg"
-                                 src="${cpath}/member/profile-image?ts=<%=System.currentTimeMillis()%>"
-                                 alt="profile"
-                                 class="w-full h-full object-cover"
-                                 loading="lazy"
-                                 onerror="this.onerror=null; this.src='${defaultProfile}';"/>
-                        </div>
+            <div class="flex-1 flex flex-col items-center justify-center relative z-10">
 
-                        <div class="absolute -bottom-1 -right-1 bg-gray-900 p-1.5 rounded-full hover:bg-primary transition-colors cursor-pointer z-30"
-                             hx-get="${cpath}/myPage/profile"
-                             hx-target="body"
-                             hx-swap="beforeend">
-                            <i data-lucide="settings-2" class="w-4 h-4 text-white"></i>
-                        </div>
+                <%-- ✅ 프로필 이미지: DB에 있으면 /member/profile-image 가 200, 없으면 404 -> onerror로 기본이미지 --%>
+                <div class="w-24 h-24 rounded-full bg-white border-4 border-slate-50 shadow-xl mb-4 relative group cursor-pointer overflow-hidden">
+                    <img
+                            id="mainProfileImg"
+                            src="${cpath}/member/profile-image?ts=<%=System.currentTimeMillis()%>"
+                            alt="profile"
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            onerror="this.onerror=null; this.src='${defaultProfile}';"
+                    />
+
+                    <!-- ✅ 설정 버튼 -->
+                    <div class="absolute bottom-1 right-1 bg-gray-900 p-1.5 rounded-full border-2 border-white hover:bg-primary transition-colors cursor-pointer z-20"
+                         hx-get="${cpath}/myPage/profile"
+                         hx-target="body"
+                         hx-swap="beforeend">
+                        <i data-lucide="settings-2" class="w-4 h-4 text-white"></i>
                     </div>
                 </div>
 
                 <h2 class="text-2xl font-extrabold text-gray-900 mb-1">${loginUser.userName}</h2>
                 <p class="text-sm text-gray-400 font-medium mb-3">${loginUser.userId}</p>
 
-                <div class="flex items-center gap-2 mb-4">
-
-                    <!-- ✅ 레벨 뱃지 (동일 스타일 + Lv 표기) -->
-                    <c:choose>
-                        <c:when test="${loginUser.userLevel == 1}">
-            <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-extrabold border border-primary/20">
-                Lv.1 초급
-            </span>
-                        </c:when>
-
-                        <c:when test="${loginUser.userLevel == 2}">
-            <span class="px-3 py-1 rounded-full bg-green-100 text-green-600 text-[11px] font-extrabold border border-green-200">
-                Lv.2 중급
-            </span>
-                        </c:when>
-
-                        <c:when test="${loginUser.userLevel == 3}">
-            <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-600 text-[11px] font-extrabold border border-orange-200">
-                Lv.3 고급
-            </span>
-                        </c:when>
-
-                        <c:otherwise>
-            <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-600 text-[11px] font-extrabold border border-gray-200">
-                일반
-            </span>
-                        </c:otherwise>
-                    </c:choose>
-
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
+                        Lv.${loginUser.userLevel} ${loginUser.userLevel == 1 ? '초급': loginUser.userLevel == 2 ? '중급': loginUser.userLevel == 3 ? '고급' : '초급'}
+                    </span>
                     <span class="w-1 h-1 rounded-full bg-gray-300"></span>
-
                     <p class="text-xs text-gray-500 font-bold">
                         함께한 지 <span class="text-primary"><%= dayCount %>일</span>
                     </p>
                 </div>
-
             </div>
 
-            <div class="flex w-full border-t border-slate-100 pt-4">
-                <div class="flex-1 flex items-center justify-center gap-3 border-r border-slate-100">
-                    <span class="text-sm font-extrabold text-gray-500 whitespace-nowrap">총 자산</span>
-                    <p class="text-lg font-black text-slate-800 tracking-tight whitespace-nowrap">
+            <div class="flex w-full border-t border-slate-100 py-6">
+                <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-100">
+                    <span class="text-sm font-bold text-gray-400 mb-1">총 자산</span>
+                    <p class="text-2xl font-black text-slate-800 tracking-tight">
                         <c:choose>
                             <c:when test="${not empty userAsset}">
                                 <fmt:formatNumber value="${userAsset.totalAsset}" pattern="#,###"/>
                             </c:when>
                             <c:otherwise>0</c:otherwise>
                         </c:choose>
-                        <span class="text-lg font-black text-slate-800 ml-1">원</span>
+                        <span class="text-base font-bold text-gray-400">원</span>
                     </p>
-                    <c:if test="${not empty userAsset and userAsset.totalReturnPct < 0}">
-                        <span class="text-xs font-bold text-blue-500 flex items-center whitespace-nowrap">
-                            <i data-lucide="trending-down" class="w-3 h-3 mr-1"></i>
-                            <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.1"/>%
-                        </span>
-                    </c:if>
+                    <div class="mt-1">
+                        <c:choose>
+                            <c:when test="${not empty userAsset and userAsset.totalReturnPct < 0}">
+                                <span class="text-xs font-bold text-blue-500 flex items-center">
+                                    <i data-lucide="trending-down" class="w-3 h-3 mr-1"></i>
+                                    <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.1"/>%
+                                </span>
+                            </c:when>
+                        </c:choose>
+                    </div>
                 </div>
 
-                <div class="flex-1 flex items-center justify-center gap-3">
-                    <span class="text-sm font-extrabold text-gray-500 whitespace-nowrap">예수금</span>
-                    <p class="text-lg font-black text-primary tracking-tight whitespace-nowrap">
+                <div class="flex-1 flex flex-col items-center justify-center">
+                    <span class="text-sm font-bold text-gray-400 mb-1">예수금</span>
+                    <p class="text-2xl font-black text-primary tracking-tight">
                         <c:choose>
                             <c:when test="${not empty userAsset}">
                                 <fmt:formatNumber value="${userAsset.cashBalance}" pattern="#,###"/>
                             </c:when>
                             <c:otherwise>0</c:otherwise>
                         </c:choose>
-                        <span class="text-lg font-black text-primary ml-1">원</span>
+                        <span class="text-base font-bold text-indigo-300">원</span>
                     </p>
                 </div>
             </div>
@@ -148,19 +126,12 @@
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-lg font-extrabold text-gray-900">내 포트폴리오</h3>
             </div>
-
             <div id="chartContainer" class="flex-1 relative w-full min-h-0 flex flex-col p-2">
-                <div class="flex-1 min-h-0 flex items-stretch justify-center">
-                    <div class="w-full max-w-[760px] h-full flex items-stretch gap-6 -translate-x-2">
-                        <div class="flex-1 min-h-0">
-                            <canvas id="stockChart" class="w-full h-full"></canvas>
-                        </div>
-                        <div class="w-[260px] max-w-[260px] shrink-0 pr-1 flex flex-col min-h-0">
-                            <div class="flex-1 min-h-0 overflow-y-auto pr-1"
-                                 id="stockLegend"
-                                 style="scrollbar-gutter: stable;"></div>
-                        </div>
-                    </div>
+                <div class="flex justify-end mb-2">
+                    <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>
+                </div>
+                <div class="flex-1 min-h-0 flex items-center justify-center">
+                    <canvas id="stockChart"></canvas>
                 </div>
             </div>
         </div>
@@ -188,135 +159,97 @@
         if (window.lucide) lucide.createIcons();
         drawStockChart();
 
-        function ellipsize(str, max) {
-            if (!str) return '';
-            return str.length > max ? (str.slice(0, max) + '…') : str;
-        }
-
-        function normalizeAndSort(items) {
-            const arr = Array.isArray(items) ? items.slice() : [];
-            arr.sort((a, b) => {
-                const pa = Number(a.weightPct ?? 0);
-                const pb = Number(b.weightPct ?? 0);
-                return pb - pa;
-            });
-            return arr;
-        }
-
-        function renderHtmlLegend(legendEl, fullLabels, shortLabels, colors, data) {
-            if (!legendEl) return;
-            legendEl.innerHTML = "";
-
-            const ul = document.createElement("ul");
-            ul.className = "space-y-2";
-
-            for (let i = 0; i < fullLabels.length; i++) {
-                const li = document.createElement("li");
-                li.className = "flex items-center gap-2";
-
-                const dot = document.createElement("span");
-                dot.className = "inline-block w-2.5 h-2.5 rounded-full shrink-0";
-                dot.style.backgroundColor = colors[i] || "#CBD5E1";
-
-                const name = document.createElement("span");
-                name.className = "text-xs font-bold text-slate-600 truncate max-w-[150px]";
-                name.textContent = shortLabels[i];
-                name.title = fullLabels[i];
-
-                const pct = document.createElement("span");
-                pct.className = "ml-auto text-[11px] font-extrabold text-slate-400 tabular-nums whitespace-nowrap";
-                pct.textContent = (data[i] ?? 0) + "%";
-
-                li.appendChild(dot);
-                li.appendChild(name);
-                li.appendChild(pct);
-                ul.appendChild(li);
-            }
-
-            legendEl.appendChild(ul);
-        }
-
         function drawStockChart() {
-            const canvas = document.getElementById('stockChart');
-            const legendEl = document.getElementById('stockLegend');
-            if (!canvas || !legendEl) return;
+            const container = document.getElementById('chartContainer');
+            if (!container) return;
 
-            const ctx = canvas.getContext('2d');
-            const raw = ${not empty chartDataJson ? chartDataJson : '[]'};
+            container.innerHTML = '';
 
-            if (window.__stockChartInstance) {
-                window.__stockChartInstance.destroy();
-                window.__stockChartInstance = null;
-            }
+            // ✅ 라벨 다시 추가 (innerHTML 비워서 사라짐 방지)
+            const labelRow = document.createElement('div');
+            labelRow.className = "flex justify-end mb-2";
+            labelRow.innerHTML = '<span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">보유 비중</span>';
+            container.appendChild(labelRow);
 
-            const sorted = normalizeAndSort(raw);
+            // ✅ 차트 래퍼
+            const chartWrap = document.createElement('div');
+            chartWrap.className = "flex-1 min-h-0 flex items-center justify-center";
+            container.appendChild(chartWrap);
 
-            if (!sorted || sorted.length === 0) {
-                legendEl.innerHTML = "";
-                window.__stockChartInstance = new Chart(ctx, {
+            const newCanvas = document.createElement('canvas');
+            newCanvas.id = 'stockChart';
+            chartWrap.appendChild(newCanvas);
+
+            const ctx = newCanvas.getContext('2d');
+            const chartDataFromServer = ${not empty chartDataJson ? chartDataJson : '[]'};
+
+            const commonOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                cutout: '65%',
+                layout: {padding: 10}
+            };
+
+            if (chartDataFromServer.length === 0) {
+                new Chart(ctx, {
                     type: 'doughnut',
                     data: {
                         labels: ['데이터 없음'],
-                        datasets: [{ data: [100], backgroundColor: ['#F1F5F9'], borderWidth: 0 }]
+                        datasets: [{data: [100], backgroundColor: ['#F1F5F9'], borderWidth: 0}]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: false,
+                        ...commonOptions,
                         cutout: '70%',
-                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                        plugins: {legend: {display: false}, tooltip: {enabled: false}}
                     }
                 });
-                return;
-            }
+            } else {
+                const labels = chartDataFromServer.map(item => item.stockName);
+                const data = chartDataFromServer.map(item => item.weightPct);
+                const colors = chartDataFromServer.map(item => item.color);
 
-            const fullLabels = sorted.map(item => item.stockName);
-            const data = sorted.map(item => item.weightPct);
-            const colors = sorted.map(item => item.color);
-
-            const shortLabels = fullLabels.map(name => ellipsize(name, 10));
-            renderHtmlLegend(legendEl, fullLabels, shortLabels, colors, data);
-
-            window.__stockChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: shortLabels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 0,
-                        hoverOffset: 15
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    cutout: '65%',
-                    layout: { padding: { top: 10, right: 8, bottom: 10, left: 8 } },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(30, 41, 59, 0.95)',
-                            padding: 12,
-                            cornerRadius: 8,
-                            displayColors: false,
-                            bodyFont: { family: 'Pretendard', size: 14 },
-                            callbacks: {
-                                label: function (context) {
-                                    const idx = context.dataIndex;
-                                    return fullLabels[idx] + ': ' + context.raw + '%';
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: colors,
+                            borderWidth: 0,
+                            hoverOffset: 15
+                        }]
+                    },
+                    options: {
+                        ...commonOptions,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    font: {family: 'Pretendard', size: 12, weight: 'bold'},
+                                    usePointStyle: true, boxWidth: 8, padding: 15, color: '#64748B'
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 41, 59, 0.95)',
+                                padding: 12, cornerRadius: 8, displayColors: false,
+                                bodyFont: {family: 'Pretendard', size: 14},
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.label + ': ' + context.raw + '%';
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
-        document.body.addEventListener('profile-image-updated', function () {
-            const img = document.getElementById('mainProfileImg');
-            if (img) img.src = '${cpath}/member/profile-image?ts=' + Date.now();
+        //✅ (선택) 모달에서 이미지 업로드 후 메인 프로필도 즉시 갱신하고 싶으면:
+        document.body.addEventListener('profile-image-updated', function(){
+        const img = document.getElementById('mainProfileImg');
+        if (img) img.src = '${cpath}/member/profile-image?ts=' + Date.now();
         });
     })();
 </script>

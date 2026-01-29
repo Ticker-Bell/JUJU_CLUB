@@ -4,6 +4,7 @@ import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.mapper.RoadMapMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -85,4 +86,10 @@ public class RoadMapService {
         return roadMapMapper.chapterTestResult(userSeq);
     }
 
+    // 온보딩 이후 유저 레벨에 맞게 insert
+    @Transactional
+    public void insertInitUserLesson(Integer userSeq, Integer userLevel) {
+        roadMapMapper.insertInitUserLesson(userSeq, userLevel);
+        roadMapMapper.insertInitCurrentUserLesson(userSeq, userLevel);
+    };
 }

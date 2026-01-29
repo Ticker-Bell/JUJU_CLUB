@@ -2,7 +2,6 @@ package com.tickerbell.jujuclub.mypage.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.auth.dto.AccountDTO;
-import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.auth.service.AccountService;
 import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
 import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
@@ -27,7 +26,7 @@ import java.util.Map;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/myPage")
+@RequestMapping("/myPage") // 다시 /myPage로 원복
 public class MyPageController {
 
     private final RoadMapService roadMapService;
@@ -35,31 +34,27 @@ public class MyPageController {
     private final UserAssetService userAssetService;
     private final AccountService accountService;
 
+    /**
+     * [1] 마이페이지 메인 화면 반환 (데이터 로딩 없이 껍데기만)
+     * URL: /myPage/main.do
+     */
     @GetMapping("/main.do")
-    public String myPage(HttpSession session, Model model) {
+    public String myPage() {
+        return "myPage/myPageMain";
+    }
 
-        // 1. 유저 정보 확인
-        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+    /**
+     * [2] 자산 정보 및 차트 데이터 조회 (비동기)
+     * URL: /myPage/asset
+     */
+    @GetMapping("/asset")
+    public String getUserAsset(HttpSession session, Model model) {
         Integer userSeq = (Integer) session.getAttribute("userSeq");
 
-        if (userSeq == null) {
-            //userSeq = 2; // 테스트용 계정
-            session.setAttribute("userSeq", userSeq);
-            if (loginUser == null) {
-                loginUser = new MemberDTO();
-                loginUser.setUserName("테스트유저(2번)");
-                loginUser.setUserId("testUser1");
-                session.setAttribute("loginUser", loginUser);
-            }
-        }
-
-        // ---------------------------------------------------------
-        // [1] 차트 데이터 조회 (보유 주식)
-        // ---------------------------------------------------------
+        // --- 차트 데이터 로직 ---
         try {
             List<PortfolioAllocationItemDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
             List<Map<String, Object>> chartData = new ArrayList<>();
-
             if (holdings != null) {
                 for (PortfolioAllocationItemDTO item : holdings) {
                     if (item.getWeightPct() > 0) {
@@ -71,16 +66,13 @@ public class MyPageController {
                     }
                 }
             }
-            // JSON 문자열로 변환하여 전달 (JSP 스크립트에서 사용)
             model.addAttribute("chartDataJson", new ObjectMapper().writeValueAsString(chartData));
         } catch (Exception e) {
             log.error("차트 데이터 조회 실패", e);
             model.addAttribute("chartDataJson", "[]");
         }
 
-        // ---------------------------------------------------------
-        // [2] 자산 정보 조회 (총 자산, 예수금)
-        // ---------------------------------------------------------
+        // --- 자산 정보 로직 ---
         try {
             UserInvestSummeryDTO userAsset = userAssetService.getUserInvestSummary(userSeq);
             if(userAsset == null) userAsset = new UserInvestSummeryDTO();
@@ -97,9 +89,17 @@ public class MyPageController {
             model.addAttribute("userAsset", new UserInvestSummeryDTO());
         }
 
-        // ---------------------------------------------------------
-        // [3] 미션 정보 조회 (일일 미션)
-        // ---------------------------------------------------------
+        return "myPage/myPageAsset";
+    }
+
+    /**
+     * [3] 미션 정보 조회 (비동기)
+     * URL: /myPage/mission
+     */
+    @GetMapping("/mission")
+    public String getUserMission(HttpSession session, Model model) {
+        Integer userSeq = (Integer) session.getAttribute("userSeq");
+
         try {
             List<MissionDTO> missionList = roadMapService.missionList(userSeq);
             int successCount = (int) missionList.stream()
@@ -114,6 +114,6 @@ public class MyPageController {
             model.addAttribute("missionSuccessCount", 0);
         }
 
-        return "myPage/myPageMain";
+        return "myPage/missionSection";
     }
 }

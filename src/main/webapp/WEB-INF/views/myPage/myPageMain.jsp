@@ -28,6 +28,9 @@
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
+<!-- ✅ dotlottie 다시 추가 (dotlottie-wc 커스텀 엘리먼트 등록용) -->
+<script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
+
 <script>
     tailwind.config = {
         theme: {
@@ -39,12 +42,54 @@
     }
 </script>
 
+<style>
+    /* ✅ 로딩 점(.) 애니메이션 - JS로 제어 */
+    .mypage-loading-dots{
+        display: inline-block;
+        min-width: 1.8em; /* ".", "..", "..." 폭 확보 */
+        text-align: left;
+        white-space: pre;
+    }
+
+    /* ✅ dotlottie가 "로드/업그레이드" 되면서 레이아웃 흔들리는 것 방지:
+       커스텀 엘리먼트가 업그레이드 전/후에도 동일한 크기를 갖도록 고정 */
+    dotlottie-wc{
+        display: block;
+        width: 150px;
+        height: 150px;
+        flex: 0 0 150px;
+    }
+
+    /* [유지] 스크롤바 스타일 */
+    .mypage-scrollbar {
+        overflow-y: auto !important;
+        scrollbar-width: thin;
+        scrollbar-color: transparent transparent;
+    }
+    .mypage-scrollbar:hover {
+        scrollbar-color: #cbd5e1 transparent;
+    }
+    .mypage-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .mypage-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .mypage-scrollbar::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 4px;
+    }
+    .mypage-scrollbar:hover::-webkit-scrollbar-thumb {
+        background-color: #cbd5e1;
+    }
+</style>
+
 <div class="w-full max-w-[1600px] mx-auto h-full flex flex-col p-5">
     <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-5 min-h-0">
 
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative justify-center">
             <div class="flex items-center justify-between mb-2 shrink-0">
-                <h3 class="text-lg font-extrabold text-gray-900">프로필</h3>
+                <h3 class="text-xl font-extrabold text-gray-900">프로필</h3>
             </div>
 
             <div class="flex-1 flex flex-col items-center justify-center relative z-10">
@@ -70,7 +115,7 @@
                 </div>
 
                 <h2 class="text-2xl font-extrabold text-gray-900 mb-1">${loginUser.userName}</h2>
-                <p class="text-sm text-gray-400 font-medium mb-3">${loginUser.userId}</p>
+                <p class="text-sm text-gray-500 font-medium mb-4">${loginUser.userId}</p>
 
                 <div class="flex items-center gap-2 mb-6">
                     <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
@@ -124,7 +169,7 @@
 
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col">
             <div class="flex items-center justify-between mb-2 shrink-0">
-                <h3 class="text-lg font-extrabold text-gray-900">내 포트폴리오</h3>
+                <h3 class="text-xl font-extrabold text-gray-900">내 포트폴리오</h3>
             </div>
             <div id="chartContainer" class="flex-1 relative w-full min-h-0 flex flex-col p-2">
                 <div class="flex justify-end mb-2">
@@ -140,17 +185,16 @@
 
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative overflow-hidden">
             <div class="flex items-center justify-between mb-2 shrink-0">
-                <h3 class="text-lg font-extrabold text-gray-900">획득 뱃지</h3>
+                <h3 class="text-xl font-extrabold text-gray-900">획득 뱃지</h3>
             </div>
             <div class="flex-1 flex flex-col items-center justify-center text-center pb-4">
-                <div class="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-5 rotate-12 border border-slate-100 shadow-sm">
-                    <i data-lucide="message-circle-warning" class="w-10 h-10 text-slate-300 -rotate-12"></i>
+                <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-4 rotate-12 border border-slate-100 shadow-sm">
+                    <i data-lucide="message-circle-warning" class="w-8 h-8 text-slate-300 -rotate-12"></i>
                 </div>
-                <p class="text-lg font-extrabold text-gray-500 mb-1">현재는 비어있습니다.</p>
-                <p class="text-sm font-medium text-gray-400">열심히 활동해서 뱃지를 모아보세요!</p>
+                <p class="text-lg font-extrabold text-gray-500 mb-0.5">비어있습니다</p>
+                <p class="text-sm font-medium text-gray-400">열심히 활동해 보세요!</p>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -245,6 +289,7 @@
                 });
             }
         }
+        initLoadingDots();
 
         //✅ (선택) 모달에서 이미지 업로드 후 메인 프로필도 즉시 갱신하고 싶으면:
         document.body.addEventListener('profile-image-updated', function(){

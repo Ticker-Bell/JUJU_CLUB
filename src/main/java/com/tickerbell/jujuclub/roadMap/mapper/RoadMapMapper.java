@@ -34,4 +34,10 @@ public interface RoadMapMapper {
 
     // mission 보상금 지급
     boolean missionReward(@Param("user_seq") Integer userSeq, @Param("mission_seq") Integer reward);
+
+    // 유저 온보딩 이후 레벨에 맞춰 레슨정보 삽입
+    void insertInitUserLesson(@Param("user_seq")Integer userSeq, @Param("user_level") Integer userLevel);
+
+    void insertInitCurrentUserLesson(@Param("user_seq")Integer userSeq, @Param("user_level") Integer userLevel);
+
 }

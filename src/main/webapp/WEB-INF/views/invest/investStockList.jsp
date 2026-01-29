@@ -2,7 +2,6 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 
 <style>
@@ -861,6 +860,15 @@
 
 
                 success: function (data) {
+                    if (!data || data.length === 0) {
+                        if (sortType === 'interest') {
+                            $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
+                        } else {
+                            $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+                        }
+                        return;
+                    }
+
                     if (data && data.length > 0) {
                         renderStockList(data, sortType, page);
 
@@ -886,15 +894,6 @@
         // 리스트 렌더링 함수
         function renderStockList(data, sortType, page) {
             const $container = $('#stockList');
-
-            if (!data || data.length === 0) {
-                if (sortType === 'interest') {
-                    $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
-                } else {
-                    $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
-                }
-                return;
-            }
 
             let html = '';
 
@@ -1031,6 +1030,10 @@
         }
 
         function toggleLike() {
+            if (!selectedStockState?.stockCode) {
+                return;
+            }
+
             const likeEl = document.getElementById('header-stockLike');
             const isLiked = likeEl.dataset.liked === "true";
 
@@ -1063,8 +1066,8 @@
             selectedStockState.stockName = stockName;
             selectedStockState.stockCode = stockCode;
 
-            document.getElementById('header-stock').innerText = stockCode;
-            document.getElementById('header-stockName').innerText = stockName;
+            document.getElementById('header-stock').innerText = stockCode ? stockCode : '-';
+            document.getElementById('header-stockName').innerText = stockName ? stockName : '---';
 
             loadChartData('D', stockCode);
 
@@ -1072,7 +1075,7 @@
             fetch(`${pageContext.request.contextPath}/invest/chart/marketType?stockCode=` + stockCode)
                 .then(res => res.text())
                 .then(marketType => {
-                    document.getElementById('header-marketType').innerText = marketType;
+                    document.getElementById('header-marketType').innerText = marketType ? marketType : '-';
                 });
         }
 
@@ -1115,23 +1118,29 @@
         }
 
         function updateHeaderStock(stock) {
-            if (!stock) return;
             const priceEl = document.getElementById('header-price');
             const changeEl = document.getElementById('header-change');
             //현재 장 시간이 아닐 때
-            if (!stock.displayChange && isOutOfMarketTime()) {
+            if (isOutOfMarketTime()) {
                 priceEl.innerText = "현재 장 시간이 아닙니다. ";
                 return;
             }
             //현재가와 변동값이 있으면 보여줌
-            if (stock.displayPrice) priceEl.innerText = stock.displayPrice + "원";
-            if (stock.displayChange) changeEl.innerText = stock.displayChange;
-            const sign = stock.dayOverDaySign;
-            let color = "#666"; // 보합
-            if (sign === "1" || sign === "2") color = "#bf0f06"; // 빨강
-            if (sign === "4" || sign === "5") color = "#0051af"; // 파랑
+            if (!stock || stock.displayPrice == null) {
+                priceEl.innerText = "- 원";
+                changeEl.innerText = "-";
+            } else {
+                priceEl.innerText = stock.displayPrice + "원";
+                changeEl.innerText = stock.displayChange;
+                tradePrice(stock.displayPrice);
+                const sign = stock.dayOverDaySign;
+                let color = "#666"; // 보합
+                if (sign === "1" || sign === "2") color = "#bf0f06"; // 빨강
+                if (sign === "4" || sign === "5") color = "#0051af"; // 파랑
 
-            changeEl.style.color = color;
+                changeEl.style.color = color;
+            }
+
         }
 
         let prevStockCode = null;
@@ -1202,7 +1211,6 @@
 
         // investBuySell
         let currentTradePrice = null;
-        let tradeStockCode = null;
 
         function switchTab(type) {
             const buyBtn = document.getElementById('buy-button');
@@ -1276,43 +1284,102 @@
             return document.getElementById('investJsp')?.classList.contains('active');
         }
 
+        // 구매 버튼 비활성화 (독립)
+        function resetBuyButton() {
+            const buyBtn = document.getElementById('doBuyButton');
+            buyBtn.classList.remove('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
+            buyBtn.classList.add('bg-[#E6E7EB]', 'text-[#999999]');
+            document.getElementById('buyExpectedPrice').innerText = '-';
+        }
+
+// 판매 버튼 비활성화 (독립)
+        function resetSellButton() {
+            const sellBtn = document.getElementById('doSellButton');
+            sellBtn.classList.remove('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
+            sellBtn.classList.add('bg-[#E6E7EB]', 'text-[#999999]');
+            document.getElementById('sellExpectedPrice').innerText = '-';
+        }
+
+// 모달 닫을 때 등 전체 초기화가 필요할 때 사용
+        function resetInvestButtons() {
+            resetBuyButton();
+            resetSellButton();
+        }
 
         function buyExpectedPrice() {
-            //예상 금액 계산
             const price = currentTradePrice;
             const amount = Number(document.getElementById('buyAmountInput').value);
             let total = price * amount;
 
-            if (isNaN(total)) {
-                document.getElementById('buyExpectedPrice').innerText = '-';
+            // 조건 검사: 값이 없거나 0이면 비활성화 함수 호출
+            if (!total || isNaN(total) || !isInvestTabActive()) {
+                resetBuyButton();
                 return;
-            } else if (isInvestTabActive() && total !== 0 && total !== null) {
-                document.getElementById('doBuyButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
-                document.getElementById('doBuyButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             }
+
+            // 활성화 로직
+            const buyBtn = document.getElementById('doBuyButton');
+            buyBtn.classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
+            buyBtn.classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             document.getElementById('buyExpectedPrice').innerText = total.toLocaleString();
         }
 
         function sellExpectedPrice() {
-            //예상 금액 계산
             const price = currentTradePrice;
             const amount = Number(document.getElementById('sellAmountInput').value);
-            const total = price * amount;
-            if (isNaN(total)) {
-                document.getElementById('sellExpectedPrice').innerText = '-';
-                return;
-            } else if (isInvestTabActive() && total !== 0 && total !== null) {
+            let total = price * amount;
 
-                document.getElementById('doSellButton').classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
-                document.getElementById('doSellButton').classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
+            // 조건 검사: 값이 없거나 0이면 비활성화 함수 호출
+            if (!total || isNaN(total) || !isInvestTabActive()) {
+                resetSellButton();
+                return;
             }
+
+            // 활성화 로직
+            const sellBtn = document.getElementById('doSellButton');
+            sellBtn.classList.remove('bg-[#E6E7EB]', 'text-[#999999]');
+            sellBtn.classList.add('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             document.getElementById('sellExpectedPrice').innerText = total.toLocaleString();
         }
+
+        function openResultModal({type, title, desc, buttonText}) {
+            const modal = document.getElementById('resultModal');
+            const icon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDesc = document.getElementById('modalDesc');
+            const actionBtn = document.getElementById('modalActionBtn');
+            const bar = document.getElementById('modalBar');
+
+            // 초기화
+            icon.className = 'w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg';
+            icon.innerHTML = '';
+
+            if (type === 'success') {
+                icon.classList.add('bg-green-100', 'text-green-600');
+                icon.innerHTML = '✔';
+                bar.classList.add('bg-green-500');
+            } else {
+                icon.classList.add('bg-red-100', 'text-red-600');
+                icon.innerHTML = '✖';
+                bar.classList.add('bg-red-500');
+            }
+
+            modalTitle.innerText = title;
+            modalDesc.innerText = desc;
+            actionBtn.innerText = buttonText;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+        }
+
 
         function trade(stockCode) {
             //매수, 매도 버튼 로직
             let amount;
-            tradeStockCode = stockCode;
+
             const tradeType = document.querySelector('.tab-item.active').innerText.trim() === '매수' ? 'Y' : 'N';
 
             if (tradeType === 'Y') {
@@ -1336,17 +1403,34 @@
                 .then(response => response.json())
                 .then(result => {
                     if (result.success) {
-                        alert(tradeType === 'Y' ? '매수 완료!' : '매도 완료!');
-                        $("#investBuySell").load(location.href + " #investBuySell > *");
+                        openResultModal({
+                            type: 'success',
+                            title: tradeType === 'Y' ? '매수 완료 🎉' : '매도 완료 🎉',
+                            desc: tradeType === 'Y'
+                                ? currentTradePrice + '원\n' + amount + '주\n매수 주문이 정상적으로 체결되었습니다.'
+                                : currentTradePrice + '원\n' + amount + '주\n매도 주문이 정상적으로 체결되었습니다.',
+                            buttonText: '확인'
+                        });
+
+                        document.getElementById('modalActionBtn').onclick = () => {
+                            const container = document.getElementById('investBuySell');
+                            const inputs = container.querySelectorAll('input, select, textarea');
+                            inputs.forEach(input => input.value = '');
+                            hasQuantity(stockCode)
+                            resetInvestButtons();
+                            closeModal();
+                        };
                     } else {
-                        if (tradeType === 'Y') {
-                            document.getElementById('buyErrorMessage').innerText = result.message;
-                        } else {
-                            document.getElementById('sellErrorMessage').innerText = result.message;
-                        }
+                        openResultModal({
+                            type: 'error',
+                            title: '거래 실패',
+                            desc: result.message,
+                            buttonText: '다시 시도'
+                        });
                     }
                 })
                 .catch(error => console.log('Error: ' + error));
         }
-    })();
+    })
+    ();
 </script>

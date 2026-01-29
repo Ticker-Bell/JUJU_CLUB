@@ -3,6 +3,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 
 <style>

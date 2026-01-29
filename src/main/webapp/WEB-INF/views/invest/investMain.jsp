@@ -3,6 +3,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
 
 <style>
@@ -63,8 +64,8 @@
             <jsp:include page="investMy.jsp"></jsp:include>
         </div>
         <div id="investJsp" class="tab-content">
-            <div id="stock" class="flex flex-row justify-between w-full gap-16">
-                <div id="investComponents" class="flex flex-col gap-16">
+            <div id="stock" class="flex flex-row justify-between w-full gap-8">
+                <div id="investComponents" class="flex flex-col gap-8">
                     <jsp:include page="investStockList.jsp"></jsp:include>
                 </div>
                 <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">

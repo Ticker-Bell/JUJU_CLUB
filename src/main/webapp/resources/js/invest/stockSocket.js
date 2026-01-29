@@ -30,10 +30,12 @@ const StockSocket = {
 
         //웹소켓 연결
         const socket = new SockJS(`${contextPath}/ws-jujuclub`);
+
         this.stompClient = Stomp.over(socket);
 
+        self.stompClient.debug = null;
+
         this.stompClient.connect({}, function (frame) {
-            console.log("connected: " + frame);
             self.isConnected = true;
 
             stockCodes.forEach(stockCode => {
@@ -66,7 +68,6 @@ const StockSocket = {
 
         const subscription = this.stompClient.subscribe(`/topic/stock/${stockCode}`, (response) => {
             const stockData = JSON.parse(response.body);
-            console.log("웹소켓 원본 데이터 수신:", stockData);
             this.lastestData[stockData.stockCode] = stockData;
             const fns =  this.listeners[stockData.stockCode] || [];
             fns.forEach(fn => fn(stockData));
@@ -74,7 +75,6 @@ const StockSocket = {
 
         //구독 객체를 저장
         this.subscribeCodes.set(stockCode, subscription);
-        console.log(`${stockCode} 구독 완료`);
     },
 
     addListener(stockCode, fn){
@@ -118,7 +118,6 @@ const StockSocket = {
                 const payload = {stockCodes: [stockCode], tr_type: "2"};
                 this.stompClient.send("/app/invest/request/chartData", {}, JSON.stringify(payload));
 
-                console.log(`${stockCode} 구독 해제 및 데이터 삭제 완료`);
             }
         });
     },
@@ -138,6 +137,5 @@ const StockSocket = {
         this.subscribeCodes.clear();
         this.lastestData = {};
 
-        console.log('웹소켓 연결 종료');
     }
 };

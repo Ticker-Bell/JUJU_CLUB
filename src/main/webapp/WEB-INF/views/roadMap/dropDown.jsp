@@ -6,12 +6,12 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/roadMap/dropDown.css">
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/roadMap/dropDown.css">
 
 <div class="stage-controls-left">
     <div class="select-wrapper">
-        <button id="levelSelect" class="control-item w-[100px]" type="button">
-            <span class="btn-text">${userLesson.getLevelName()}</span>
+        <button id="levelSelect" class="control-item w-[100px]" type="button" aria-label="레벨 선택">
+            <span class="btn-text">${userLesson.levelName}</span>
         </button>
         <ul class="optionList">
             <c:forEach items="${levelList}" var="level">
@@ -22,8 +22,7 @@
 
     <div class="select-wrapper">
         <button id="chapterSelect" class="control-item w-[260px]" type="button" aria-label="챕터 선택">
-                <span class="btn-text">${userLesson.getChapterName()}</span>
-
+                <span class="btn-text">${userLesson.chapterName}</span>
         </button>
         <ul class="optionList custom-scroll" id="chapterListContainer"></ul>
     </div>

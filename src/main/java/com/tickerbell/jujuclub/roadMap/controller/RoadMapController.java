@@ -32,6 +32,7 @@ public class RoadMapController {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
 
+
         List<LevelDTO> levelList = roadMapService.levelList();
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
         List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
@@ -59,8 +60,8 @@ public class RoadMapController {
             UserLessonDTO user = userMap.get(lesson.getLessonId());
             ChapterResultDTO result = resultMap.get(lesson.getChapterId());
 
-            boolean isLssnFinished = user != null && user.getEndDate() != null
-                    && !user.getEndDate().toString().isEmpty();
+            boolean isLssnFinished = user != null && user.getEndDate() != null && !user.getEndDate().toString().isEmpty();
+            boolean isLssnCurrent = user != null && user.getStartDate() != null && user.getEndDate() == null;
 
             boolean isChptFinished = result != null && "Y".equals(result.getIsPass());
 
@@ -69,7 +70,7 @@ public class RoadMapController {
                     lesson.setStatus("completed");
                     isUnlocked = true;
                 } else {
-                    if (isUnlocked) {
+                    if (isUnlocked || isLssnCurrent) {
                         lesson.setStatus("current");
                         isUnlocked = false;
                     } else {
@@ -94,7 +95,7 @@ public class RoadMapController {
 
         // 현재 진행하고 있는 유저 레슨/챕터 정보 전달
         LevelChapterLessonDTO userLesson = allLearningList.stream()
-                .filter(lesson -> "current".equals(lesson.getStatus()))
+                .filter(lesson -> !"TEST".equals(lesson.getLessonType()) && "current".equals(lesson.getStatus()))
                 .findFirst()
                 .orElse(allLearningList.get(0));
 

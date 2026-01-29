@@ -3,16 +3,15 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tickerbell.jujuclub.auth.mapper.MemberMapper">
 
-    <select id="selectUserById" parameterType="string"
-            resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
+    <select id="selectUserById" parameterType="string" resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
         SELECT
-        user_seq   as userSeq,
-        user_id    as userId,
-        user_pw    as userPw,
-        user_name  as userName,
-        user_level as userLevel,
-        created_at as createdAt,
-        user_image as userImage
+            user_seq   as userSeq,
+            user_id    as userId,
+            user_pw    as userPw,
+            user_name  as userName,
+            user_level as userLevel,
+            created_at as createdAt,
+            user_image as userImage
         FROM USERS
         WHERE user_id = #{userId}
     </select>
@@ -23,12 +22,9 @@
             <if test="userName != null and userName != ''">
                 user_name = #{userName},
             </if>
-
             <if test="userPw != null and userPw != ''">
                 user_pw = #{userPw},
             </if>
-
-            <!-- ✅ user_image 업데이트(삽입) -->
             <if test="userImage != null">
                 user_image = #{userImage, jdbcType=BLOB},
             </if>
@@ -39,5 +35,15 @@
     <delete id="deleteUser">
         DELETE FROM USERS WHERE user_id = #{userId}
     </delete>
+
+    <select id="selectUserBySeq" parameterType="int" resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
+        SELECT
+            user_seq   as userSeq,
+            user_id    as userId,
+            user_name  as userName,
+            user_image as userImage
+        FROM USERS
+        WHERE user_seq = #{userSeq}
+    </select>
 
 </mapper>

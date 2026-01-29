@@ -33,9 +33,9 @@ public class RankingService {
     response.setUserId(rankingResponse.getUserId());
     response.setUserName(rankingResponse.getUserName());
     response.setUserAssetRank(rankingResponse.getUserAssetRank());
-    response.setUserRevenueRank(rankingResponse.getUserRevenueRank());
-    response.setTotalAsset(rankingResponse.getTotalAsset());
-    response.setTotalRevenueRate(rankingResponse.getTotalRevenueRate());
+    response.setCashBalance(rankingResponse.getCashBalance());
+    response.setUserLssnCnt(rankingResponse.getUserLssnCnt());
+    response.setUserLssnRank(rankingResponse.getUserLssnRank());
     response.setTotUserCnt(totUserCnt);
 
     response.setRankingBorardListOBA(rankingListOBA);

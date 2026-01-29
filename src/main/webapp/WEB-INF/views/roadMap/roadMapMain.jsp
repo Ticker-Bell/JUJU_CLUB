@@ -350,7 +350,7 @@
 
             // 초기 로딩일 때만 현재 위치로 스크롤 & 드롭다운 동기화
             if (isFirstLoad) {
-                const currentNode = nodePositions.find(p => p.data.status === 'current');
+                const currentNode = nodePositions.find(p => p.data.status === 'current' && p.data.type !== 'TEST');
 
                 // 만약 'current'가 없으면(다 깼거나 오류) 가장 마지막 완료된 곳이라도 찾음
                 const targetNode = currentNode || nodePositions[nodePositions.length - 1];

@@ -5,7 +5,7 @@ import com.tickerbell.jujuclub.invest.service.KISApiService;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
 import com.tickerbell.jujuclub.invest.service.WatchlistService;
-import com.tickerbell.jujuclub.invest.util.ColorUtil;
+import com.tickerbell.jujuclub.utils.ColorUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

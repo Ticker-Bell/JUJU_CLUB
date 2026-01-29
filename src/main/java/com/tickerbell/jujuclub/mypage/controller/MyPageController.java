@@ -39,7 +39,15 @@ public class MyPageController {
      * URL: /myPage/main.do
      */
     @GetMapping("/main.do")
-    public String myPage() {
+    public String myPage(Model model, HttpSession session) {
+
+        Integer userSeq = (Integer) session.getAttribute("userSeq");
+        AccountDTO accountDTO = accountService.getMyAccount(userSeq);
+
+        Long cashBalance = accountDTO.getCashBalance();
+
+        model.addAttribute("userCashBalance",cashBalance);
+
         return "myPage/myPageMain";
     }
 

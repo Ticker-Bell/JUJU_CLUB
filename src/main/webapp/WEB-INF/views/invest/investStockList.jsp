@@ -1249,9 +1249,6 @@
             }
         });
 
-        document.getElementById('doBuyButton').addEventListener('click', () => trade(code));
-        document.getElementById('doSellButton').addEventListener('click', () => trade(code));
-
         function tradePrice(currentPrice) {
             if (currentPrice === undefined) currentPrice = '-';
             currentTradePrice = currentPrice;

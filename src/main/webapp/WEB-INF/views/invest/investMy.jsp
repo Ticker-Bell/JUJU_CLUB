@@ -347,10 +347,12 @@
     }
 
     .holdings-scroll {
+        max-height: calc(60px * 15); /* 15개 높이 */
         flex: 1;
         overflow-y: auto;
         min-height: 0;
         padding-right: 14px; /* 스크롤바 여유 */
+        scrollbar-gutter: stable;
     }
 
     /* 빈 상태 메시지 */
@@ -571,8 +573,8 @@
 
 </div>
 <script>
-        //페이지를 바꿔도 전역변수가 안없어져서 감싸기
-        (function () {
+    //페이지를 바꿔도 전역변수가 안없어져서 감싸기
+    (function () {
 
         const userSeq = "${sessionScope.userSeq}";
 
@@ -581,184 +583,189 @@
 
         //보유 종목 없을 경우 차트 메세지 토글
         function setChartEmptyState(isEmpty) {
-        const message = document.getElementById("emptyChartMessage");
-        const canvas = document.getElementById("holdingsChart");
-        if (!message || !canvas) return;
+            const message = document.getElementById("emptyChartMessage");
+            const canvas = document.getElementById("holdingsChart");
+            if (!message || !canvas) return;
 
-        message.style.display = isEmpty ? "block" : "none";
-        canvas.style.display = isEmpty ? "none" : "block";
+            message.style.display = isEmpty ? "block" : "none";
+            canvas.style.display = isEmpty ? "none" : "block";
         }
 
         let flag = false; //중복 호출 방지
 
-        function initChart(){
+        function initChart() {
             if (Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
-            setChartEmptyState(false);
-            DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
+                setChartEmptyState(false);
+                DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
             } else {
                 setChartEmptyState(true);
             }
 
-                updateData();
-                //페이지 자동 갱신(1분) 60*1000
-                setInterval(updateData, 30 * 1000);
+            updateData();
+            //페이지 자동 갱신(1분) 60*1000
+            setInterval(updateData, 30 * 1000);
         }
 
-            if(document.readyState === 'loading'){
+        if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', initChart);
         } else {
             initChart();
         }
 
-            //1분마다 데이터 자동 갱신 AJAX
-            //1)fetch(url) 서버에 데이터 요청
-            //2)data=await result.json() json을 js객체로 변환
-            //3)setInterval() 1분마다 updateData() 실행
+        //1분마다 데이터 자동 갱신 AJAX
+        //1)fetch(url) 서버에 데이터 요청
+        //2)data=await result.json() json을 js객체로 변환
+        //3)setInterval() 1분마다 updateData() 실행
 
+        async function updateData() {
 
+            //dom에 investMain의 데이터도 올라와 있으므로 my 탭 아닐때 제한하기
+            const myJsp = document.getElementById('myJsp');
+            if (!myJsp || !myJsp.classList.contains('active')) {
+                return; //my탭이 아니면 updateData 함수 즉시 종료
+            }
 
-            async function updateData() {
             if (flag) return;
             flag = true;
             try {
-            const url =
-            "${pageContext.request.contextPath}/stock/api/invest/selectedData"
-            + "?userSeq=" + userSeq //userSeq (세션 저장 완료시 변경)
-            + "&ts=" + Date.now(); // 캐시 방지용
+                const url =
+                    "${pageContext.request.contextPath}/stock/api/invest/selectedData"
+                    + "?userSeq=" + userSeq //userSeq (세션 저장 완료시 변경)
+                    + "&ts=" + Date.now(); // 캐시 방지용
 
-            const result = await fetch(url, {cache: "no-store"});
-            if (!result.ok) throw new Error("HTTP " + result.status);
-            const data = await result.json();
+                const result = await fetch(url, {cache: "no-store"});
+                if (!result.ok) throw new Error("HTTP " + result.status);
+                const data = await result.json();
 
-            // const chartCanvas = document.getElementById("holdingsChart");
-            // //데이터 없다고 표시해주기
-            // setChartEmptyState(!chartDataFromServer || chartDataFromServer.length === 0);
-            // //데이터 있으면 차트 표시
-            // if (chartCanvas && Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
-            //     DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
-            // }
+                // const chartCanvas = document.getElementById("holdingsChart");
+                // //데이터 없다고 표시해주기
+                // setChartEmptyState(!chartDataFromServer || chartDataFromServer.length === 0);
+                // //데이터 있으면 차트 표시
+                // if (chartCanvas && Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
+                //     DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
+                // }
 
-            //사용자 자산
-            const assetData = data.userInvestSummeryData;
-            const pctData = document.getElementById("totalReturnPct");
+                //사용자 자산
+                const assetData = data.userInvestSummeryData;
+                const pctData = document.getElementById("totalReturnPct");
 
-            if (assetData) {
-            document.getElementById("totalAsset").textContent = Number(assetData.totalAsset).toLocaleString("ko-KR");
-            document.getElementById("cashBalance").textContent = Number(assetData.cashBalance).toLocaleString("ko-KR");
-            document.getElementById("totalStockValue").textContent = Number(assetData.totalStockValue).toLocaleString("ko-KR");
+                if (assetData) {
+                    document.getElementById("totalAsset").textContent = Number(assetData.totalAsset).toLocaleString("ko-KR");
+                    document.getElementById("cashBalance").textContent = Number(assetData.cashBalance).toLocaleString("ko-KR");
+                    document.getElementById("totalStockValue").textContent = Number(assetData.totalStockValue).toLocaleString("ko-KR");
 
-            if (pctData) {
-            //null 또는 undefined일 경우 0으로 처리
-            const pct = parseFloat(assetData.totalReturnPct) || 0;
-            pctData.classList.remove("positive", "negative");
-            if (pct > 0) {
-            pctData.classList.add("positive");
-        } else if (pct < 0) {
-            pctData.classList.add("negative");
-        }
-            pctData.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
-        }
+                    if (pctData) {
+                        //null 또는 undefined일 경우 0으로 처리
+                        const pct = parseFloat(assetData.totalReturnPct) || 0;
+                        pctData.classList.remove("positive", "negative");
+                        if (pct > 0) {
+                            pctData.classList.add("positive");
+                        } else if (pct < 0) {
+                            pctData.classList.add("negative");
+                        }
+                        pctData.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
+                    }
 
-            //test
-            document.getElementById("test_time").textContent = new Date().toLocaleTimeString();
-        }
-            //관심종목
-            const watchlist = data.watchlistItemList;
-            if (Array.isArray(watchlist)) {
-            watchlist.forEach(item => {
-            const code = item.stockCode;
-            const row = document.querySelector('.watch-row[data-code="' + code + '"]');
-            if (!row) return;
+                    //test
+                    document.getElementById("test_time").textContent = new Date().toLocaleTimeString();
+                }
+                //관심종목
+                const watchlist = data.watchlistItemList;
+                if (Array.isArray(watchlist)) {
+                    watchlist.forEach(item => {
+                        const code = item.stockCode;
+                        const row = document.querySelector('.watch-row[data-code="' + code + '"]');
+                        if (!row) return;
 
-            //현재가
-            const curData = row.querySelector(".currentPriceValue");
-            if (curData != null && item.currentPrice != null) {
-            curData.textContent = Number(item.currentPrice).toLocaleString("ko-KR");
-        }
+                        //현재가
+                        const curData = row.querySelector(".currentPriceValue");
+                        if (curData != null && item.currentPrice != null) {
+                            curData.textContent = Number(item.currentPrice).toLocaleString("ko-KR");
+                        }
 
-            //등락률
-            const pctData = row.querySelector(".pctValue");
-            if (pctData) {
-            const cp = parseFloat(item.changePct) || 0;
-            pctData.classList.remove("positive", "negative");
+                        //등락률
+                        const pctData = row.querySelector(".pctValue");
+                        if (pctData) {
+                            const cp = parseFloat(item.changePct) || 0;
+                            pctData.classList.remove("positive", "negative");
 
-            if (cp > 0) {
-            pctData.classList.add("positive");
-        } else if (cp < 0) {
-            pctData.classList.add("negative");
-        }
-            //보합(0)일 때도 값이 나오도록 보장
-            pctData.textContent = (cp > 0 ? "+" : "") + cp.toFixed(2) + "%";
-        }
-        });
-        }
-            //차트 갱신 + 범례 갱신
-            const newChartData = data.chartData || []; //chartData에 값이 없으면 빈 배열 사용
-            setChartEmptyState(!newChartData || newChartData.length === 0); //없으면 없다고 텍스트 띄우기
-            if (Array.isArray(newChartData)) {
-            //차트 갱신
-            const chartCanvas2 = document.getElementById("holdingsChart");
-            if (chartCanvas2 && newChartData.length > 0) {
-            DonutChart.renderOrUpdateDonut("holdingsChart", newChartData);
-        }
+                            if (cp > 0) {
+                                pctData.classList.add("positive");
+                            } else if (cp < 0) {
+                                pctData.classList.add("negative");
+                            }
+                            //보합(0)일 때도 값이 나오도록 보장
+                            pctData.textContent = (cp > 0 ? "+" : "") + cp.toFixed(2) + "%";
+                        }
+                    });
+                }
+                //차트 갱신 + 범례 갱신
+                const newChartData = data.chartData || []; //chartData에 값이 없으면 빈 배열 사용
+                setChartEmptyState(!newChartData || newChartData.length === 0); //없으면 없다고 텍스트 띄우기
+                if (Array.isArray(newChartData)) {
+                    //차트 갱신
+                    const chartCanvas2 = document.getElementById("holdingsChart");
+                    if (chartCanvas2 && newChartData.length > 0) {
+                        DonutChart.renderOrUpdateDonut("holdingsChart", newChartData);
+                    }
 
-            //범례 갱신 (DOM 다시 그리기)
-            const legend = document.getElementById("chartLegend");
-            if (legend) {
-            legend.innerHTML = "";
-            newChartData.forEach(it => {
-            const div = document.createElement("div");
-            div.className = "legend-item";
-            div.innerHTML =
-            '<div class="legend-color" style="background-color:' + (it.color || "#ccc") + ';"></div>'
-            + "<span>" + (it.stockName || "") + "</span>"
-            + "<span>" + (it.weightPct != null ? Number(it.weightPct).toFixed(0) : "-") + "%</span>";
-            legend.appendChild(div);
-        });
-        }
-        }
+                    //범례 갱신 (DOM 다시 그리기)
+                    const legend = document.getElementById("chartLegend");
+                    if (legend) {
+                        legend.innerHTML = "";
+                        newChartData.forEach(it => {
+                            const div = document.createElement("div");
+                            div.className = "legend-item";
+                            div.innerHTML =
+                                '<div class="legend-color" style="background-color:' + (it.color || "#ccc") + ';"></div>'
+                                + "<span>" + (it.stockName || "") + "</span>"
+                                + "<span>" + (it.weightPct != null ? Number(it.weightPct).toFixed(2) : "-") + "%</span>";
+                            legend.appendChild(div);
+                        });
+                    }
+                }
 
-            //보유종목(테이블) 갱신
-            //portfolioAllocationItemList = 보유종목 리스트(REST가 주는 키)
-            const portfolioList = data.portfolioAllocationItemList || [];
-            if (Array.isArray(portfolioList)) {
-            portfolioList.forEach(item => {
-            const stockCode = item.stockCode;
-            //JSP에서 각 행에 data-code="005930" 이런 식으로 박혀있음
-            const row = document.querySelector('.holding-row[data-code="' + stockCode + '"]');
-            if (!row) {
-            console.warn("화면에 없는 보유종목(새로 생긴 듯):", stockCode);
-            return;
-        }
+                //보유종목(테이블) 갱신
+                //portfolioAllocationItemList = 보유종목 리스트(REST가 주는 키)
+                const portfolioList = data.portfolioAllocationItemList || [];
+                if (Array.isArray(portfolioList)) {
+                    portfolioList.forEach(item => {
+                        const stockCode = item.stockCode;
+                        //JSP에서 각 행에 data-code="005930" 이런 식으로 박혀있음
+                        const row = document.querySelector('.holding-row[data-code="' + stockCode + '"]');
+                        if (!row) {
+                            console.warn("화면에 없는 보유종목(새로 생긴 듯):", stockCode);
+                            return;
+                        }
 
-            //현재가 갱신
-            const curEl = row.querySelector(".currentPriceData");
-            if (curEl && item.currentPrice != null) {
-            curEl.textContent = Number(item.currentPrice).toLocaleString("ko-KR");
-        }
+                        //현재가 갱신
+                        const curEl = row.querySelector(".currentPriceData");
+                        if (curEl && item.currentPrice != null) {
+                            curEl.textContent = Number(item.currentPrice).toLocaleString("ko-KR");
+                        }
 
-            //평가손익 갱신
-            const pnlEl = row.querySelector(".pnlData"); //row<tr>한줄 안에서 클래스가 pnlData인 요소의 HTMLElement(요소객체)
-            if (pnlEl) { //존재여부체크
-            //서버값주기
-            const pnl = (item.pnl == null) ? 0 : Number(item.pnl);
+                        //평가손익 갱신
+                        const pnlEl = row.querySelector(".pnlData"); //row<tr>한줄 안에서 클래스가 pnlData인 요소의 HTMLElement(요소객체)
+                        if (pnlEl) { //존재여부체크
+                            //서버값주기
+                            const pnl = (item.pnl == null) ? 0 : Number(item.pnl);
 
-            pnlEl.classList.remove("positive", "negative");
-            pnlEl.classList.add(pnl >= 0 ? "positive" : "negative");
-            pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
-        }
-        });
-        }
+                            pnlEl.classList.remove("positive", "negative");
+                            pnlEl.classList.add(pnl >= 0 ? "positive" : "negative");
+                            pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
+                        }
+                    });
+                }
 
-            //마지막 갱신 표시
-            const testEl = document.getElementById("test");
-            if (testEl) testEl.textContent = new Date().toLocaleTimeString();
+                //마지막 갱신 표시
+                const testEl = document.getElementById("test");
+                if (testEl) testEl.textContent = new Date().toLocaleTimeString();
 
-        } catch (error) {
-            console.log("실패 : ", error);
-        } finally {
-            flag = false; //성공 실패 두 경우 다 해제
+            } catch (error) {
+                console.log("실패 : ", error);
+            } finally {
+                flag = false; //성공 실패 두 경우 다 해제
+            }
         }
-        }
-        })();
+    })();
 </script>

@@ -72,9 +72,11 @@ out/
 bin/
 
 # Tomcat
+.smarttomcat/
 logs/
 work/
 temp/
+.smarttomcat/
 
 ################################
 # JSP / Frontend cache

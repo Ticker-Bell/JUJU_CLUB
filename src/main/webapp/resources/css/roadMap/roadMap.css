@@ -12,87 +12,161 @@
 }
 
 /* SVG Styles */
-#roadBorder {
-    fill: none;
-    stroke: #312E81;
-    stroke-width: 100px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    opacity: 0.1;
+#roadmapSvg {
+    overflow: visible;
 }
 
 #roadPath {
     fill: none;
-    stroke: #4F46E5;
-    stroke-width: 6px;
+    stroke: #ffffff;
+    stroke-width: 20px;
     stroke-linecap: round;
+    stroke-dasharray: 35px 10px;
     stroke-linejoin: round;
 }
 
-#roadDashed {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.4);
-    stroke-width: 2px;
-    stroke-dasharray: 10 15;
-    stroke-linecap: round;
+/* 별똥별 기본 스타일 */
+.star-shooting {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 2px;
+    background: #CEC8F6;
+    border-radius: 50%;
+
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.1),
+    0 0 0 8px rgba(255,255,255,0.1),
+    0 0 20px rgba(255,255,255,1);
+    opacity: 0;
+}
+
+/* 별똥별 꼬리 */
+.star-shooting::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, #d1c9ff, transparent);
+}
+
+/* 떨어지는 애니메이션 */
+@keyframes shooting {
+    0% {
+        transform: rotate(315deg) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1; /* 나타남 */
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(315deg) translateX(-1500px);
+        opacity: 0;
+    }
+}
+
+
+/* 챕터 깃발 스타일 */
+.flag-div {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+    z-index: 30;
     pointer-events: none;
 }
 
-#roadPathActive {
-    fill: none;
-    stroke: #818CF8;
-    stroke-width: 6px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    filter: drop-shadow(0 0 8px rgba(129, 140, 248, 0.8));
-    transition: d 0.8s ease-in-out;
+/* 깃발 이미지 */
+.flag-div img {
+    display: block;
+    width: 95px;
+    height: auto;
 }
+
+/* 깃발 위에 올라갈 텍스트 */
+.flag-div span {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: #191919;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 1;
+}
+
 
 /* Orb (노드) 스타일 */
 .orb {
     position: absolute;
-    width: 72px;
-    height: 72px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    /*border: 4px solid #E0E7FF;*/
+    background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    border: 4px solid #E0E7FF;
-    z-index: 30;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    /*z-index: 30;*/
+    box-shadow: 0 0 10px white;
     transition: transform .18s ease, box-shadow .18s ease;
     user-select: none;
     cursor: pointer;
     pointer-events: auto !important;
+    /*filter: blur(1px);*/
 }
 
 .orb:hover {
     transform: scale(1.15) translateY(-5px);
-    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 0 20px white;
 }
 
 /* 상태별 스타일 */
 .orb.completed {
-    border-color: #4F46E5;
-    background: #fff;
-    color: #4F46E5;
+    background: radial-gradient(#dddbff 50%, #4f46e5);
+    box-shadow: 0 0 20px #423bc8;
+    filter: blur(1px);
 }
 
 .orb.current {
-    border-color: #4F46E5;
-    background: #4F46E5;
-    color: #fff;
-    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0.25);
+    background: #908bef;
+    color: white;
+    box-shadow: 0 0 0 20px rgba(79, 70, 229);
     animation: pulse 2s infinite;
 }
 
 .orb.locked {
-    background: #F3F4F6;
-    border-color: #E5E7EB;
-    color: #9CA3AF;
+    background: rgb(194, 194, 194);
+    color: #fff;
     cursor: not-allowed;
-    opacity: 0.9;
+}
+
+.chapter-test {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    transition: transform .18s ease, box-shadow .18s ease;
+    user-select: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+    width: 80px;
+    height: 80px;
+}
+
+.chapter-test:hover {
+    transform: scale(1.15) translateY(-5px);
 }
 
 @keyframes pulse {
@@ -106,6 +180,8 @@
         box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
     }
 }
+
+
 
 /* 툴팁 스타일 */
 .tip {
@@ -137,8 +213,10 @@
     pointer-events: auto;
 }
 
+
+
+
 /* 챕터 이동 버튼 전용 스타일 */
-/* 2. 미션 버튼 전용 스타일 (독립시킴) */
 .nav-btn-locaton-left {
     position: absolute;
     bottom: 24px;
@@ -154,7 +232,6 @@
 }
 
 .nav-btn {
-    /* [기존 control-item 스타일을 여기로 가져옴] */
     height: 60px;
     width: 60px; /* 정사각형 */
     background: rgba(255, 255, 255, 0.9);
@@ -181,7 +258,3 @@
     transform: translateY(-2px);
     box-shadow: 0 16px 36px rgba(17, 24, 39, 0.12);
 }
-
-
-/*  ----- 로드맵 배경 ----- */
-

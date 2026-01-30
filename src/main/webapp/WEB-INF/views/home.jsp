@@ -178,15 +178,15 @@
                     <div class="w-full h-full flex flex-col justify-center">
                         <div class="text-center mb-6 flex-shrink-0">
                             <h2 class="text-2xl font-black text-gray-900 mb-1">투자 레벨 진단</h2>
-                            <p class="text-sm text-gray-500">본인의 주식 지식 수준을 1(전혀 모름) ~ 5(매우 잘 앎) 단계로 평가해주세요.</p>
+                            <p class="text-sm text-gray-500">본인의 주식 지식 수준을 1(전혀 그렇지 않다) ~ 5(매우 그렇다) 단계로 평가해주세요.</p>
                         </div>
                         <div class="flex-grow overflow-y-auto px-2 custom-scrollbar" style="max-height: 420px;">
                             <form id="survey-form" onsubmit="event.preventDefault();" class="space-y-8 py-2 px-1">
-                                <c:forEach var="item" items="${['주식, 채권, 펀드의 차이를 명확히 설명할 수 있나요?', 'PER, PBR, EPS 등 재무 지표의 의미를 알고 있나요?', '캔들 차트, 이동평균선 등 기술적 분석이 가능한가요?', '금리, 환율이 주가에 미치는 영향을 이해하나요?', 'ETF, 리츠 등 다양한 금융 상품을 알고 있나요?', '손절매 기준과 분산 투자 원칙을 세우고 있나요?']}" varStatus="status">
+                                <c:forEach var="item" items="${['주식 투자를 경험해 본 적이 있나요?', 'PER, PBR, EPS 등 재무 지표의 의미를 알고 있나요?', '캔들 차트, 이동평균선 등 기술적 분석이 가능한가요?', '금리, 환율이 주가에 미치는 영향을 이해하나요?', 'ETF, 리츠 등 다양한 금융 상품을 알고 있나요?', '손절매 기준과 분산 투자 원칙을 세우고 있나요?']}" varStatus="status">
                                     <div class="space-y-3">
                                         <label class="block text-base font-bold text-gray-700">${status.count}. ${item}</label>
                                         <div class="flex justify-between items-center gap-2 bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                                            <span class="text-xs text-gray-400 font-medium whitespace-nowrap">모름</span>
+                                            <span class="text-xs text-gray-400 font-medium whitespace-nowrap">전혀 그렇지 않다</span>
                                             <div class="flex justify-between w-full px-2">
                                                 <c:forEach begin="1" end="5" var="score">
                                                     <label class="cursor-pointer flex flex-col items-center gap-1 group relative">
@@ -197,7 +197,7 @@
                                                     </label>
                                                 </c:forEach>
                                             </div>
-                                            <span class="text-xs text-gray-400 font-medium whitespace-nowrap">잘 앎</span>
+                                            <span class="text-xs text-gray-400 font-medium whitespace-nowrap">매우 그렇다</span>
                                         </div>
                                     </div>
                                 </c:forEach>

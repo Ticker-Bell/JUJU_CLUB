@@ -12,19 +12,23 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/roadMap/roadMap.css">
+<link rel="stylesheet" type="text/css" href="${cpath}/resources/css/roadMap/roadMap.css">
 <link rel="stylesheet" as="style" crossorigin
       href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
 
 
 <div class="flex flex-col -m-8 w-[calc(100%+4rem)] h-[calc(100%+4rem)] min-h-0 bg-gray-50 relative p-0 border-0">
-
+    <!-- 레슨/챕터 드롭다운 -->
     <div class="absolute top-4 left-4 z-40 gap-2">
         <%@ include file="dropDown.jsp" %>
     </div>
+
+    <!-- 미션버튼 -->
     <div class="absolute top-4 right-4 z-40">
         <%@ include file="missionButton.jsp" %>
     </div>
+
+    <!-- 로드맵 챕터 좌우 이동 버튼 -->
     <div class="absolute bottom-10 left-4 z-50">
         <div class="nav-btn-locaton-left">
             <button id="preBtn" type="button" class="nav-btn" aria-label="이전 챕터">
@@ -44,56 +48,26 @@
     <div id="roadmapScroll"
          class="w-full h-full overflow-x-auto overflow-y-hidden snap-container scroll-smooth relative">
         <div id="innerContent" class="h-full relative">
-
-            <div id="space-bg" class="absolute inset-0 overflow-hidden pointer-events-none"
-                 style="background:#0b0820;">
-
-                <!-- 🌙 Big Dome -->
-                <div class="absolute bottom-[-40%] left-1/2 -translate-x-1/2
-              w-[140%] h-[140%] rounded-full"
-                     style="background:
-         radial-gradient(circle at 50% 30%,
-           #7c5cff 0%,
-           #4b3bd6 35%,
-           #2a1e78 60%,
-           transparent 70%);">
-                </div>
-
-                <!-- 🌌 Inner Glow -->
-                <div class="absolute bottom-[-30%] left-1/2 -translate-x-1/2
-              w-[90%] h-[90%] rounded-full blur-2xl"
-                     style="background:
-         radial-gradient(circle,
-           #9f7bff 0%,
-           #5b4bdb 45%,
-           transparent 70%);">
-                </div>
-
-                <!-- ⭐ Soft Stars -->
-                <div class="absolute inset-0"
-                     style="
-        background-image:
-          radial-gradient(#fff6c9 2px, transparent 3px),
-          radial-gradient(#fff6c9 1.5px, transparent 3px);
-        background-size: 120px 120px, 80px 80px;
-        background-position: 0 0, 40px 60px;
-        opacity: 0.6;
-       ">
+            <!-- 배경 -->
+            <div id="space-bg"
+                 class="absolute inset-0 overflow-hidden pointer-events-none"
+                 style="background-image: url('${cpath}/resources/images/roadMapIcons/roadMap-bg.png'); background-repeat: repeat;">
+                <div id="shootingStarLayer" class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden" style="z-index: 1;">
                 </div>
             </div>
 
-
-
-            <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 10;">
-                <path id="roadBorder" d=""/>
-                <path id="roadPath" d=""/>
-                <path id="roadDashed" d=""/>
-                <path id="roadPathActive" d=""/>
+            <!-- 로드맵 경로 -->
+            <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none"
+                 style="z-index: 10; overflow: visible;">
+                <path id="roadPath" d=""></path>
+                <path id="roadBorder" d=""></path>
             </svg>
 
+            <!-- 레슨/챕터 버튼 -->
             <div id="nodesLayer" class="absolute inset-0 pointer-events-none p-0 m-0" style="z-index: 20;">
             </div>
 
+            <!-- 툴팁 -->
             <%@ include file="toolTip.jsp" %>
 
         </div>
@@ -107,14 +81,13 @@
         const chapterMap = {};
         let globalChapterSeq = 0;
 
-        const CPATH = '${pageContext.request.contextPath}';
-
         <c:forEach items="${allLearningList}" var="item" varStatus="status">
         var chId = '${item.chapterId}';
         if (chapterMap[chId] === undefined) {
             chapterMap[chId] = globalChapterSeq++;
         }
         var currentChapterIdx = chapterMap[chId];
+
 
         <c:if test="${not empty item.lessonId}">
 
@@ -135,8 +108,7 @@
         });
         </c:if>
         </c:forEach>
-
-        console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
+        // console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
 
         let nodePositions = [];
 
@@ -172,7 +144,7 @@
             const chapterSpan = chapterBtn.querySelector('.btn-text');
             const chapterListUl = document.getElementById('chapterListContainer');
 
-            return fetch(CPATH + '/roadMapApi/chapters?levelId=' + levelId)
+            return fetch('${cpath}/roadMapApi/chapters?levelId=' + levelId)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response');
                     return response.json();
@@ -272,7 +244,7 @@
                 newBtn.classList.add("bg-indigo-600", "hover:bg-indigo-700", "shadow-indigo-200");
                 newBtn.innerText = isChapter ? "시험 응시하기" : (status === 'completed' ? "다시하기" : "시작하기");
 
-                newBtn.setAttribute('hx-post', CPATH + '/lesson/' + (isChapter ? 'chapter-test' : 'lessonInfo'));
+                newBtn.setAttribute('hx-post', '${cpath}/lesson/' + (isChapter ? 'chapter-test' : 'lessonInfo'));
                 newBtn.setAttribute('hx-target', '#main');
 
                 var param = {lessonId: data.id};
@@ -301,7 +273,7 @@
             tooltip.classList.add('visible');
         };
 
-        /* --- 3. 로드맵 그리기 (초기화 플래그 파라미터 추가) --- */
+        /* --- 3. 로드맵 그리기 --- */
         // isFirstLoad: true면 현재 진행 위치로 강제 스크롤, false(resize 등)면 위치 유지
         const initRoadmap = (isFirstLoad = false) => {
             const inner = document.getElementById('innerContent');
@@ -331,6 +303,7 @@
                 const centerY = vh / 2;
                 const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
 
+                console.log("nodePositions x: " + x + ", y: " + y + ", data: " + node);
                 nodePositions.push({x, y, data: node});
             });
 
@@ -341,34 +314,44 @@
                 const isChapter = data.type === 'TEST';
                 const status = data.status;
 
-                el.className = 'orb ' + status;
                 if (isChapter) {
-                    el.style.width = '80px';
-                    el.style.height = '80px';
-                }
-
-                if (isChapter) {
+                    el.classList.add('chapter-test');
                     if (status === 'completed') {
-                        el.innerHTML = '<i data-lucide="trophy" class="w-10 h-10 text-yellow-400 fill-yellow-100"></i>';
-                        el.classList.add('border-yellow-400', 'bg-yellow-50');
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-completed.png" alt="테스트완료">';
                     } else if (status === 'current') {
-                        el.innerHTML = '<i data-lucide="unlock" class="w-10 h-10 text-white animate-pulse"></i>';
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-current.png" alt="테스트진행중">';
                     } else {
-                        el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-locked.png" alt="테스트잠금">';
                     }
                 } else {
-                    if (status === 'completed') {
-                        el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
-                    } else if (status === 'current') {
-                        el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                    } else {
+                    el.classList.add('orb', status);
+                    if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="play" class="w-6 h-6 fill-white ml-1"></i>';
+                    } else if (status === 'locked') {
                         el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
                     }
                 }
 
+                // 챕터 깃발 생성
+                if (data.inChapterIdx === 0) {
+                    const flagDiv = document.createElement('div');
+                    const chapterText = "챕터 " + parseInt(data.chapterId.replace(/[^0-9]/g, '').slice(-3));
 
-                el.style.left = (pos.x - (isChapter ? 40 : 36)) + "px";
+                    flagDiv.classList.add('flag-div');
+                    flagDiv.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span>' + chapterText + '</span>';
+
+                    flagDiv.style.left = (pos.x - 100) + "px";
+                    flagDiv.style.top = (pos.y - 100) + "px";
+
+                    nodesLayer.appendChild(flagDiv);
+                }
+
+
+
+                el.style.left = (pos.x - (isChapter ? 40 : 30)) + "px";
                 el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
+
+                console.log("el.style.left: " + el.style.left + ", el.style.top: " + el.style.top);
 
                 el.onclick = (e) => {
                     e.stopPropagation();
@@ -435,34 +418,94 @@
 
             let d = "M " + nodePositions[0].x + " " + nodePositions[0].y;
             for (let i = 0; i < nodePositions.length - 1; i++) {
-                const curr = nodePositions[i];
                 const next = nodePositions[i + 1];
-                const dist = next.x - curr.x;
-                const cp1 = {x: curr.x + (dist * 0.5), y: curr.y};
-                const cp2 = {x: next.x - (dist * 0.5), y: next.y};
-                d += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
+                d += " L " + next.x + " " + next.y;
             }
 
-            if (pathBorder) pathBorder.setAttribute('d', d);
-            if (pathMain) pathMain.setAttribute('d', d);
-            if (pathDashed) pathDashed.setAttribute('d', d);
+            // if (pathBorder) {
+            //     pathBorder.setAttribute('d', d);
+            //     pathBorder.style.stroke = '#ffffff';
+            //     pathBorder.style.fill = 'none';
+            //     pathBorder.style.strokeWidth = "4px";
+            //     pathBorder.style.strokeLinecap = 'round';
+            //     pathBorder.style.strokeDasharray = '5px 20px';
+            //     pathBorder.style.strokeIinejoin = 'round';
+            // }
+            if (pathMain) {
+                pathMain.setAttribute('d', d);
+                pathMain.style.stroke = '#ffffff';
+                pathMain.style.fill = 'none';
+                pathMain.style.strokeWidth = "4px";
+                pathMain.style.strokeLinecap = 'round';
+                pathMain.style.strokeDasharray = '5px 20px';
+                pathMain.style.strokeIinejoin = 'round';
+                pathMain.style.filter = 'blur(1px)';
+            }
+            // if (pathDashed) pathDashed.setAttribute('d', d);
+            //
+            // if (pathActive) {
+            //     const currentPosIdx = nodePositions.findIndex(p => p.data.status === 'current');
+            //     if (currentPosIdx <= 0) {
+            //         pathActive.setAttribute('d', '');
+            //     } else {
+            //         let activeD = "M " + nodePositions[0].x + " " + nodePositions[0].y;
+            //         for (let i = 0; i < currentPosIdx; i++) {
+            //             const curr = nodePositions[i];
+            //             const next = nodePositions[i + 1];
+            //             const dist = next.x - curr.x;
+            //             const cp1 = {x: curr.x + (dist * 0.5), y: curr.y};
+            //             const cp2 = {x: next.x - (dist * 0.5), y: next.y};
+            //             activeD += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
+            //         }
+            //         pathActive.setAttribute('d', activeD);
+            //     }
+            // }
+        };
 
-            if (pathActive) {
-                const currentPosIdx = nodePositions.findIndex(p => p.data.status === 'current');
-                if (currentPosIdx <= 0) {
-                    pathActive.setAttribute('d', '');
-                } else {
-                    let activeD = "M " + nodePositions[0].x + " " + nodePositions[0].y;
-                    for (let i = 0; i < currentPosIdx; i++) {
-                        const curr = nodePositions[i];
-                        const next = nodePositions[i + 1];
-                        const dist = next.x - curr.x;
-                        const cp1 = {x: curr.x + (dist * 0.5), y: curr.y};
-                        const cp2 = {x: next.x - (dist * 0.5), y: next.y};
-                        activeD += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
-                    }
-                    pathActive.setAttribute('d', activeD);
-                }
+        // 별똥별 그리기
+        const initShootingStars = () => {
+            const container = document.getElementById('shootingStarLayer');
+            if (!container) return;
+
+            // 기존 별 초기화 (중복 방지)
+            container.innerHTML = '';
+
+            // 1. 맵 전체 너비와 높이 가져오기
+            const mapWidth = document.getElementById('innerContent')?.scrollWidth || window.innerWidth * 5;
+            const mapHeight = window.innerHeight;
+
+            // 2. 별 개수 설정 (가로 길이에 비례해서 넉넉하게 생성)
+            // 예: 200px 당 1개꼴로 생성
+            const starCount = Math.floor(mapWidth / 200);
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star-shooting');
+
+                // [위치 랜덤]
+                // 가로: 0 ~ 맵 전체 너비
+                const x = Math.random() * mapWidth;
+                // 세로: 화면 상단부 (0 ~ 40%) 에서 시작
+                const y = Math.random() * (mapHeight * 0.4);
+
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+
+                // [시간 랜덤]
+                // 지속 시간: 3초 ~ 7초 사이
+                const duration = Math.random() * 4 + 3;
+                // 딜레이: 0초 ~ 10초 사이 (별들이 동시에 떨어지지 않게 분산)
+                const delay = Math.random() * 10;
+
+                star.style.animationName = 'shooting';
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = delay + 's';
+
+                // 무한 반복
+                star.style.animationIterationCount = 'infinite';
+                star.style.animationTimingFunction = 'linear';
+
+                container.appendChild(star);
             }
         };
 
@@ -634,6 +677,7 @@
             // [핵심] 렌더링 안정성을 위해 약간의 지연 후 그리기
             setTimeout(() => {
                 initRoadmap(true); // true = 내 위치로 스크롤 이동
+                initShootingStars();
             }, 100);
         };
 

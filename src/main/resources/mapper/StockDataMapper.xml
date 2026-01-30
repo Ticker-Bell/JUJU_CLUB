@@ -8,5 +8,10 @@
                                  market_type,
                                  sector)
         VALUES (#{stockCode}, #{stockName}, #{marketType}, #{sector})
+        ON DUPLICATE KEY UPDATE
+                         stock_code = #{stockCode},
+                         stock_name = #{stockName},
+                         market_type = #{marketType},
+                         sector = #{sector}
     </insert>
 </mapper>

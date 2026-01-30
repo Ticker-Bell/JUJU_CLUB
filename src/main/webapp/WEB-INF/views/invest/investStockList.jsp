@@ -409,7 +409,7 @@
                             class="pl-2 border-2 rounded-md border-[#E6E7EB] py-1 focus:border-[#5E45EB] outline-none"
                             type="number"
                             id="sellAmountInput"
-                            alt="수량 입력창" `
+                            alt="수량 입력창"
                     />
                 </div>
                 <div id="sell-form-item" class="flex justify-between">
@@ -437,8 +437,12 @@
         const contextPath = "${pageContext.request.contextPath}";
 
         //리스트의 종목 가격을 실시간으로 업데이트
-        function initListSocket(stockCodes) {
-
+        $(document).ready(function () {
+            if ($('#investTab').hasClass('active')) {
+                startWebSocket();
+            }
+        });
+        window.initListSocket = function (stockCodes) {
             if (!stockCodes || stockCodes.length === 0) return;
 
             // StockSocket 연결 시작
@@ -1251,6 +1255,7 @@
         document.addEventListener('click', (e) => {
             if (e.target.id === 'doBuyButton') {
                 trade(code);
+                console.log('매수');
             }
             if (e.target.id === 'doSellButton') {
                 trade(code);
@@ -1425,8 +1430,12 @@
                             type: 'error',
                             title: '거래 실패',
                             desc: result.message,
-                            buttonText: '다시 시도'
+                            buttonText: '확인'
                         });
+
+                        document.getElementById('modalActionBtn').onclick = () => {
+                            closeModal();
+                        };
                     }
                 })
                 .catch(error => console.log('Error: ' + error));

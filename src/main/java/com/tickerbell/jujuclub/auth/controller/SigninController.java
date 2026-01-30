@@ -83,7 +83,7 @@ public class SigninController {
             Integer level = req.get("level");
             if (level == null || level < 1 || level > 3) throw new IllegalArgumentException("유효하지 않은 레벨입니다.");
 
-            // 레벨 DB 업데이트
+            // 회원가입 후 유저 레벨 등록
             signinService.updateUserLevel(loginUser.getUserSeq(), level);
 
             // 세션 정보 갱신

@@ -20,12 +20,16 @@ public class SignupController {
         this.signupService = signupService;
     }
 
+    /**
+     * 회원가입
+     *
+     * @return map {@code Map<String, Object>}
+     */
     @PostMapping(
             value = "/signin.ajax",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-
     @ResponseBody
     public Map<String, Object> signupAjax(@RequestBody SignupAjaxRequest request) {
 
@@ -58,6 +62,12 @@ public class SignupController {
     }
 
     // 1. 이메일 중복 확인 API
+    /**
+     * 유저 정보 수정 (이미지) - 기본 이미지 처리, 파일 형식 확인, 캐시 방지 처리
+     *
+     * @param img byte[]
+     * @return new ResponseEntity&lt;&gt;(out, headers, HttpStatus.OK) Map&lt;String, Object&gt;
+     */
     @GetMapping("/check-email")
     @ResponseBody
     public Map<String, Object> checkEmail(@RequestParam String email) {
@@ -74,6 +84,12 @@ public class SignupController {
     }
 
     // 2. 닉네임 중복 확인 API
+    /**
+     * 유저 정보 수정 (이미지) - 기본 이미지 처리, 파일 형식 확인, 캐시 방지 처리
+     *
+     * @param img byte[]
+     * @return new ResponseEntity&lt;&gt;(out, headers, HttpStatus.OK) Map&lt;String, Object&gt;
+     */
     @GetMapping("/check-nickname")
     @ResponseBody
     public Map<String, Object> checkNickname(@RequestParam String nickname) {

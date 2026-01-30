@@ -3,47 +3,79 @@ package com.tickerbell.jujuclub.auth.service;
 import com.tickerbell.jujuclub.auth.dto.AccountDTO;
 import com.tickerbell.jujuclub.auth.mapper.AccountMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccountService {
 
     private final AccountMapper accountMapper;
 
+    /**
+     * 유저 계좌 조회
+     *
+     * @param userSeq Integer
+     * @return accountMapper.selectAccountByUserSeq(userSeq) AccountDTO
+     */
+    public AccountDTO getMyAccount(Integer userSeq) {
+
+        return accountMapper.selectAccountByUserSeq(userSeq);
+    }
+
+    /**
+     * 유저 계좌 생성
+     *
+     * @param userSeq Integer
+     * @return accountNo String
+     */
     // [수정] void -> Long (생성된 계좌번호 반환)
     public String createAccount(Integer userSeq) {
-        // 1. 중복 계좌 확인
-        if (accountMapper.checkAccountExist(userSeq) > 0) {
-            return null; // 이미 존재하면 null 반환 (혹은 예외 처리)
-        }
 
-        // 2. 계좌번호 생성 (14자리)
         String accountNo = generateRandomAccountNo();
 
-        // 3. DTO 생성 (초기 자본금 100만원 설정)
-        AccountDTO account = AccountDTO.builder()
-                .userSeq(userSeq)
-                .accountNo(accountNo)
-                .cashBalance(1000000L) // [수정] 1,000,000원
-                .build();
+        try {
+            log.info("[{}] 유저 계좌 생성  - 유저 계좌 유효성 검사 DB 조회 시작", userSeq);
 
-        // 4. DB 저장
-        accountMapper.insertAccount(account);
+            // 중복된 유저 계좌 확인
+            if (accountMapper.checkAccountExist(userSeq) > 0) {
 
-        // [추가] 생성된 번호 반환
+                // 유저 계좌가 존재하면 null 반환
+                return null;
+            }
+            log.info("[{}] 유저 계좌 생성  - 유저 계좌 유효성 검사 DB 조회 종료", userSeq);
+
+            // AccountDTO 생성 및 cashBalance를 1,000,000으로 설정
+            AccountDTO account = AccountDTO.builder()
+                    .userSeq(userSeq)
+                    .accountNo(accountNo)
+                    .cashBalance(1000000L)
+                    .build();
+
+            // 만들어진 AccountDTO를 DB에 저장
+            log.info("[{}] 유저 계좌 생성  -  유저 계좌 등록 시작", userSeq);
+            accountMapper.insertAccount(account);
+            log.info("[{}] 유저 계좌 생성  -  유저 계좌 등록 종료", userSeq);
+        } catch (Exception e) {
+            log.error("유저 계좌 생성 실패");
+            throw new RuntimeException(e);
+        }
+
+        // 계좌번호를 반환
         return accountNo;
     }
 
+    /**
+     * 계좌번호 랜덤 생성
+     *
+     * @return String.valueOf(randomNumber) String
+     */
     private String generateRandomAccountNo() {
-        // 14자리 랜덤 숫자 (10조 ~ 99조 사이)
+        // 계좌번호를 14자리로 랜덤 생성
         long randomNumber = (long) (Math.random() * 90000000000000L) + 10000000000000L;
 
-        // [핵심] 숫자를 String으로 변환하여 반환
+        // long을 String으로 변환
         return String.valueOf(randomNumber);
-    }
-
-    public AccountDTO getMyAccount(Integer userSeq) {
-        return accountMapper.selectAccountByUserSeq(userSeq);
     }
 }

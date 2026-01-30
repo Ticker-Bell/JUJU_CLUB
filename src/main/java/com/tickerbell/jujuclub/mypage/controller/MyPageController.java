@@ -34,6 +34,11 @@ public class MyPageController {
     private final UserAssetService userAssetService;
     private final AccountService accountService;
 
+    @GetMapping("/profile")
+    public String profile(Model model) {
+        return "myPage/myPageProfile";
+    }
+
     /**
      * [1] 마이페이지 메인 화면 반환 (데이터 로딩 없이 껍데기만)
      * URL: /myPage/main.do

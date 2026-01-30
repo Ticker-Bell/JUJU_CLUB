@@ -3,6 +3,7 @@ package com.tickerbell.jujuclub.auth.controller;
 import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.auth.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -18,105 +19,144 @@ import java.util.Map;
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
 
+    /**
+     * 유저 정보 수정
+     *
+     * @param request Map<String, String>
+     * @return response Map<String, Object>
+     */
     @PostMapping("/updateProfile.ajax")
     @ResponseBody
-    public Map<String, Object> updateProfile(@RequestBody Map<String, String> req, HttpSession session) {
-        Map<String, Object> res2 = new HashMap<>();
+    public Map<String, Object> updateProfile(@RequestBody Map<String, String> request, HttpSession session) {
 
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Map<String, Object> response = new HashMap<>();
+
         if (loginUser == null) {
-            res2.put("ok", false);
-            res2.put("message", "로그인 정보가 없습니다.");
-            return res2;
+            response.put("ok", false);
+            response.put("message", "로그인 정보가 없습니다.");
+            return response;
         }
 
         try {
-            String userName = req.get("userName");
-            String userPw = req.get("userPw");
+            log.info("[{}] 유저 정보 수정 시작", loginUser.getUserId());
 
+            String userName = request.get("userName");
+            String userPw = request.get("userPw");
+
+            log.info("[{}],[{}],[{}] 유저 정보 수정 - 유저 닉네임, 비밀번호 수정 시작", loginUser.getUserId(), userName, userPw);
             memberService.updateProfile(loginUser.getUserId(), userName, userPw);
+            log.info("[{}],[{}],[{}] 유저 정보 수정 - 유저 닉네임, 비밀번호 수정 종료", loginUser.getUserId(), userName, userPw);
 
-            if (StringUtils.hasText(userName)) loginUser.setUserName(userName);
+            if (StringUtils.hasText(userName))
+                loginUser.setUserName(userName);
+
             session.setAttribute("loginUser", loginUser);
 
-            res2.put("ok", true);
-            res2.put("message", "회원 정보가 성공적으로 수정되었습니다.");
+            response.put("ok", true);
+            response.put("message", "회원 정보가 성공적으로 수정되었습니다.");
+
         } catch (Exception e) {
-            e.printStackTrace();
-            res2.put("ok", false);
-            res2.put("message", "수정 중 오류가 발생했습니다.");
+            log.info("[{}] 유저 정보 수정 종료", loginUser.getUserId());
+            response.put("ok", false);
+            response.put("message", "수정 중 오류가 발생했습니다.");
         }
-        return res2;
+        return response;
     }
 
-    /** ✅ user_image(MEDIUMBLOB) 업로드/저장 */
+    /**
+     * 유저 정보 수정 (이미지)
+     *
+     * @param userImage MultipartFile
+     * @return response Map<String, Object>
+     */
     @PostMapping(value = "/updateProfileImage.ajax", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
-    public Map<String, Object> updateProfileImage(@RequestParam("userImage") MultipartFile userImage,
-        HttpSession session) {
-        Map<String, Object> res = new HashMap<>();
+    public Map<String, Object> updateProfileImage(@RequestParam("userImage") MultipartFile userImage, HttpSession session) {
 
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+        Map<String, Object> response = new HashMap<>();
+
         if (loginUser == null) {
-            res.put("ok", false);
-            res.put("message", "로그인 정보가 없습니다.");
-            return res;
+            response.put("ok", false);
+            response.put("message", "로그인 정보가 없습니다.");
+            return response;
         }
 
         try {
+            log.info("[{}],[{}] 유저 정보 수정 (이미지) 시작", loginUser.getUserId(), userImage);
+
             if (userImage == null || userImage.isEmpty()) {
-                res.put("ok", false);
-                res.put("message", "업로드된 파일이 없습니다.");
-                return res;
+                response.put("ok", false);
+                response.put("message", "업로드된 파일이 없습니다.");
+                return response;
             }
 
             long maxBytes = 2L * 1024 * 1024;
             if (userImage.getSize() > maxBytes) {
-                res.put("ok", false);
-                res.put("message", "이미지 용량이 너무 큽니다. (최대 2MB)");
-                return res;
+                response.put("ok", false);
+                response.put("message", "이미지 용량이 너무 큽니다. (최대 2MB)");
+                return response;
             }
 
             String ct = userImage.getContentType();
             if (ct == null || !ct.startsWith("image/")) {
-                res.put("ok", false);
-                res.put("message", "이미지 파일만 업로드할 수 있습니다.");
-                return res;
+                response.put("ok", false);
+                response.put("message", "이미지 파일만 업로드할 수 있습니다.");
+                return response;
             }
 
+            log.info("[{}],[{}] 유저 정보 수정 (이미지) 시작", loginUser.getUserId(), userImage);
             memberService.updateProfileImage(loginUser.getUserId(), userImage.getBytes());
+            log.info("[{}],[{}] 유저 정보 수정 (이미지) 종료", loginUser.getUserId(), userImage);
 
-            res.put("ok", true);
-            res.put("message", "프로필 이미지가 저장되었습니다.");
+            response.put("ok", true);
+            response.put("message", "프로필 이미지가 저장되었습니다.");
+
         } catch (Exception e) {
-            e.printStackTrace();
-            res.put("ok", false);
-            res.put("message", "이미지 저장 중 오류가 발생했습니다.");
+            log.error("[{}],[{}] 유저 정보 수정 (이미지) 실패", loginUser.getUserId(), userImage);
+
+            response.put("ok", false);
+            response.put("message", "이미지 저장 중 오류가 발생했습니다.");
         }
-        return res;
+        return response;
     }
 
-    /** ✅ (내 프로필) DB에 저장된 user_image를 내려줌 */
+    /**
+     * 유저 정보 (이미지) 가져오기
+     *
+     * @return buildImageResponse(img, request) ResponseEntity&lt;byte[]&gt;
+     */
     @GetMapping("/profile-image")
     public ResponseEntity<byte[]> profileImageMine(HttpSession session, HttpServletRequest request) {
+
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
+        log.info("유저 정보 (이미지) 가져오기 - DB에서 가져오기 시작");
         MemberDTO dbUser = memberService.selectUserById(loginUser.getUserId());
         byte[] img = (dbUser != null) ? dbUser.getUserImage() : null;
+        log.info("유저 정보 (이미지) 가져오기 - DB에서 가져오기 종료");
 
         return buildImageResponse(img, request);
     }
 
-    /** ✅ (랭킹/타유저) userSeq로 이미지 내려줌 */
+    /**
+     * 유저 정보 수정 (이미지)
+     *
+     * @param userSeq int
+     * @return buildImageResponse(img, request) {@code ResponseEntity<byte[]>}
+     */
     @GetMapping(value = "/profile-image", params = "userSeq")
     public ResponseEntity<byte[]> profileImageBySeq(@RequestParam("userSeq") int userSeq,
         HttpSession session,
         HttpServletRequest request) {
+
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -126,7 +166,12 @@ public class MemberController {
         return buildImageResponse(img, request);
     }
 
-    /** ✅ 공통: 이미지 응답 + default fallback + 캐시 방지 */
+    /**
+     * 유저 정보 수정 (이미지) - 기본 이미지 처리, 파일 형식 확인, 캐시 방지 처리
+     *
+     * @param img byte[]
+     * @return new ResponseEntity&lt;&gt;(out, headers, HttpStatus.OK) Map&lt;String, Object&gt;
+     */
     private ResponseEntity<byte[]> buildImageResponse(byte[] img, HttpServletRequest request) {
         byte[] out = img;
 

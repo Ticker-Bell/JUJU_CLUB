@@ -76,7 +76,7 @@
                         <div class="flex-1">
                             <div class="flex items-center gap-1 flex-shrink-0">
                                 <img class="w-5 h-5 object-contain"
-                                     src="${cpath}/resources/images/roadMapIcons/money1.png" alt="돈아이콘">
+                                     src="${cpath}/resources/images/roadMapIcons/money3.png" alt="돈아이콘">
                                 <div class="text-sm font-extrabold text-gray-900"><fmt:formatNumber value="${m.reward}" type="number" /></div>
                             </div>
                         </div>

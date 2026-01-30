@@ -52,17 +52,17 @@
             <div id="space-bg"
                  class="absolute inset-0 overflow-hidden pointer-events-none"
                  style="background-image: url('${cpath}/resources/images/roadMapIcons/roadMap-bg.png'); background-repeat: repeat;">
-
+                <div id="shootingStarLayer" class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden" style="z-index: 1;">
+                </div>
             </div>
 
             <!-- 로드맵 경로 -->
-            <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 10; overflow: visible;">
+            <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none"
+                 style="z-index: 10; overflow: visible;">
                 <path id="roadPath" d=""></path>
                 <path id="roadBorder" d=""></path>
-
-<%--                <path id="roadDashed" d=""></path>--%>
-<%--                <path id="roadPathActive" d=""></path>--%>
             </svg>
+
             <!-- 레슨/챕터 버튼 -->
             <div id="nodesLayer" class="absolute inset-0 pointer-events-none p-0 m-0" style="z-index: 20;">
             </div>
@@ -303,7 +303,7 @@
                 const centerY = vh / 2;
                 const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
 
-                console.log("nodePositions x: "+x+", y: "+y+", data: "+node);
+                console.log("nodePositions x: " + x + ", y: " + y + ", data: " + node);
                 nodePositions.push({x, y, data: node});
             });
 
@@ -325,31 +325,33 @@
                     }
                 } else {
                     el.classList.add('orb', status);
-                     if (status === 'current') {
+                    if (status === 'current') {
                         el.innerHTML = '<i data-lucide="play" class="w-6 h-6 fill-white ml-1"></i>';
-                    } else if(status === 'locked') {
+                    } else if (status === 'locked') {
                         el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
                     }
                 }
 
-                if(data.inChapterIdx === 0) {
+                // 챕터 깃발 생성
+                if (data.inChapterIdx === 0) {
                     const flagDiv = document.createElement('div');
-                    const chapterText = "챕터 "+ parseInt(data.chapterId.replace(/[^0-9]/g, '').slice(-3));
+                    const chapterText = "챕터 " + parseInt(data.chapterId.replace(/[^0-9]/g, '').slice(-3));
 
                     flagDiv.classList.add('flag-div');
-                    flagDiv.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span>'+ chapterText +'</span>';
+                    flagDiv.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span>' + chapterText + '</span>';
 
-                    flagDiv.style.left = (pos.x -  100) + "px";
+                    flagDiv.style.left = (pos.x - 100) + "px";
                     flagDiv.style.top = (pos.y - 100) + "px";
 
                     nodesLayer.appendChild(flagDiv);
                 }
 
 
+
                 el.style.left = (pos.x - (isChapter ? 40 : 30)) + "px";
                 el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
 
-                console.log("el.style.left: "+el.style.left+", el.style.top: "+el.style.top);
+                console.log("el.style.left: " + el.style.left + ", el.style.top: " + el.style.top);
 
                 el.onclick = (e) => {
                     e.stopPropagation();
@@ -458,6 +460,53 @@
             //         pathActive.setAttribute('d', activeD);
             //     }
             // }
+        };
+
+        // 별똥별 그리기
+        const initShootingStars = () => {
+            const container = document.getElementById('shootingStarLayer');
+            if (!container) return;
+
+            // 기존 별 초기화 (중복 방지)
+            container.innerHTML = '';
+
+            // 1. 맵 전체 너비와 높이 가져오기
+            const mapWidth = document.getElementById('innerContent')?.scrollWidth || window.innerWidth * 5;
+            const mapHeight = window.innerHeight;
+
+            // 2. 별 개수 설정 (가로 길이에 비례해서 넉넉하게 생성)
+            // 예: 200px 당 1개꼴로 생성
+            const starCount = Math.floor(mapWidth / 200);
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star-shooting');
+
+                // [위치 랜덤]
+                // 가로: 0 ~ 맵 전체 너비
+                const x = Math.random() * mapWidth;
+                // 세로: 화면 상단부 (0 ~ 40%) 에서 시작
+                const y = Math.random() * (mapHeight * 0.4);
+
+                star.style.left = x + 'px';
+                star.style.top = y + 'px';
+
+                // [시간 랜덤]
+                // 지속 시간: 3초 ~ 7초 사이
+                const duration = Math.random() * 4 + 3;
+                // 딜레이: 0초 ~ 10초 사이 (별들이 동시에 떨어지지 않게 분산)
+                const delay = Math.random() * 10;
+
+                star.style.animationName = 'shooting';
+                star.style.animationDuration = duration + 's';
+                star.style.animationDelay = delay + 's';
+
+                // 무한 반복
+                star.style.animationIterationCount = 'infinite';
+                star.style.animationTimingFunction = 'linear';
+
+                container.appendChild(star);
+            }
         };
 
         /* --- 4. 드롭다운 초기화 --- */
@@ -628,6 +677,7 @@
             // [핵심] 렌더링 안정성을 위해 약간의 지연 후 그리기
             setTimeout(() => {
                 initRoadmap(true); // true = 내 위치로 스크롤 이동
+                initShootingStars();
             }, 100);
         };
 

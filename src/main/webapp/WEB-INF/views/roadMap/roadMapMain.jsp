@@ -49,10 +49,11 @@
          class="w-full h-full overflow-x-auto overflow-y-hidden snap-container scroll-smooth relative">
         <div id="innerContent" class="h-full relative">
             <!-- 배경 -->
-            <div id="space-bg" class="absolute inset-0 overflow-hidden pointer-events-none">
-                <div id="bg-img"></div>
-            </div>
+            <div id="space-bg"
+                 class="absolute inset-0 overflow-hidden pointer-events-none"
+                 style="background-image: url('${cpath}/resources/images/roadMapIcons/roadMap-bg.png'); background-repeat: repeat;">
 
+            </div>
 
             <!-- 로드맵 경로 -->
             <svg id="roadmapSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 10; overflow: visible;">
@@ -87,6 +88,7 @@
         }
         var currentChapterIdx = chapterMap[chId];
 
+
         <c:if test="${not empty item.lessonId}">
 
         nodesData.push({
@@ -106,8 +108,7 @@
         });
         </c:if>
         </c:forEach>
-
-        console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
+        // console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
 
         let nodePositions = [];
 
@@ -272,7 +273,7 @@
             tooltip.classList.add('visible');
         };
 
-        /* --- 3. 로드맵 그리기 (초기화 플래그 파라미터 추가) --- */
+        /* --- 3. 로드맵 그리기 --- */
         // isFirstLoad: true면 현재 진행 위치로 강제 스크롤, false(resize 등)면 위치 유지
         const initRoadmap = (isFirstLoad = false) => {
             const inner = document.getElementById('innerContent');
@@ -302,6 +303,7 @@
                 const centerY = vh / 2;
                 const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
 
+                console.log("nodePositions x: "+x+", y: "+y+", data: "+node);
                 nodePositions.push({x, y, data: node});
             });
 
@@ -312,31 +314,42 @@
                 const isChapter = data.type === 'TEST';
                 const status = data.status;
 
-                el.classList.add('orb', (isChapter? 'status': 'chapter'));
-
-
                 if (isChapter) {
+                    el.classList.add('chapter-test');
                     if (status === 'completed') {
-                        el.innerHTML = "<img src='${cpath}/resources/images/roadMapIcons/chapter-complete.png' alt==>";
-                        el.classList.add('border-yellow-400', 'bg-yellow-50');
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-completed.png" alt="테스트완료">';
                     } else if (status === 'current') {
-                        el.innerHTML = '<i data-lucide="unlock" class="w-10 h-10 text-white animate-pulse"></i>';
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-current.png" alt="테스트진행중">';
                     } else {
-                        el.innerHTML = '<i data-lucide="lock" class="w-8 h-8 text-gray-400"></i>';
+                        el.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/chapter-locked.png" alt="테스트잠금">';
                     }
                 } else {
-                    if (status === 'completed') {
-                        el.innerHTML = '<i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>';
-                    } else if (status === 'current') {
-                        el.innerHTML = '<i data-lucide="play" class="w-8 h-8 fill-white ml-1"></i>';
-                    } else {
+                    el.classList.add('orb', status);
+                     if (status === 'current') {
+                        el.innerHTML = '<i data-lucide="play" class="w-6 h-6 fill-white ml-1"></i>';
+                    } else if(status === 'locked') {
                         el.innerHTML = '<span class="text-xl font-bold font-mono text-gray-300">' + (data.inChapterIdx + 1) + '</span>';
                     }
+                }
+
+                if(data.inChapterIdx === 0) {
+                    const flagDiv = document.createElement('div');
+                    const chapterText = "챕터 "+ parseInt(data.chapterId.replace(/[^0-9]/g, '').slice(-3));
+
+                    flagDiv.classList.add('flag-div');
+                    flagDiv.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span>'+ chapterText +'</span>';
+
+                    flagDiv.style.left = (pos.x -  100) + "px";
+                    flagDiv.style.top = (pos.y - 100) + "px";
+
+                    nodesLayer.appendChild(flagDiv);
                 }
 
 
                 el.style.left = (pos.x - (isChapter ? 40 : 30)) + "px";
                 el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
+
+                console.log("el.style.left: "+el.style.left+", el.style.top: "+el.style.top);
 
                 el.onclick = (e) => {
                     e.stopPropagation();

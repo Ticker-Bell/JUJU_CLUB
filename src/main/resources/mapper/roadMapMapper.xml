@@ -124,6 +124,7 @@
         on user_account.user_seq = user_mission.user_seq
             join mission on user_mission.mission_seq  = mission.mission_seq
             set cash_balance = cash_balance + mission_reward,
+                updated_at = CURRENT_TIMESTAMP,
                 user_mission.is_completed = 'Y',
                 user_mission.is_rewarded = 'Y'
         where user_account.user_seq = #{user_seq} and mission.mission_seq = #{mission_seq}

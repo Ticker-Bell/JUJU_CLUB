@@ -31,7 +31,7 @@ public class LessonService {
    * 레슨 CONCEPT형 문제 조회
    *
    * @param qstChatMsgRequest QstChatMsgDTO.QstChatMsgRequest
-   * @return Map<String, List < QstChatMsgDTO.QstChatMsgJsonDTO>>
+   * @return Map&lt;String, List &lt;QstChatMsgDTO.QstChatMsgJsonDTO&gt;&gt;
    */
   public Map<String, List<QstChatMsgDTO.QstChatMsgJsonDTO>> getLessonChat(
       QstChatMsgDTO.QstChatMsgRequest qstChatMsgRequest) throws Exception {
@@ -80,7 +80,7 @@ public class LessonService {
    * 레슨 화면 타이틀 조회
    *
    * @param lessonId String
-   * @return List<LessonTitle>
+   * @return List&lt;LessonTitle&gt;
    */
   public List<LessonTitle> getLessonTitle(String lessonId) {
     try {
@@ -107,7 +107,7 @@ public class LessonService {
    * 레슨 문항 조회
    *
    * @param lessonId String
-   * @return List<LessonQst>
+   * @return List&lt;LessonQst&gt;
    */
   public List<LessonQst> getLssnQst(String lessonId) throws IOException {
 
@@ -230,7 +230,7 @@ public class LessonService {
      * 챕터테스트 문항 조회
      *
      * @param lessonRequest LessonDTO.LessonRequest
-     * @return List<LessonQst>
+     * @return List&lt;LessonQst&gt;
      */
     public List<LessonQst> getChapterTest (LessonDTO.LessonRequest lessonRequest) throws IOException {
 

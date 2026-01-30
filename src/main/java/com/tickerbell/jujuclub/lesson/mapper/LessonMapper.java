@@ -13,14 +13,14 @@ public interface LessonMapper {
    * 개념형 문제 조회
    *
    * @param qstChatMsgRequest QstChatMsgDTO.QstChatMsgRequest
-   * @return List<QstChatMsgDTO>
+   * @return List&lt;QstChatMsgDTO&gt;
    */
   List<QstChatMsgDTO> selectQstChat(QstChatMsgDTO.QstChatMsgRequest qstChatMsgRequest);
   /**
    * 레슨 타이틀 조회
    *
    * @param lessonId String
-   * @return List<LessonDTO.LessonTitle>
+   * @return List&lt;LessonDTO.LessonTitle&gt;
    */
   List<LessonDTO.LessonTitle> selectLssnTitle(String lessonId);
 
@@ -28,7 +28,7 @@ public interface LessonMapper {
    * 레슨 문항 조회
    *
    * @param lessonId String
-   * @return List<LessonDTO.LessonQst>
+   * @return List&lt;LessonDTO.LessonQst&gt;
    */
   List<LessonDTO.LessonQst> selectQSt(String lessonId);
 
@@ -57,14 +57,14 @@ public interface LessonMapper {
    * 유저 레슨 결과 조회
    *
    * @param lessonRequest LessonRequest
-   * @return List<LessonDTO.LessonResponse>
+   * @return List&lt;LessonDTO.LessonResponse&gt;
    */
   List<LessonDTO.LessonResponse> selectUsrLssnRslt(LessonRequest lessonRequest);
   /**
    * 챕터 테스트 문항 조회
    *
    * @param lessonRequest LessonDTO.LessonRequest
-   * @return List<LessonDTO.LessonQst>
+   * @return List&lt;LessonDTO.LessonQst&gt;
    */
   List<LessonDTO.LessonQst> getChapterTestQst(LessonDTO.LessonRequest lessonRequest);
   /**

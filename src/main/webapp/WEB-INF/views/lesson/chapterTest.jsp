@@ -225,7 +225,6 @@
   const chapterId = '${chapterId}'
   <%--const cpath = '${cpath}'--%>
 
-  console.log(chapterId)
   initQuiz();
 
   /* ---------------- 초기화 ---------------- */

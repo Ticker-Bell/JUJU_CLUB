@@ -35,16 +35,16 @@ public class StockCorpInfoService {
         String w52LwprData = formatComma(kisCorpInfoDTO.getW52Lwpr());
 
         //PER
-        String per = (kisCorpInfoDTO.getPer() == null || kisCorpInfoDTO.getPer().isEmpty()) ? "-" : kisCorpInfoDTO.getPer();
+        String per = formatIfDataEmpty(kisCorpInfoDTO.getPer());
 
         //PBR
-        String pbr = (kisCorpInfoDTO.getPbr() == null || kisCorpInfoDTO.getPbr().isEmpty()) ? "-" : kisCorpInfoDTO.getPbr();
+        String pbr = formatIfDataEmpty(kisCorpInfoDTO.getPbr());
 
         //EPS
-        String eps = formatComma(kisCorpInfoDTO.getEps());
+        String eps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getEps()));
 
         //BPS
-        String bps = formatComma(kisCorpInfoDTO.getBps());
+        String bps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getBps()));
 
         //다트 재무제표 가져오기
         DARTCorpInfoDTO dartCorpInfoDTO = dartApiService.getDartCorpInfo(stockCode);
@@ -130,5 +130,19 @@ public class StockCorpInfoService {
             return data;
         }
     }
+
+    private String formatIfDataEmpty(String data) {
+        if (data == null) return "-";
+
+        String newData = data.trim();
+        if (newData.isEmpty()) return "-";
+
+        try {
+            return Double.parseDouble(newData) == 0.0 ? "데이터가 없습니다." : newData;
+        } catch (NumberFormatException e) {
+            return "-";
+        }
+    }
+
 
 }

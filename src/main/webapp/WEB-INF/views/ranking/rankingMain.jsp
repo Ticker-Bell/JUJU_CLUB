@@ -203,118 +203,118 @@
 </div>
 
 <script>
-    (function () {
-        window.RANKING_DATA = {
-            asset: {
-                myRank: "${rankingInfo.userAssetRank}",
-                myVal: "₩ <fmt:formatNumber value='${rankingInfo.cashBalance}'/>",
-                label: "총 보유자금",
-                top3: [
-                    <c:forEach var="r" items="${rankingInfo.rankingBorardListOBA}" begin="0" end="2" varStatus="s">
-                    {
-                        name: "${r.userName}",
-                        mainVal: "₩ <fmt:formatNumber value='${r.cashBalance}'/>",
-                        lessonVal: "${r.userLssnCnt} 개"
-                    }${!s.last ? ',' : ''}
-                    </c:forEach>
-                ]
-            },
-            profit: {
-                myRank: "${rankingInfo.userLssnRank}",
-                myVal: "${rankingInfo.userLssnCnt} 개",
-                label: "총 진행 레슨 수",
-                top3: [
-                    <c:forEach var="r" items="${rankingInfo.rankingBorardListOBR}" begin="0" end="2" varStatus="s">
-                    {
-                        name: "${r.userName}",
-                        mainVal: "₩ <fmt:formatNumber value='${r.cashBalance}'/>",
-                        lessonVal: "${r.userLssnCnt} 개"
-                    }${!s.last ? ',' : ''}
-                    </c:forEach>
-                ]
-            }
-        };
+  (function () {
+    window.RANKING_DATA = {
+      asset: {
+        myRank: "${rankingInfo.userAssetRank}",
+        myVal: "₩ <fmt:formatNumber value='${rankingInfo.cashBalance}'/>",
+        label: "총 보유자금",
+        top3: [
+          <c:forEach var="r" items="${rankingInfo.rankingBorardListOBA}" begin="0" end="2" varStatus="s">
+          {
+            name: "${r.userName}",
+            mainVal: "₩ <fmt:formatNumber value='${r.cashBalance}'/>",
+            lessonVal: "${r.userLssnCnt} 개"
+          }${!s.last ? ',' : ''}
+          </c:forEach>
+        ]
+      },
+      profit: {
+        myRank: "${rankingInfo.userLssnRank}",
+        myVal: "${rankingInfo.userLssnCnt} 개",
+        label: "총 진행 레슨 수",
+        top3: [
+          <c:forEach var="r" items="${rankingInfo.rankingBorardListOBR}" begin="0" end="2" varStatus="s">
+          {
+            name: "${r.userName}",
+            mainVal: "₩ <fmt:formatNumber value='${r.cashBalance}'/>",
+            lessonVal: "${r.userLssnCnt} 개"
+          }${!s.last ? ',' : ''}
+          </c:forEach>
+        ]
+      }
+    };
 
-        let currentSlideIndex = 0;
-        let currentRankType = 'asset';
+    let currentSlideIndex = 0;
+    let currentRankType = 'asset';
 
-        function updateCardContent() {
-            const cardTitle = document.getElementById('card-title');
-            const cardRank = document.getElementById('card-rank');
-            const cardAsset = document.getElementById('card-asset');
-            const cardLesson = document.getElementById('card-lesson');
-            if(!cardTitle || !cardRank || !cardAsset || !cardLesson) return;
+    function updateCardContent() {
+      const cardTitle = document.getElementById('card-title');
+      const cardRank = document.getElementById('card-rank');
+      const cardAsset = document.getElementById('card-asset');
+      const cardLesson = document.getElementById('card-lesson');
+      if(!cardTitle || !cardRank || !cardAsset || !cardLesson) return;
 
-            const data = window.RANKING_DATA[currentRankType]?.top3?.[currentSlideIndex];
-            if(!data) return;
+      const data = window.RANKING_DATA[currentRankType]?.top3?.[currentSlideIndex];
+      if(!data) return;
 
-            cardTitle.textContent = (data.name ?? '-') + '님의 투자 현황';
-            cardRank.textContent = "RANK #" + (currentSlideIndex + 1);
-            cardAsset.textContent = data.mainVal ?? '-';
-            cardLesson.textContent = data.lessonVal ?? '-';
+      cardTitle.textContent = (data.name ?? '-') + '님의 투자 현황';
+      cardRank.textContent = "RANK #" + (currentSlideIndex + 1);
+      cardAsset.textContent = data.mainVal ?? '-';
+      cardLesson.textContent = data.lessonVal ?? '-';
 
-            document.querySelectorAll('.trophy').forEach(t => t.classList.remove('active'));
-            const activeTrophy = document.getElementById('trophy-' + currentSlideIndex);
-            if(activeTrophy) activeTrophy.classList.add('active');
+      document.querySelectorAll('.trophy').forEach(t => t.classList.remove('active'));
+      const activeTrophy = document.getElementById('trophy-' + currentSlideIndex);
+      if(activeTrophy) activeTrophy.classList.add('active');
 
-            const list = window.RANKING_DATA[currentRankType]?.top3 || [];
-            list.forEach((user, idx) => {
-                const el = document.getElementById('trophy-name-' + idx);
-                if(el) el.textContent = user.name ?? '-';
-            });
-        }
+      const list = window.RANKING_DATA[currentRankType]?.top3 || [];
+      list.forEach((user, idx) => {
+        const el = document.getElementById('trophy-name-' + idx);
+        if(el) el.textContent = user.name ?? '-';
+      });
+    }
 
-        function moveSlide(dir) {
-            const max = window.RANKING_DATA[currentRankType]?.top3?.length || 0;
-            if(max <= 1) return;
-            currentSlideIndex = (currentSlideIndex + dir + max) % max;
-            updateCardContent();
-        }
+    function moveSlide(dir) {
+      const max = window.RANKING_DATA[currentRankType]?.top3?.length || 0;
+      if(max <= 1) return;
+      currentSlideIndex = (currentSlideIndex + dir + max) % max;
+      updateCardContent();
+    }
 
-        window.switchRankTab = function(type) {
-            currentRankType = type;
-            currentSlideIndex = 0;
-            updateCardContent();
+    window.switchRankTab = function(type) {
+      currentRankType = type;
+      currentSlideIndex = 0;
+      updateCardContent();
 
-            const tabAsset = document.getElementById('tab-asset');
-            const tabProfit = document.getElementById('tab-profit');
-            const tableAsset = document.getElementById('table-asset');
-            const tableProfit = document.getElementById('table-profit');
-            const slider = document.getElementById('tab-slider');
+      const tabAsset = document.getElementById('tab-asset');
+      const tabProfit = document.getElementById('tab-profit');
+      const tableAsset = document.getElementById('table-asset');
+      const tableProfit = document.getElementById('table-profit');
+      const slider = document.getElementById('tab-slider');
 
-            if(type === 'asset') {
-                tabAsset.classList.add('active');
-                tabProfit.classList.remove('active');
-                slider.style.width = tabAsset.offsetWidth + 'px';
-                slider.style.left = tabAsset.offsetLeft + 'px';
-                tableAsset.style.opacity = '1';
-                tableAsset.style.pointerEvents = 'auto';
-                tableProfit.style.opacity = '0';
-                tableProfit.style.pointerEvents = 'none';
-            } else {
-                tabAsset.classList.remove('active');
-                tabProfit.classList.add('active');
-                slider.style.width = tabProfit.offsetWidth + 'px';
-                slider.style.left = tabProfit.offsetLeft + 'px';
-                tableAsset.style.opacity = '0';
-                tableAsset.style.pointerEvents = 'none';
-                tableProfit.style.opacity = '1';
-                tableProfit.style.pointerEvents = 'auto';
-            }
+      if(type === 'asset') {
+        tabAsset.classList.add('active');
+        tabProfit.classList.remove('active');
+        slider.style.width = tabAsset.offsetWidth + 'px';
+        slider.style.left = tabAsset.offsetLeft + 'px';
+        tableAsset.style.opacity = '1';
+        tableAsset.style.pointerEvents = 'auto';
+        tableProfit.style.opacity = '0';
+        tableProfit.style.pointerEvents = 'none';
+      } else {
+        tabAsset.classList.remove('active');
+        tabProfit.classList.add('active');
+        slider.style.width = tabProfit.offsetWidth + 'px';
+        slider.style.left = tabProfit.offsetLeft + 'px';
+        tableAsset.style.opacity = '0';
+        tableAsset.style.pointerEvents = 'none';
+        tableProfit.style.opacity = '1';
+        tableProfit.style.pointerEvents = 'auto';
+      }
 
-            const data = window.RANKING_DATA[type];
-            document.getElementById('my-rank-val').innerText = data.myRank;
-            document.getElementById('my-main-label').innerText = data.label;
-            document.getElementById('my-main-val').innerText = data.myVal;
-        };
+      const data = window.RANKING_DATA[type];
+      document.getElementById('my-rank-val').innerText = data.myRank;
+      document.getElementById('my-main-label').innerText = data.label;
+      document.getElementById('my-main-val').innerText = data.myVal;
+    };
 
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        if(prevBtn) prevBtn.onclick = () => moveSlide(-1);
-        if(nextBtn) nextBtn.onclick = () => moveSlide(1);
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if(prevBtn) prevBtn.onclick = () => moveSlide(-1);
+    if(nextBtn) nextBtn.onclick = () => moveSlide(1);
 
-        switchRankTab('asset');
+    switchRankTab('asset');
 
-        if(typeof lucide !== 'undefined') lucide.createIcons();
-    })();
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+  })();
 </script>

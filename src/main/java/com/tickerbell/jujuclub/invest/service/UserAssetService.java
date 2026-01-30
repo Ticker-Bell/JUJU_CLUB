@@ -26,7 +26,7 @@ public class UserAssetService {
             cashBalance = 0L;
         }
 
-        //2.주식평가금액
+        //2.총 주식평가금액
         long totalStockValue = 0L;
 
         List<PortfolioAllocationItemDTO> portfolioList = portfolioService.getPortfolioAllocationItems(userSeq);
@@ -41,7 +41,7 @@ public class UserAssetService {
 
         //4.원금(초기자금 + 보상금 - 미션, 테스트 등)
 //        Long totalReward = userAssetMapper.selectChapTestReward(userSeq) + userAssetMapper.selectMissionReward(userSeq);
-        Long totalReward = userAssetMapper.selectUserTotalReward(userSeq);
+        Long totalReward = userAssetMapper.selectUserTotalReward(userSeq); //보상금
         if(totalReward == null){
             totalReward = 0L;
         }
@@ -59,8 +59,8 @@ public class UserAssetService {
 
         return UserInvestSummeryDTO.builder()
                 .totalAsset(totalAsset) //총 평가자산
-                .cashBalance(cashBalance) //보유현금
-                .totalStockValue(totalStockValue) //총 평가자산
+                .cashBalance(cashBalance) //예수금
+                .totalStockValue(totalStockValue) //총 평가금액
                 .totalReturnPct(totalReturnProfit) //총 수익률
                 .build();
 

@@ -57,7 +57,7 @@ public class MemberController {
     @PostMapping(value = "/updateProfileImage.ajax", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseBody
     public Map<String, Object> updateProfileImage(@RequestParam("userImage") MultipartFile userImage,
-                                                  HttpSession session) {
+        HttpSession session) {
         Map<String, Object> res = new HashMap<>();
 
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
@@ -115,8 +115,8 @@ public class MemberController {
     /** ✅ (랭킹/타유저) userSeq로 이미지 내려줌 */
     @GetMapping(value = "/profile-image", params = "userSeq")
     public ResponseEntity<byte[]> profileImageBySeq(@RequestParam("userSeq") int userSeq,
-                                                    HttpSession session,
-                                                    HttpServletRequest request) {
+        HttpSession session,
+        HttpServletRequest request) {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
@@ -133,7 +133,7 @@ public class MemberController {
         MediaType mediaType = MediaType.IMAGE_PNG;
         if (out == null || out.length == 0) {
             try (InputStream is = request.getServletContext()
-                    .getResourceAsStream("/resources/images/default-profile.png")) {
+                .getResourceAsStream("/resources/images/default-profile.png")) {
                 if (is == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 out = is.readAllBytes();
                 mediaType = MediaType.IMAGE_PNG;
@@ -143,14 +143,14 @@ public class MemberController {
             }
         } else {
             if (out.length >= 4
-                    && (out[0] & 0xFF) == 0x89
-                    && (out[1] & 0xFF) == 0x50
-                    && (out[2] & 0xFF) == 0x4E
-                    && (out[3] & 0xFF) == 0x47) {
+                && (out[0] & 0xFF) == 0x89
+                && (out[1] & 0xFF) == 0x50
+                && (out[2] & 0xFF) == 0x4E
+                && (out[3] & 0xFF) == 0x47) {
                 mediaType = MediaType.IMAGE_PNG;
             } else if (out.length >= 2
-                    && (out[0] & 0xFF) == 0xFF
-                    && (out[1] & 0xFF) == 0xD8) {
+                && (out[0] & 0xFF) == 0xFF
+                && (out[1] & 0xFF) == 0xD8) {
                 mediaType = MediaType.IMAGE_JPEG;
             } else {
                 mediaType = MediaType.APPLICATION_OCTET_STREAM;

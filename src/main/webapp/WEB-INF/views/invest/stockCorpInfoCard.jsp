@@ -143,11 +143,29 @@
         <div class="corpo-info-grid">
             <div class="corpo-info-item">
                 <div class="corpo-info-label">PER</div>
-                <div class="corpo-info-value highlight" id="perValue">${stockCorpInfo.per} 배</div>
+                <div class="corpo-info-value highlight" id="perValue">
+                    <c:choose>
+                        <c:when test="${stockCorpInfo.per == '데이터가 없습니다.'}">
+                            ${stockCorpInfo.per}
+                        </c:when>
+                        <c:otherwise>
+                            ${stockCorpInfo.per} 배
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">PBR</div>
-                <div class="corpo-info-value highlight" id="pbrValue">${stockCorpInfo.pbr} 배</div>
+                <div class="corpo-info-value highlight" id="pbrValue">
+                    <c:choose>
+                        <c:when test="${stockCorpInfo.pbr == '데이터가 없습니다.'}">
+                            ${stockCorpInfo.pbr}
+                        </c:when>
+                        <c:otherwise>
+                            ${stockCorpInfo.pbr} 배
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">ROE(%)</div>
@@ -159,11 +177,29 @@
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">EPS</div>
-                <div class="corpo-info-value" id="epsValue">${stockCorpInfo.eps} 원</div>
+                <div class="corpo-info-value" id="epsValue">
+                    <c:choose>
+                        <c:when test="${stockCorpInfo.eps == '데이터가 없습니다.'}">
+                            ${stockCorpInfo.eps}
+                        </c:when>
+                        <c:otherwise>
+                            ${stockCorpInfo.eps} 원
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
             <div class="corpo-info-item">
                 <div class="corpo-info-label">BPS</div>
-                <div class="corpo-info-value" id="bpsValue">${stockCorpInfo.bps} 원</div>
+                <div class="corpo-info-value" id="bpsValue">
+                    <c:choose>
+                        <c:when test="${stockCorpInfo.bps == '데이터가 없습니다.'}">
+                            ${stockCorpInfo.bps}
+                        </c:when>
+                        <c:otherwise>
+                            ${stockCorpInfo.bps} 원
+                        </c:otherwise>
+                    </c:choose>
+                </div>
             </div>
         </div>
         <p class="corpo-note">KIS, DART API 데이터 반영</p>

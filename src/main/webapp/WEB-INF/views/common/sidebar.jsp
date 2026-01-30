@@ -23,14 +23,6 @@
             <div class="nav-icon-box"><img class="w-5 h-5 stroke-[2]" src="${cpath}/resources/images/navIcons/map.svg" alt="맵아이콘"></div>
             <span class="text-sm font-bold mt-0.5">학습 로드맵</span>
         </a>
-        <a href="${cpath}/myPage/main.do" class="nav-item group"
-           hx-get="${cpath}/myPage/main.do"
-           hx-target="#main"
-           hx-swap="innerHTML"
-           hx-push-url="true">
-            <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/user.svg" alt="마이아이콘" class="w-5 h-5 stroke-[2]"></div>
-            <span class="text-sm font-bold mt-0.5">마이페이지</span>
-        </a>
         <a href="${cpath}/invest/main.do" class="nav-item group"
            hx-get="${cpath}/invest/main.do"
            hx-target="#main"
@@ -46,6 +38,14 @@
            hx-push-url="true">
             <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/trophy-outline.svg" alt="랭킹아이콘" class="w-5 h-5 stroke-[2]"></div>
             <span class="text-sm font-bold mt-0.5">랭킹</span>
+        </a>
+        <a href="${cpath}/myPage/main.do" class="nav-item group"
+           hx-get="${cpath}/myPage/main.do"
+           hx-target="#main"
+           hx-swap="innerHTML"
+           hx-push-url="true">
+            <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/user.svg" alt="마이아이콘" class="w-5 h-5 stroke-[2]"></div>
+            <span class="text-sm font-bold mt-0.5">마이페이지</span>
         </a>
     </nav>
 

@@ -100,3 +100,4 @@ application-dev.properties
 *.zip
 *.tar.gz
 *.rar
+stockInfoFiles/

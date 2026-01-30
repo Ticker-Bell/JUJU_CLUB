@@ -3,11 +3,13 @@ package com.tickerbell.jujuclub.roadMap.service;
 import com.tickerbell.jujuclub.roadMap.dto.*;
 import com.tickerbell.jujuclub.roadMap.mapper.RoadMapMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoadMapService {
@@ -78,45 +80,54 @@ public class RoadMapService {
      * @return List&ltMissionDTO&gt
      */
     public List<MissionDTO> missionList(Integer userSeq) {
-        List<MissionDTO> list = roadMapMapper.missionList(userSeq);
-        MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
+        try {
+            log.info("[{}] 유저 미션 데이터 조회 - 유저 미션 DB 조회 시작", userSeq);
+            List<MissionDTO> list = roadMapMapper.missionList(userSeq);
+            log.info("[{}] 유저 미션 데이터 조회 - 유저 미션 DB 조회 완료", userSeq);
 
-        for(MissionDTO mission: list) {
-            // 미션타입에 따라 진행횟수 저장
-            switch (mission.getType()) {
-                case "lesson":
-                    mission.setProgress(check.getLesson());
-                    break;
-                case "chapterTest":
-                    mission.setProgress(check.getChapterTest());
-                    break;
-                case "buyStocks":
-                    mission.setProgress(check.getBuyStocks());
-                    break;
-                case "watchList":
-                    mission.setProgress(check.getWatchList());
-                    break;
-                default:
-                    mission.setProgress(0);
-                    break;
-            }
+            log.info("[{}] 유저 미션 완료 조회 - 유저 미션 완료 DB 조회 시작", userSeq);
+            MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
+            log.info("[{}] 유저 미션 완료 조회 - 유저 미션 완료 DB 조회 완료", userSeq);
 
-            // 미션성공여부, 보상금 지급여부 저장
-            if(mission.getProgress() >= mission.getCount()) {
-                if("N".equals(mission.getIsSuccess())) {
-                    mission.setIsSuccess("Y");
-                    boolean rewardSuccess = roadMapMapper.missionReward(userSeq, mission.getMissionId());
-                    if(rewardSuccess) {
-                        System.out.println("미션 보상금 지급 완료");
-                        mission.setIsRewarded("Y");
-                    } else {
-                        System.out.println("미션 보상금 지급 실패");
+            for (MissionDTO mission : list) {
+                // 미션타입에 따라 진행횟수 저장
+                switch (mission.getType()) {
+                    case "lesson":
+                        mission.setProgress(check.getLesson());
+                        break;
+                    case "chapterTest":
+                        mission.setProgress(check.getChapterTest());
+                        break;
+                    case "buyStocks":
+                        mission.setProgress(check.getBuyStocks());
+                        break;
+                    case "watchList":
+                        mission.setProgress(check.getWatchList());
+                        break;
+                    default:
+                        mission.setProgress(0);
+                        break;
+                }
+
+                // 미션성공여부, 보상금 지급여부 저장
+                if (mission.getProgress() >= mission.getCount()) {
+                    if ("N".equals(mission.getIsSuccess())) {
+                        mission.setIsSuccess("Y");
+                        boolean rewardSuccess = roadMapMapper.missionReward(userSeq, mission.getMissionId());
+                        if (rewardSuccess) {
+                            System.out.println("미션 보상금 지급 완료");
+                            mission.setIsRewarded("Y");
+                        } else {
+                            System.out.println("미션 보상금 지급 실패");
+                        }
                     }
                 }
             }
-        }
 
-        return list;
+            return list;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

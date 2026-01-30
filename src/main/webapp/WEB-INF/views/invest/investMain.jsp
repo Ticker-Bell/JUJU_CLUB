@@ -90,7 +90,6 @@
 
     //웹소켓 연결 로직
     function startWebSocket() {
-        console.log('웹소켓 연결');
         let initialCodes = [];
         $('.stock-item').each(function () {
             initialCodes.push($(this).data('code'));
@@ -104,17 +103,11 @@
     //웹소켓 구독 해제
     function unsubscribeAll() {
         //구독 해제
-        console.log('unsubscribeAll 진입');
-
         if (typeof StockSocket !== 'undefined') {
-            console.log('웹소켓 구독 해제');
-
             const currentCodes = Array.from(StockSocket.subscribeCodes.keys());
-            console.log(currentCodes);
 
             if (currentCodes.length > 0) {
                 StockSocket.unsubscribe(currentCodes);
-                console.log('웹소켓 구독 해제 완료');
             }
         }
 
@@ -128,7 +121,6 @@
         //특정 함수가 존재하고, 실행 가능한 상태인지 확인
         if (typeof StockSocket !== 'undefined' && typeof StockSocket.disconnect === 'function') {
             StockSocket.disconnect();
-            console.log("웹소켓 연결 완전히 종료됨");
         }
     }
 

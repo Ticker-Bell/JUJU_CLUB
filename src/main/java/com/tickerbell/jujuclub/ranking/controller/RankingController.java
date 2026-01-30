@@ -15,6 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RankingController {
 
   private final RankingService rankingService;
+
+  /**
+   * 랭킹 리스트 조회
+   *
+   * @return ranking/rankingMain
+   */
   @GetMapping("/main.do")
   public String ranking(
        HttpSession session

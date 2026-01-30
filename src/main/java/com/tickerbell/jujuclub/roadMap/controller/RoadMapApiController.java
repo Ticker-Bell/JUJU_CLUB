@@ -18,10 +18,15 @@ public class RoadMapApiController {
 
     private final RoadMapService roadMapService;
 
+    /**
+     * 레벨에 맞는 챕터 전체 반환
+     *
+     * @param levelId Integer
+     * @return roadMapService.chapterList(levelId)
+     */
     @GetMapping("/chapters")
     public List<ChapterDTO> getChapter(@RequestParam("levelId") Integer levelId) {
-        // 로그 확인용
-        // System.out.println("요청 받은 levelId: " + levelId);
+
         return roadMapService.chapterList(levelId);
     }
 }

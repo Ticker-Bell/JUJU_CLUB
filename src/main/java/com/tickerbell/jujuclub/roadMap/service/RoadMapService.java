@@ -14,31 +14,69 @@ public class RoadMapService {
 
     private final RoadMapMapper roadMapMapper;
 
-    // level 모두 조회
+    /**
+     * 레벨 전체 조회
+     *
+     * @return List&ltLevelDTO&gt
+     */
     public List<LevelDTO> levelList() {
         return roadMapMapper.levelList();
     }
 
-    // level id 기준 chapter 모두 조회
-    public List<ChapterDTO> chapterList(Integer levelSeq) {
-        return roadMapMapper.chapterList(levelSeq);
+    /**
+     * level id에 맞는 chapter 정보 전체 조회
+     *
+     * @param levelId Integer
+     * @return List&ltChapterDTO&gt
+     */
+    public List<ChapterDTO> chapterList(Integer levelId) {
+        return roadMapMapper.chapterList(levelId);
     }
 
-    // user seq에 따라 현재까지 진행한 레슨 전부 조회
+    /**
+     * user의 현재 레슨 진행 정보 조회
+     *
+     * @param userSeq Integer
+     * @return List&ltUserLessonDTO&gt
+     */
     public List<UserLessonDTO> userLessonList(Integer userSeq) {
         return roadMapMapper.userLessonList(userSeq);
     }
 
-    // 전체 level, chapter, lesson 조회
+    /**
+     * level, chapter, lesson 전체 조회
+     *
+     * @return List&ltLevelChapterLessonDTO&gt
+     */
     public List<LevelChapterLessonDTO> allLearningList() {
         return roadMapMapper.allLearningList();
     }
 
-    // 유저 미션 삽입
+    /**
+     * user의 chatper test 결과 전체 조회
+     *
+     * @param userSeq Integer
+     * @return List&ltChapterResultDTO&gt
+     */
+    public List<ChapterResultDTO> chapterTestResult(Integer userSeq) {
+        return roadMapMapper.chapterTestResult(userSeq);
+    }
+
+    /**
+     * 유저 미션 정보 등록
+     *
+     * @param userSeq Integer
+     */
     public void insertInitUserMission(Integer userSeq) {
         roadMapMapper.insertInitUserMission(userSeq);
     }
-    // 유저 미션 모두 조회
+
+    /**
+     * user의 미션 데이터 조회
+     *
+     * @param userSeq Integer
+     * @return List&ltMissionDTO&gt
+     */
     public List<MissionDTO> missionList(Integer userSeq) {
         List<MissionDTO> list = roadMapMapper.missionList(userSeq);
         MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
@@ -81,12 +119,13 @@ public class RoadMapService {
         return list;
     }
 
-    // 챕터테스트 모두 조회
-    public List<ChapterResultDTO> chapterTestResult(Integer userSeq) {
-        return roadMapMapper.chapterTestResult(userSeq);
-    }
-
-    // 온보딩 이후 유저 레벨에 맞게 insert
+    /**
+     * 온보딩 후 레벨에 맞는 레슨 정보 삽입
+     * - 설정된 레벨의 이전 레슨 완료 처리
+     * - 설정된 레벨의 1챕터 1레슨 삽입
+     *
+     * @param userSeq Integer, userLevel Integer
+     */
     @Transactional
     public void insertInitUserLesson(Integer userSeq, Integer userLevel) {
         roadMapMapper.insertInitUserLesson(userSeq, userLevel);

@@ -22,16 +22,17 @@ public class RoadMapController {
     private final RoadMapService roadMapService;
     private final UserInfoService userInfoService;
 
+
+    /**
+     * 로드맵 메인화면 정보 조희
+     *
+     * @return /roadMap/roadMapMain
+     */
     @GetMapping("/main.do")
     public String getRoadMap(Model model, HttpSession session) {
-        // 테스트용
-//        Integer levelSeq = 1;
-//        Integer userSeq = 11;
-//        String chapterId = "LV2_CH001";
         
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
-
 
         List<LevelDTO> levelList = roadMapService.levelList();
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
@@ -110,6 +111,12 @@ public class RoadMapController {
         return "roadMap/roadMapMain";
     }
 
+
+    /**
+     * 미션 정보 조회
+     *
+     * @return roadMap/missionModal
+     */
     @GetMapping("/mission.do")
     public String getMission(Model model, HttpSession session) {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
@@ -120,6 +127,7 @@ public class RoadMapController {
 
         model.addAttribute("mission", missionList);
         model.addAttribute("successCount", successCount);
+
         return "roadMap/missionModal";
     }
 }

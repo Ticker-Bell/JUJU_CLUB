@@ -56,12 +56,12 @@
                 <span class="text-gray-600 flex items-center gap-1 group-hover:text-[#5E45EB] transition-colors">
                     주간 미션 <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-[#5E45EB]"></i>
                 </span>
-                <span class="font-extrabold" style="color:#F97316;">45%</span>
+                <span class="font-extrabold" style="color:#F97316;">0%</span>
             </div>
             <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden">
-                <div class="mypage-mission-bar weekly" style="width: 45%"></div>
+                <div class="mypage-mission-bar weekly" style="width: 0%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-1.5 truncate">이번 주 수익률 3% 달성 도전</p>
+            <p class="text-xs text-gray-400 mt-1.5 truncate">클릭하여 주간 미션을 확인하세요.</p>
         </div>
 
         <%-- 3. 월간 미션 --%>
@@ -70,12 +70,12 @@
                 <span class="text-gray-600 flex items-center gap-1 group-hover:text-[#5E45EB] transition-colors">
                     월간 미션 <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-[#5E45EB]"></i>
                 </span>
-                <span class="font-extrabold" style="color:#EC4899;">20%</span>
+                <span class="font-extrabold" style="color:#EC4899;">0%</span>
             </div>
             <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden">
-                <div class="mypage-mission-bar monthly" style="width: 20%"></div>
+                <div class="mypage-mission-bar monthly" style="width: 0%"></div>
             </div>
-            <p class="text-xs text-gray-400 mt-1.5 truncate">누적 거래액 500만원 달성하기</p>
+            <p class="text-xs text-gray-400 mt-1.5 truncate">클릭하여 월간 미션을 확인하세요.</p>
         </div>
 
     </div>

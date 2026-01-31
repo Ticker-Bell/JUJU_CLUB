@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.KISCorpInfoDTO;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
-import com.tickerbell.jujuclub.utils.RequestNewAccessToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -85,7 +84,7 @@ public class KISApiService {
             String priceRate = output.path("prdy_ctrt").asText(); //등락률:prdy_ctrt
             String priceSign = output.path("prdy_vrss_sign").asText(); //등락 부호:prdy_vrss_sign
 
-            System.out.println("현재가 데이터 : " + currentPrice + " 등락률 : " + priceRate + " 부호 : " + priceSign);
+            System.out.println(stockCode + " 현재가 데이터 : " + currentPrice + " 등락률 : " + priceRate + " 부호 : " + priceSign);
             //
             return new KISDataDTO(currentPrice, priceRate, priceSign);
 

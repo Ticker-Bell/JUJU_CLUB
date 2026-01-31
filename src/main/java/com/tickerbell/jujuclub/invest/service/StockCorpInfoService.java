@@ -52,7 +52,7 @@ public class StockCorpInfoService {
         //ROE 자기자본이익률(%) : (당기 순이익 / 자본 총 계) * 100
         String roe;
         if(dartCorpInfoDTO.getRoe() == 0.0){
-            roe  = "roe 없음";
+            roe  = "ROE 없음";
         } else {
             BigDecimal bd = BigDecimal.valueOf(dartCorpInfoDTO.getRoe());
             bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -62,7 +62,7 @@ public class StockCorpInfoService {
         //부채비율(%) : (부채 총 계 / 자본 총 계) * 100
         String debtRatio;
         if(dartCorpInfoDTO.getDebtRatio() == 0.0){
-            debtRatio  = "debtRatio 없음";
+            debtRatio  = "부채비율 없음";
         } else {
             BigDecimal bd = BigDecimal.valueOf(dartCorpInfoDTO.getDebtRatio());
             bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -138,7 +138,7 @@ public class StockCorpInfoService {
         if (newData.isEmpty()) return "-";
 
         try {
-            return Double.parseDouble(newData) == 0.0 ? "데이터가 없습니다." : newData;
+            return Double.parseDouble(newData) == 0.0 ? "없음" : newData;
         } catch (NumberFormatException e) {
             return "-";
         }

@@ -37,6 +37,8 @@
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/ranking/rankingMain.css">
     <%--챕터 테스트 css--%>
     <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/chapterTest.css">
+    <%--로딩--%>
+    <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/main/main.css">
 </head>
 
 <body class="flex flex-col h-screen w-full overflow-hidden bg-white">
@@ -47,6 +49,16 @@
     <!-- sidebar -->
     <jsp:include page="sidebar.jsp"/>
 
+    <!-- 로딩 -->
+    <div id="investLoadingOverlay"
+         class="loading-overlay <c:if test="${targetPage eq 'invest/investMain'}">is-active</c:if>">
+        <div class="loading-panel">
+            <img class="loading-image"
+                 src="${cpath}/resources/images/Rocketship.gif"
+                 alt="로딩"/>
+        </div>
+    </div>
+
     <!-- Main -->
     <main id="main" class="flex-1 overflow-y-auto p-8 flex flex-col bg-gray-50">
         <jsp:include page="/WEB-INF/views/${targetPage}.jsp"/>
@@ -55,11 +67,11 @@
 
 <%--htmx 사용할때는 동적으로 처리하는거라 화면 교체후에 다시 생성해야 한다고하네요--%>
 <script>
-  document.body.addEventListener('htmx:afterSwap', (evt) => {
-    if (evt.detail.target.id === 'main' && window.lucide) {
-      lucide.createIcons(evt.detail.target); // main 안에 있는 SVG만 다시 생성
-    }
-  });
+    document.body.addEventListener('htmx:afterSwap', (evt) => {
+        if (evt.detail.target.id === 'main' && window.lucide) {
+            lucide.createIcons(evt.detail.target); // main 안에 있는 SVG만 다시 생성
+        }
+    });
 </script>
 
 <script src="${cpath}/resources/js/main/main.js"></script>

@@ -6,6 +6,7 @@ import com.tickerbell.jujuclub.invest.mapper.WatchlistMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -34,6 +35,9 @@ public class WatchlistService {
                 e.printStackTrace();
             }
         }
+
+        //현재가 높은 순 정렬
+        items.sort(Comparator.comparingInt(WatchlistItemDTO::getCurrentPrice).reversed());
 
         return items;
     }

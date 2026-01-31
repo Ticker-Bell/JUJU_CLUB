@@ -65,9 +65,4 @@ public class PortfolioService {
         return items;
     }
 
-    public int calAvgPrice(int userSeq, int stockSeq, int quantity, int price){
-        //체결시 업데이트 필요
-        return 0;
-    }
-
 }

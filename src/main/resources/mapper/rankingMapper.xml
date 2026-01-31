@@ -30,7 +30,7 @@
                       FROM USERS U
                              LEFT JOIN USER_QUESTION_RESULT UQR
                                        ON UQR.USER_SEQ = U.USER_SEQ
-                                         AND UQR.finished_at IS NOT NULL
+                                         AND UQR.FINISHED_AT IS NOT NULL
                       GROUP BY U.USER_SEQ,
                                U.CREATED_AT) L
                      ON A.USER_SEQ = L.USER_SEQ
@@ -50,7 +50,7 @@
            LEFT JOIN USER_QUESTION_RESULT UQR
                      ON U.USER_SEQ = UQR.USER_SEQ
                        AND UQR.FINISHED_AT IS NOT NULL
-    GROUP BY U.USER_SEQ
+    GROUP BY U.USER_SEQ, U.USER_ID, U.USER_NAME, U.USER_LEVEL, UA.CASH_BALANCE
   </select>
   <select id="getRankingBoardListOBR"
     resultType="com.tickerbell.jujuclub.ranking.dto.RankingDTO$RankingListOBR">
@@ -63,8 +63,9 @@
            LEFT JOIN USER_QUESTION_RESULT UQR
                      ON U.USER_SEQ = UQR.USER_SEQ
                        AND UQR.FINISHED_AT IS NOT NULL
-           LEFT JOIN USER_ACCOUNT UA ON U.user_seq = UA.user_seq
-    GROUP BY U.USER_SEQ
+                       AND UQR.FINISHED_AT > U.CREATED_AT
+           LEFT JOIN USER_ACCOUNT UA ON U.USER_SEQ = UA.user_seq
+    GROUP BY U.USER_SEQ, U.USER_ID, U.USER_NAME, U.USER_LEVEL, UA.CASH_BALANCE
   </select>
   <select id="getTotalUserCount" resultType="java.lang.Integer">
     SELECT COUNT(USER_SEQ) AS totUserCnt

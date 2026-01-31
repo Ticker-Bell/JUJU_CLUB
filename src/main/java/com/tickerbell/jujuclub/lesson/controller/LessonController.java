@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -23,9 +22,15 @@ public class LessonController {
 
   private final LessonService lessonService;
 
+
+  /**
+   * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
+   *
+   * @param lessonId String
+   * @return lesson/lessonInfo
+   */
   @PostMapping("/lessonInfo")
   public String getLessonInfo(
-      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       HttpSession session,
       Model model) throws Exception {
@@ -59,9 +64,16 @@ public class LessonController {
     return "lesson/lessonInfo";
   }
 
+
+
+  /**
+   * 레슨 SELECT,MATCH,DRAG,LINK 문항 조회
+   *
+   * @param lessonId String, questionId String
+   * @return /lesson/qst2,/lesson/qst3,/lesson/qst4,/lesson/qst5,/lesson/error
+   */
   @PostMapping("/qst")
   public String getQstInfo(
-      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       @RequestParam String questionId,
       HttpSession session,
@@ -95,9 +107,16 @@ public class LessonController {
 
   }
 
+
+
+  /**
+   * 레슨 완료 정보 등록
+   *
+   * @param lessonId String
+   * @return redirect:/roadMap/main.do
+   */
   @PostMapping("/updateLssnInfo")
   public String getLessonInfo(
-      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String lessonId,
       HttpSession session) throws Exception {
 
@@ -108,9 +127,17 @@ public class LessonController {
     return "redirect:/roadMap/main.do";
   }
 
+
+
+
+  /**
+   * 챕터 테스트 시작 정보 등록
+   *
+   * @param lessonId String
+   * @return lesson/chapterTest
+   */
   @PostMapping("/chapter-test")
   public String getChapterTest(
-      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String chapterId,
       @RequestParam String lessonId,
       HttpSession session,
@@ -139,9 +166,17 @@ public class LessonController {
     return "lesson/chapterTest";
   }
 
+
+
+
+  /**
+   * 챕터 테스트 완료 정보 등록
+   *
+   * @param chapterId String, score Int, isPass, session, model
+   *
+   */
   @PostMapping("/update-chapter")
   public void updateChapterRslt(
-      @RequestHeader(value = "HX-Request", defaultValue = "false") boolean isHtmx,
       @RequestParam String chapterId,
       @RequestParam int score,
       @RequestParam String isPass,

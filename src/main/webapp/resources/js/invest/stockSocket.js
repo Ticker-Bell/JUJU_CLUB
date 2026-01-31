@@ -1,6 +1,5 @@
 const StockSocket = {
     //연결 및 구독 관리 파일 & 데이터 스로틀링(현재 3초)
-
     stompClient: null,
     //임시 저장할 변수
     lastestData: {},
@@ -14,7 +13,6 @@ const StockSocket = {
     connect: function (contextPath, stockCodes, onMessageCallback) {
         //stockCodes: 데이터를 받을 종목 코드 배열, onMessageCallback: 웹소켓을 연결하고 실행할 함수
         const self = this;
-
         //이미 연결되어있으면 구독만 처리하는 로직
         if (this.isConnected && this.stompClient) {
             const newCodes = stockCodes.filter(stockCode => !self.subscribeCodes.has(stockCode));
@@ -64,12 +62,12 @@ const StockSocket = {
 
     //구독
     subscribeStock: function (stockCode) {
-        if (this.subscribeCodes.has(stockCode)) return ;
+        if (this.subscribeCodes.has(stockCode)) return;
 
         const subscription = this.stompClient.subscribe(`/topic/stock/${stockCode}`, (response) => {
             const stockData = JSON.parse(response.body);
             this.lastestData[stockData.stockCode] = stockData;
-            const fns =  this.listeners[stockData.stockCode] || [];
+            const fns = this.listeners[stockData.stockCode] || [];
             fns.forEach(fn => fn(stockData));
         });
 
@@ -77,7 +75,7 @@ const StockSocket = {
         this.subscribeCodes.set(stockCode, subscription);
     },
 
-    addListener(stockCode, fn){
+    addListener(stockCode, fn) {
         //리스너 등록
         if (!this.listeners[stockCode]) {
             this.listeners[stockCode] = [];
@@ -125,17 +123,20 @@ const StockSocket = {
 
     //웹소켓 연결 중지
     disconnect: function () {
-        if (this.stompClient) {
-            this.stompClient.disconnect();
+        if (this.stompClient && this.stompClient.connected) {
+            this.stompClient.disconnect(() => {
+                console.log("STOMP 클라이언트가 정상적으로 종료되었습니다.");
+            });
         }
 
-        clearInterval(this.updateTimer);
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+            this.updateTimer = null;
+        }
 
         this.stompClient = null;
         this.isConnected = false;
-        this.updateTimer = null;
         this.subscribeCodes.clear();
         this.lastestData = {};
-
     }
 };

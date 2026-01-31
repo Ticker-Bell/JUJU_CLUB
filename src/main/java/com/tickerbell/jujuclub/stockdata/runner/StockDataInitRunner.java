@@ -91,7 +91,7 @@ public class StockDataInitRunner{
         List<StockDataDTO> stockDataDTOList = new ArrayList<>();
 
         for(Map<String, String> stock : kospiStocks){
-            if(stock.get("단축코드").length() != 6) continue;
+            if(stock.get("단축코드").length() > 7) continue;
             StockDataDTO stockDataDTO = StockDataDTO.builder()
                     .stockCode(stock.get("단축코드"))
                     .stockName(stock.get("한글명"))

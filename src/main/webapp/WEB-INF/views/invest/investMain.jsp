@@ -55,9 +55,10 @@
 <div class="w-full flex flex-col px-[24]">
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
-        <button id="myTab" class="active" onclick="changeJsp(this, 'my')">마이</button>
-<%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
-        <button id="investTab" onclick="changeJsp(this, 'invest')">투자</button>
+        <button id="myTab" class="active" onclick="changeJsp('my')">마이</button>
+        <%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
+        <button id="investTab" onclick="changeJsp('invest')">투자</button>
+        <button id="assetDetailTab" onclick="changeJsp('asset')">거래 내역</button>
     </nav>
     <div class="tab-container">
         <div id="myJsp" class="tab-content active">
@@ -69,36 +70,100 @@
                     <jsp:include page="investStockList.jsp"></jsp:include>
                 </div>
                 <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
-                    <jsp:include page="investChart.jsp" ></jsp:include>
+                    <jsp:include page="investChart.jsp"></jsp:include>
                     <div id="stockCorpInfo-container" class="w-full">
-                    <jsp:include page="stockCorpInfoCard.jsp" ></jsp:include>
+                        <jsp:include page="stockCorpInfoCard.jsp"></jsp:include>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="assetDetailJsp" class="tab-content">
+            <jsp:include page="assetDetail.jsp"></jsp:include>
+        </div>
     </div>
 </div>
 <script>
-    function changeJsp(element, type) {
+    //페이지를 나갈 때
+    window.addEventListener('beforeunload', function () {
+        disconnectWebsocket();
+    });
+
+    //웹소켓 연결 로직
+    function startWebSocket() {
+        let initialCodes = [];
+        $('.stock-item').each(function () {
+            initialCodes.push($(this).data('code'));
+        });
+
+        if (initialCodes.length > 0) {
+            initListSocket(initialCodes);
+        }
+    }
+
+    //웹소켓 구독 해제
+    function unsubscribeAll() {
+        //구독 해제
+        if (typeof StockSocket !== 'undefined') {
+            const currentCodes = Array.from(StockSocket.subscribeCodes.keys());
+
+            if (currentCodes.length > 0) {
+                StockSocket.unsubscribe(currentCodes);
+            }
+        }
+
+    }
+
+    //웹소켓 연결 종료 로직
+    function disconnectWebsocket() {
+        unsubscribeAll();
+
+        // 소켓 연결 물리적 종료
+        //특정 함수가 존재하고, 실행 가능한 상태인지 확인
+        if (typeof StockSocket !== 'undefined' && typeof StockSocket.disconnect === 'function') {
+            StockSocket.disconnect();
+        }
+    }
+
+    function changeJsp(type) {
 
         const myJsp = document.getElementById('myJsp');
         const myTab = document.getElementById('myTab');
+        const investJsp = document.getElementById('investJsp');
+        const investTab = document.getElementById('investTab');
+        const assetDetailJsp = document.getElementById('assetDetailJsp');
+        const assetDetailTab = document.getElementById('assetDetailTab');
 
         //탭 전환
         if (type === 'my') {
+            unsubscribeAll();
             myJsp.classList.add('active');
             investJsp.classList.remove('active');
+            assetDetailJsp.classList.remove('active');
 
             myTab.classList.add('active');
             investTab.classList.remove('active');
-        } else {
+            assetDetailTab.classList.remove('active');
+        } else if (type === 'invest') {
+            startWebSocket();
             investJsp.classList.add('active');
             myJsp.classList.remove('active');
+            assetDetailJsp.classList.remove('active');
 
             investTab.classList.add('active');
             myTab.classList.remove('active');
+            assetDetailTab.classList.remove('active');
+        } else {
+            unsubscribeAll();
+            assetDetailJsp.classList.add('active');
+            investJsp.classList.remove('active');
+            myJsp.classList.remove('active');
+
+            assetDetailTab.classList.add('active');
+            investTab.classList.remove('active');
+            myTab.classList.remove('active');
         }
     }
+
     //stockCorpInfoCard.jsp에 있던 script
     function getSelectedCorpInfo(stockCode) {
         //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
@@ -113,7 +178,7 @@
                 const now = new Date();
                 const timeString = now.toLocaleTimeString('ko-KR', {hour12: false});
                 const timeEl = document.getElementById('update_time');
-                if(timeEl){
+                if (timeEl) {
                     timeEl.innerText = timeString;
                 }
             })

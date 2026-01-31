@@ -61,7 +61,7 @@
     </nav>
     <div class="tab-container">
         <div id="myJsp" class="tab-content active">
-            <jsp:include page="investMy.jsp"></jsp:include>
+           <jsp:include page="investMy.jsp"></jsp:include>
         </div>
         <div id="investJsp" class="tab-content">
             <div id="stock" class="flex flex-row justify-between w-full gap-8">

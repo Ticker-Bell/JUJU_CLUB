@@ -1190,6 +1190,19 @@
                 sellExpectedPrice();
             }
         })
+
+        //input 태그에 -, e 입력 방지
+        document.addEventListener('keydown', (e) => {
+            const target = e.target;
+
+            if (
+                target.tagName === 'INPUT' &&
+                target.type === 'number' &&
+                (e.key === '-' || e.key === 'e')
+            ) {
+                e.preventDefault();
+            }
+        });
         document.addEventListener('click', (e) => {
             if (e.target.id === 'header-stockLike') {
                 toggleLike();

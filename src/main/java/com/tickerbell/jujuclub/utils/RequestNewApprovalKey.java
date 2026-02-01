@@ -22,6 +22,13 @@ public class RequestNewApprovalKey {
 
     private String approvalKey = null;
 
+    /**
+     * 한국투자 Open API에 실시간(웹소켓) 접속키(Approval key) 발급 요청
+     * 발급받은 접속키 return
+     *
+     * @return String
+     * @throws Exception
+     */
     public String getApprovalKey() throws Exception {
 
         HttpURLConnection conn = null;

@@ -15,6 +15,13 @@ public class TradeController {
     @Autowired
     TradeService tradeService;
 
+
+    /**
+     * 보유 수량 조회
+     *
+     * @param stockCode String
+     * @return Integer
+     */
     @GetMapping("/hasStockQuantity")
     @ResponseBody
     public Integer TradePage(@RequestParam String stockCode, HttpSession session) {

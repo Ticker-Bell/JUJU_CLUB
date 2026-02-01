@@ -22,6 +22,12 @@ public class TradeRestController {
     @Autowired
     TradeService tradeService;
 
+    /**
+     * 주식 거래
+     *
+     * @param tradeDTO TradeDTO
+     * @return ResponseEntity<Map<String, Object>>
+     */
     @PostMapping("/BuySell")
     public ResponseEntity<Map<String, Object>> buySellTrade(@RequestBody TradeDTO tradeDTO, HttpSession session) {
         Map<String, Object> response = new HashMap<>();

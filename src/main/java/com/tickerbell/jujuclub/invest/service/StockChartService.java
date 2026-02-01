@@ -29,6 +29,12 @@ public class StockChartService {
 
     private String approvalKey = null;
 
+    /**
+     * 주식 차트 웹소켓 API 연결 및 구독 관리 서비스
+     *
+     * @param trType String
+     * @param stockCodeList List<String>
+     */
     public synchronized void connectToStockChartApi(String trType, List<String> stockCodeList) throws Exception {
         //세션이 없거나 닫혀있으면 연결
         if (externalSession == null || !externalSession.isOpen()) {
@@ -36,6 +42,7 @@ public class StockChartService {
         } else if (trType.equals("1")) {
             //구독 요청
             for (String stockCode : stockCodeList) {
+                //구독하지 않았을 때
                 if (!subscribedCodes.contains(stockCode)) {
                     sendSubscribeMessage(externalSession, stockCode);
                 }
@@ -48,24 +55,45 @@ public class StockChartService {
         }
     }
 
+    /**
+     * 주식 차트 웹소켓 API 최초 연결 서비스
+     *
+     * @param stockCodeList List<String>
+     */
     private void initConnection(List<String> stockCodeList) {
         WebSocketClient client = new StandardWebSocketClient();
         String externalUrl = "ws://ops.koreainvestment.com:21000/tryitout/H0STCNT0";
 
         client.doHandshake(new TextWebSocketHandler() {
+            /**
+             * 웹소켓 연결 후 구독 메시지 전송 서비스
+             *
+             * @param session WebSocketSession
+             */
             @Override
-            public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+            public void afterConnectionEstablished(WebSocketSession session){
                 externalSession = session;
                 for (String stockCode : stockCodeList) {
-                    sendSubscribeMessage(session, stockCode);
+                    try {
+                        sendSubscribeMessage(session, stockCode);
+                    } catch (Exception e) {
+                        log.error("웹소켓 연결 후 구독 메시지 전송 서비스 중 오류 발생");
+                        throw new RuntimeException(e);
+                    }
                 }
             }
 
+            /**
+             * 받은 웹소켓 메시지 처리, 파싱 및 구독 중인 클라이언트에게 전송 서비스
+             *
+             * @param session WebSocketSession
+             * @param message TextMessage
+             */
             @Override
             protected void handleTextMessage(WebSocketSession session, TextMessage message) {
                 String chartData = message.getPayload();
 
-                // [추가] JSON 응답(성공 메시지 등)이면 파싱하지 않고 로그만 남긴 뒤 종료
+                //JSON 응답(성공 메시지 등)이면 파싱하지 않고 로그만 남긴 뒤 종료
                 if (chartData.startsWith("{") || chartData.startsWith("[")) {
                     log.info("수신된 설정 메시지: {}", chartData);
                     return;
@@ -81,15 +109,27 @@ public class StockChartService {
                         }
                     }
                 } catch (Exception e) {
-                    log.error("데이터 파싱 중 예상치 못한 에러 발생: {}", e.getMessage());
+                    log.error("웹소켓 데이터 파싱 중 오류 발생: {}", e.getMessage());
                     log.debug("에러 발생 데이터: {}", chartData);
                 }
             }
 
+            /**
+             * 웹소켓 API 통신 에러 처리
+             *
+             * @param session WebSocketSession
+             * @param exception Throwable
+             */
             public void handleTransportError(WebSocketSession session, Throwable exception) {
                 log.error("외부 API 통신 에러: " + exception.getMessage());
             }
 
+            /**
+             * 웹소켓 API 연결 해제 후 메시지 출력
+             *
+             * @param session WebSocketSession
+             * @param status CloseStatus
+             */
             public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
                 log.warn("외부 API 연결 종료. 재연결 로직이 필요합니다.");
             }
@@ -97,9 +137,15 @@ public class StockChartService {
 
     }
 
-    private void sendSubscribeMessage(WebSocketSession session, String stockCode) throws Exception {
-        approvalKey = getValidApprovalKey.getValidApprovalKey();
+    /**
+     * 웹소켓 구독 메시지 생성 서비스
+     *
+     * @param session WebSocketSession
+     * @param stockCode String
+     */
+    private void sendSubscribeMessage(WebSocketSession session, String stockCode){
         try {
+            approvalKey = getValidApprovalKey.getValidApprovalKey();
             String subscribeMessage = String.format(
                     "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"1\",\"content-type\":\"utf-8\"}," +
                             "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", approvalKey, stockCode);
@@ -113,13 +159,20 @@ public class StockChartService {
                     Map.of("stockCode", stockCode, "status", "Init", "message", "데이터 로드 시작"));
         } catch (Exception e) {
             log.error("구독 전송 에러 ({}) : {}", stockCode, e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    private void sendUnsubscribeMessage(WebSocketSession session, String stockCode) throws Exception {
+    /**
+     * 웹소켓 구독 해제 메시지 생성 서비스
+     *
+     * @param session WebSocketSession
+     * @param stockCode String
+     */
+    private void sendUnsubscribeMessage(WebSocketSession session, String stockCode) {
 
-        approvalKey = getValidApprovalKey.getValidApprovalKey();
         try {
+            approvalKey = getValidApprovalKey.getValidApprovalKey();
             String subscribeMessage = String.format(
                     "{\"header\":{\"approval_key\":\"%s\",\"custtype\":\"P\",\"tr_type\":\"2\",\"content-type\":\"utf-8\"}," +
                             "\"body\":{\"input\":{\"tr_id\":\"H0STCNT0\",\"tr_key\":\"%s\"}}}", approvalKey, stockCode);

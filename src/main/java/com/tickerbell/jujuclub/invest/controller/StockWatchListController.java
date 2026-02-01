@@ -15,6 +15,11 @@ public class StockWatchListController {
 
     private final StockChartDataService stockChartDataService;
 
+    /**
+     * 관심 종목 등록
+     *
+     * @param watchListDTO WatchListDTO
+     */
     @PostMapping
     @ResponseBody
     public void insertWatchList(@RequestBody WatchListDTO watchListDTO, HttpSession session) {
@@ -23,6 +28,12 @@ public class StockWatchListController {
         stockChartDataService.insertWatchList(watchListDTO);
     }
 
+
+    /**
+     * 관심 종목 삭제
+     *
+     * @param watchListDTO WatchListDTO
+     */
     @DeleteMapping
     @ResponseBody
     public void deleteWatchList(@RequestBody WatchListDTO watchListDTO, HttpSession session) {
@@ -31,6 +42,13 @@ public class StockWatchListController {
         stockChartDataService.deleteWatchList(watchListDTO);
     }
 
+
+    /**
+     * 관심 종목 확인
+     *
+     * @param watchListDTO WatchListDTO
+     * @return boolean 관심 종목 DB에 존재하면 true, 그렇지 않으면 false
+     */
     @GetMapping("/isLiked")
     @ResponseBody
     public boolean selectWatchList(WatchListDTO watchListDTO, HttpSession session) {

@@ -13,15 +13,15 @@ public class StockChartDataService {
     private final StockChartDataMapper stockChartDataMapper;
 
     /**
-     * 주식 장 DB 조회 서비스
+     * 주식 장 타입 DB 조회 서비스
      *
      * @param stockCode String
      * @return String
      */
     public String selectMarketType(String stockCode) {
-        log.info("[{}]: 주식 장 DB 조회 서비스 시작", stockCode);
+        log.info("[{}]: 주식 장 타입 DB 조회 서비스 시작", stockCode);
         String result = stockChartDataMapper.selectMarketType(stockCode);
-        log.info("[{}]: 주식 장 DB 조회 서비스 완료", stockCode);
+        log.info("[{}]: 주식 장 타입 DB 조회 서비스 완료", stockCode);
 
         return result;
     }

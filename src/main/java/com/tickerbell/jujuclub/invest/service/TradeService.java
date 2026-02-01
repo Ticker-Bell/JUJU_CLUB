@@ -72,9 +72,9 @@ public class TradeService {
         tradeMapper.deleteHoldings();
         log.info("주식 거래 보유 주식 DB 삭제 서비스 완료");
 
-        log.info("[{}]: 주식 거래 내역 DB 삽입 시작", tradeDTO);
+        log.info("[{}]: 주식 거래 내역 DB 삽입 서비스 시작", tradeDTO);
         tradeMapper.insertTradeHistory(tradeDTO);
-        log.info("[{}]: 주식 거래 내역 DB 삽입 완료", tradeDTO);
+        log.info("[{}]: 주식 거래 내역 DB 삽입 서비스 완료", tradeDTO);
 
         return "트랜지션이 처리되었습니다.";
     }
@@ -85,9 +85,9 @@ public class TradeService {
      * @return Integer
      */
     public Integer getStockQuantity(TradeDTO tradeDTO){
-        log.info("[{}]: 주식 거래 보유 수량 DB 조회 시작", tradeDTO);
+        log.info("[{}]: 주식 거래 보유 수량 DB 조회 서비스 시작", tradeDTO);
         Integer userQuantity =  tradeMapper.selectHoldings(tradeDTO);
-        log.info("[{}]: 주식 거래 보유 수량 DB 조회 완료", tradeDTO);
+        log.info("[{}]: 주식 거래 보유 수량 DB 조회 서비스 완료", tradeDTO);
 
         return userQuantity;
     }

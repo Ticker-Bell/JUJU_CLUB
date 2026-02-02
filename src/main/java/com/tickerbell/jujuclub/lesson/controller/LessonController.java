@@ -1,5 +1,6 @@
 package com.tickerbell.jujuclub.lesson.controller;
 
+import com.tickerbell.jujuclub.auth.dto.MemberDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO;
 import com.tickerbell.jujuclub.lesson.dto.LessonDTO.LessonRequest;
 import com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO;
@@ -37,6 +38,7 @@ public class LessonController {
 
     int userSeq = (int) session.getAttribute("userSeq");
     String questionId = lessonId + "_Q001";
+    MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
 
     // 레슨 시작 정보 등록
     if(! lessonId.equals("LV1_CH001_LS006")){
@@ -54,6 +56,7 @@ public class LessonController {
 
     List<LessonDTO.LessonQst> lessonQst = lessonService.getLssnQst(lessonId);
 
+    model.addAttribute("userName",loginUser.getUserName());
     model.addAttribute("lessonId",lessonId);
     model.addAttribute("chat", chatMap);
     model.addAttribute("colNames", chatMap.keySet());
@@ -154,7 +157,6 @@ public class LessonController {
 
     List<LessonDTO.LessonTitle> title = lessonService.getLessonTitle(lessonId);
     List<LessonDTO.LessonQst> chapterQst = lessonService.getChapterTest(lessonRequest);
-
 
     model.addAttribute("title",title);
     model.addAttribute("qst", chapterQst);

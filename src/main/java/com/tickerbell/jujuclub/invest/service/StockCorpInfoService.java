@@ -54,10 +54,15 @@ public class StockCorpInfoService {
             String pbr = formatIfDataEmpty(kisCorpInfoDTO.getPbr());
 
             //EPS
-            String eps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getEps()));
+//            String eps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getEps()));
+            String eps = formatComma(formatIfDataEmpty(kisCorpInfoDTO.getEps()));
+
 
             //BPS
-            String bps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getBps()));
+//            String bps = formatIfDataEmpty(formatComma(kisCorpInfoDTO.getBps()));
+            String bps = formatComma(formatIfDataEmpty(kisCorpInfoDTO.getBps()));
+
+            log.info("[{}] EPS={}, BPS={} 값 조회", stockCode, kisCorpInfoDTO.getEps(), kisCorpInfoDTO.getBps());
 
             log.info("[{}] DART 재무제표 조회 시작", stockCode);
             //다트 재무제표 가져오기
@@ -162,8 +167,8 @@ public class StockCorpInfoService {
             return "-";
         }
         try {
-            long value = Long.parseLong(data);
-            return new DecimalFormat("#,###").format(value);
+            double value = Double.parseDouble(data);
+            return new DecimalFormat("#,###.##").format(value);
         } catch (NumberFormatException e) {
             log.warn("콤마 포맷 실패 - data={}", data, e);
             return data;
@@ -173,8 +178,8 @@ public class StockCorpInfoService {
     /**
      * 데이터가 없거나 0이면 "없음"으로 리턴, 숫자 파싱에 실패하면 "-" 리턴
      *
-     * @param data
-     * @return
+     * @param data String
+     * @return String
      */
     private String formatIfDataEmpty(String data) {
         if (data == null) return "-";

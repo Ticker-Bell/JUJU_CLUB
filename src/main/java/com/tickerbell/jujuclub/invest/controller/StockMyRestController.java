@@ -4,15 +4,16 @@ import com.tickerbell.jujuclub.invest.dto.PortfolioDTO;
 import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
 import com.tickerbell.jujuclub.utils.ColorUtil;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -59,12 +60,11 @@ public class StockMyRestController {
             chartDataList.add(chartData);
         }
 
-
         //응답에 추가
         myData.put("chartData", chartDataList);
 
         //test
-        System.out.println("체크용 " + chartDataList);
+        System.out.println("시간 체크용 " + chartDataList);
 
         //map반환(자동으로 json변환)
         return myData;

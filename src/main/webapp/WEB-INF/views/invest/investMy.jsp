@@ -210,9 +210,9 @@
     }
 
     .card-title {
-        font-size: 16px;
+        margin-bottom: 15px;
+        font-size: 18px;
         font-weight: 600;
-        margin-bottom: 20px;
         color: #333;
     }
 
@@ -303,21 +303,72 @@
     .holdings-table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed; /* 균등 배분 핵심 */
     }
 
     .holdings-table th {
-        text-align: left;
-        padding: 12px 8px;
+        background: #f8f9fa; /* 헤더 배경색 */
+        text-align: center;
+        padding: 16px 12px;
         font-size: 13px;
-        font-weight: 500;
-        color: #999;
+        font-weight: 600;
+        color: #666;
         border-bottom: 1px solid #e0e0e0;
     }
 
     .holdings-table td {
-        padding: 15px 8px;
+        text-align: center;
+        padding: 18px 12px;
         font-size: 14px;
         border-bottom: 1px solid #f0f0f0;
+        color: #333;
+    }
+
+    /* 종목명만 왼쪽 정렬 */
+    .holdings-table th:first-child,
+    .holdings-table td:first-child {
+        text-align: center;
+        padding-left: 24px;
+    }
+
+    /* 숫자 컬럼 오른쪽 정렬 */
+    .holdings-table th:nth-child(n+2),
+    .holdings-table td:nth-child(n+2) {
+        text-align: center;
+        padding-right: 24px;
+    }
+
+    /* 컬럼 너비 지정 */
+    .holdings-table th:nth-child(1) {
+        width: 22%;
+    }
+
+    .holdings-table th:nth-child(2) {
+        width: 14%;
+    }
+
+    .holdings-table th:nth-child(3) {
+        width: 18%;
+    }
+
+    .holdings-table th:nth-child(4) {
+        width: 18%;
+    }
+
+    .holdings-table th:nth-child(5) {
+        width: 22%;
+    }
+
+    /* 종목 코드 스타일 */
+    .holdings-table .stock-name-cell .name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .holdings-table .stock-name-cell .code {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
     }
 
     .holdings-table .stock-name-cell .name {
@@ -427,6 +478,26 @@
         padding-right: 10px;
         scrollbar-gutter: stable;
     }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .update-time {
+        font-size: 14px;
+        color: #999;
+    }
+
+    .card-header.compact {
+        margin-bottom: 10px;
+    }
+
+    .card-title.spacious {
+        margin-bottom: 24px;
+    }
 </style>
 
 <div class="container">
@@ -478,7 +549,8 @@
                         <div class="label">투자 총 수익률</div>
                         <div id="totalReturnPct"
                              class="value ${userAsset.totalReturnPct > 0 ? 'positive' : (userAsset.totalReturnPct < 0 ? 'negative' : '')}">
-                            <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if><fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.00"/>%
+                            <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if><fmt:formatNumber
+                                value="${userAsset.totalReturnPct}" pattern="#,##0.00"/>%
                         </div>
                     </div>
                 </div>
@@ -489,8 +561,10 @@
         <!-- LEFT: 메인(넓게) - 보유 종목 리스트 -->
         <!-- 보유 종목 리스트 -->
         <div class="card holdings-card">
-            <h3 class="card-title">보유 종목 리스트</h3>
-            마지막 갱신 시간 <span id="test_time">-</span>
+            <div class="card-header compact">
+                <h3 class="card-title">보유 종목 리스트</h3>
+                <span class="update-time">마지막 갱신 시간 <span id="test_time">-</span></span>
+            </div>
             <c:choose>
                 <c:when test="${not empty holdings}">
                     <div id="holdingsScroll" class="holdings-scroll">
@@ -498,10 +572,10 @@
                             <thead>
                             <tr>
                                 <th>종목</th>
-                                <th class="text-right">보유주(주)</th>
-                                <th class="text-right">평균단가(원)</th>
-                                <th class="text-right">현재가(원)</th>
-                                <th class="text-right">평가손익(원)</th>
+                                <th>보유주(주)</th>
+                                <th>평균단가(원)</th>
+                                <th>현재가(원)</th>
+                                <th>평가손익(원)</th>
                             </tr>
                             </thead>
                             <tbody id="holdingStocks">
@@ -540,7 +614,7 @@
         <!-- RIGHT: 사이드(좁게) - 차트 + 관심종목 -->
         <!-- 보유 종목 차트 -->
         <div class="card chart-card">
-            <h3 class="card-title">보유 종목 차트</h3>
+            <h3 class="card-title spacious">보유 종목 차트</h3>
 
             <div class="chart-container">
                 <canvas id="holdingsChart"></canvas>

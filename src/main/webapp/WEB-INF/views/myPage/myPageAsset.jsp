@@ -155,8 +155,11 @@
       var data = sorted.map(function(item) { return item.weightPct; });
 
       // [색상 적용] 데이터 매핑 시 새로운 팔레트 사용
-      var colors = sorted.map(function(item, index) {
-        return colorPalette[index % colorPalette.length];
+      // var colors = sorted.map(function(item, index) {
+      //   return colorPalette[index % colorPalette.length];
+      // });
+      let colors = sorted.map(function (item) {
+        return item.color || '#ccc';
       });
 
       var shortLabels = fullLabels.map(function(name) { return ellipsize(name, 7); });

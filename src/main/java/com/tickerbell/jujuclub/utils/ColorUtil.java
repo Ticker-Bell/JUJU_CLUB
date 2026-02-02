@@ -23,8 +23,9 @@ public class ColorUtil {
         // 2. 색상(Hue) 계산
         // Golden Angle (약 137.508도)을 사용하여 색상을 회전시킵니다.
         // 시작점을 포인트 컬러의 Hue(약 250도) 근처로 잡으면 심리적으로 보라색과 어울리는 느낌을 줄 수 있습니다.
-        float startHue = 250.0f; // 포인트 컬러(#5E45EB)의 대략적인 Hue 값
-        float hue = ((startHue + (hash * 137.508f)) % 360) / 360.0f;
+        double startHue = 250.0; // 포인트 컬러(#5E45EB)의 대략적인 Hue 값
+        double hueCalc = ((startHue + (hash * 137.508)) % 360);
+        float hue = (float)(hueCalc / 360.0f);
 
         // 3. 채도(S)와 명도(B)를 포인트 컬러(#5E45EB) 스타일에 맞춤
         // #5E45EB의 HSB -> H:249, S:71%, B:92%

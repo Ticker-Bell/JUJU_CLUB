@@ -351,81 +351,80 @@
     </div>
 
     <script>
-      // ✅ 모달 로드 후 아이콘 다시 그리기
-      if (window.lucide) lucide.createIcons();
+        if (window.lucide) lucide.createIcons();
 
-      function openProfileImagePicker() {
-        const input = document.getElementById('profileImageInput');
-        if (!input) return;
-        input.click();
-      }
+        function openProfileImagePicker() {
+            const input = document.getElementById('profileImageInput');
+            if (input) input.click();
+        }
 
-      (function bindProfileUpload() {
-        const input = document.getElementById('profileImageInput');
-        const btn = document.getElementById('profileEditBtn');
-        const img = document.getElementById('profileAvatarImg');
+        (function bindProfileUpload() {
+            const input = document.getElementById('profileImageInput');
+            const btn = document.getElementById('profileEditBtn');
+            const img = document.getElementById('profileAvatarImg');
 
-        if (!input) return;
+            if (!input) return;
 
-        input.onchange = async function () {
-          const file = input.files && input.files[0];
-          if (!file) return;
+            input.onchange = async function () {
+                const file = input.files && input.files[0];
+                if (!file) return;
 
-          const maxBytes = 2 * 1024 * 1024;
-          if (file.size > maxBytes) {
-            alert("이미지 용량이 너무 큽니다. (최대 2MB)");
-            input.value = "";
-            return;
-          }
-          if (!file.type || !file.type.startsWith("image/")) {
-            alert("이미지 파일만 업로드할 수 있습니다.");
-            input.value = "";
-            return;
-          }
+                const maxBytes = 2 * 1024 * 1024;
+                if (file.size > maxBytes) {
+                    // ✅ alert -> showResultModal 변경
+                    showResultModal('warning', '용량 초과', '이미지 용량이 너무 큽니다.<br>(최대 2MB)');
+                    input.value = "";
+                    return;
+                }
+                if (!file.type || !file.type.startsWith("image/")) {
+                    // ✅ alert -> showResultModal 변경
+                    showResultModal('warning', '형식 오류', '이미지 파일만<br>업로드할 수 있습니다.');
+                    input.value = "";
+                    return;
+                }
 
-          const fd = new FormData();
-          fd.append("userImage", file);
+                const fd = new FormData();
+                fd.append("userImage", file);
 
-          try {
-            if (btn) btn.disabled = true;
+                try {
+                    if (btn) btn.disabled = true;
 
-            const res = await fetch(window.__CTX__ + "/member/updateProfileImage.ajax", {
-              method: "POST",
-              body: fd,
-              credentials: "same-origin"
-            });
+                    const res = await fetch(window.__CTX__ + "/member/updateProfileImage.ajax", {
+                        method: "POST", body: fd, credentials: "same-origin"
+                    });
 
-            const ct = res.headers.get("content-type") || "";
-            let data;
+                    const ct = res.headers.get("content-type") || "";
+                    let data;
+                    if (ct.includes("application/json")) {
+                        data = await res.json();
+                    } else {
+                        const text = await res.text();
+                        throw new Error("서버 응답 오류");
+                    }
 
-            if (ct.includes("application/json")) {
-              data = await res.json();
-            } else {
-              const text = await res.text();
-              throw new Error("서버 응답이 JSON이 아닙니다. status=" + res.status + " body=" + text);
-            }
+                    if (!data || !data.ok) {
+                        showResultModal('error', '업로드 실패', (data && data.message) ? data.message : "업로드에 실패했습니다.");
+                        input.value = "";
+                        return;
+                    }
 
-            if (!data || !data.ok) {
-              alert((data && data.message) ? data.message : "업로드 실패");
-              input.value = "";
-              return;
-            }
+                    if (img) img.src = window.__CTX__ + "/member/profile-image?ts=" + Date.now();
+                    document.body.dispatchEvent(new Event('profile-image-updated'));
 
-            if (img) img.src = window.__CTX__ + "/member/profile-image?ts=" + Date.now();
+                    // ✅ 성공 메시지도 모달로 변경
+                    showResultModal('success', '저장 완료', '프로필 이미지가 변경되었습니다.');
+                    input.value = "";
 
-            // ✅ main 이미지도 즉시 갱신(메인에서 리스너 쓰는 경우)
-            document.body.dispatchEvent(new Event('profile-image-updated'));
-
-            alert(data.message || "프로필 이미지가 저장되었습니다.");
-            input.value = "";
-          } catch (e) {
-            console.error(e);
-            alert("이미지 업로드 중 오류가 발생했습니다.");
-            input.value = "";
-          } finally {
-            if (btn) btn.disabled = false;
-          }
-        };
-      })();
+                } catch (e) {
+                    console.error(e);
+                    showResultModal('error', '오류 발생', '이미지 업로드 중<br>오류가 발생했습니다.');
+                    input.value = "";
+                } finally {
+                    if (btn) btn.disabled = false;
+                }
+            };
+        })();
     </script>
+
+    <jsp:include page="/WEB-INF/views/lesson/common/resultModal2.jsp" />
 </div>

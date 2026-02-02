@@ -1,125 +1,183 @@
 const contextPath = window.__CTX__ || "";
 
-// DOM이 로드되면 아이콘을 렌더링합니다.
 document.addEventListener('DOMContentLoaded', () => {
-    if (window.lucide) {
-        lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
 });
 
-/**
- * 회원정보 수정 요청
- */
-function updateProfile() {
-    // 1. 입력값 가져오기
-    const userNameInput = document.getElementById('userName');
-    const userPwInput = document.getElementById('userPw');
-
-    const userName = userNameInput.value;
-    const userPw = userPwInput.value;
-
-    // 2. 유효성 검사 (닉네임 필수)
-    if (!userName || userName.trim() === "") {
-        alert("닉네임을 입력해주세요.");
-        userNameInput.focus();
+/* ============================================================
+ * 1. 결과 모달 제어 공통 함수
+ * ============================================================ */
+function showResultModal(type, title, desc, callback, cancelCallback) {
+    const modal = document.getElementById('resultModal');
+    if (!modal) {
+        if (type === 'confirm') {
+            if (confirm(desc.replace(/<br>/g, "\n"))) callback();
+        } else {
+            alert(desc.replace(/<br>/g, "\n"));
+            if (callback) callback();
+        }
         return;
     }
 
-    // 3. 전송 데이터 객체 생성
-    const requestData = {
-        userName: userName
-    };
+    const iconContainer = document.getElementById('modalIcon');
+    const titleEl = document.getElementById('modalTitle');
+    const descEl = document.getElementById('modalDesc');
+    const actionBtn = document.getElementById('modalActionBtn');
+    const cancelBtn = document.getElementById('modalCancelBtn');
+    const modalBar = document.getElementById('modalBar');
 
-    // 비밀번호는 사용자가 입력했을 때만 전송 데이터에 포함
-    if (userPw && userPw.trim() !== "") {
-        requestData.userPw = userPw;
+    // 1) 텍스트 설정
+    if (titleEl) titleEl.innerText = title;
+    if (descEl) descEl.innerHTML = desc;
+
+    // 2) 초기화 (클래스 리셋)
+    if (iconContainer) iconContainer.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg transition-transform";
+    if (actionBtn) actionBtn.className = "flex-1 py-3.5 rounded-xl text-white font-extrabold shadow-lg hover:brightness-105 transition-all";
+    // ^ w-full 제거하고 flex-1 유지 (JSP 수정과 매칭)
+
+    if (modalBar) modalBar.className = "h-2 w-full";
+    if (cancelBtn) cancelBtn.classList.add('hidden');
+
+    // 3) 타입별 스타일 적용
+    if (type === 'success') {
+        // ✅ [수정] 성공 시 연두색(green) -> 포인트 컬러(primary)로 변경
+        setModalTheme(iconContainer, modalBar, actionBtn, 'bg-primary', 'check', 'shadow-primary/30');
+        actionBtn.innerText = "확인";
+
+    } else if (type === 'error') {
+        // 에러는 빨간색 유지
+        setModalTheme(iconContainer, modalBar, actionBtn, 'bg-red-500', 'x', 'shadow-red-500/30');
+        actionBtn.innerText = "다시 시도";
+
+    } else if (type === 'confirm') {
+        // 탈퇴 확인 등 (빨간색)
+        setModalTheme(iconContainer, modalBar, actionBtn, 'bg-red-500', 'alert-triangle', 'shadow-red-500/30');
+        actionBtn.innerText = "탈퇴하기";
+
+        if (cancelBtn) {
+            cancelBtn.classList.remove('hidden');
+            cancelBtn.onclick = function () {
+                closeModal();
+                if (cancelCallback) cancelCallback();
+            }
+        }
+
+    } else { // warning
+        // 경고는 주황색 유지
+        setModalTheme(iconContainer, modalBar, actionBtn, 'bg-orange-400', 'alert-circle', 'shadow-orange-400/30');
+        actionBtn.innerText = "확인";
     }
 
-    // 버튼 로딩 상태 변경
-    const btn = document.querySelector('.btn-primary');
-    const originalText = btn.innerText;
-    btn.innerText = '저장 중...';
-    btn.disabled = true;
+    // 아이콘 렌더링
+    if (window.lucide) lucide.createIcons();
 
-    // 4. AJAX 요청
+    // 버튼 이벤트
+    actionBtn.onclick = function () {
+        closeModal();
+        if (callback && typeof callback === 'function') callback();
+    };
+
+    // 모달 표시
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+// 테마 적용 헬퍼 함수
+function setModalTheme(icon, bar, btn, colorClass, iconName, shadowClass) {
+    if (icon) {
+        icon.innerHTML = `<i data-lucide="${iconName}" class="w-10 h-10 text-white"></i>`;
+        icon.classList.add(colorClass);
+    }
+    if (bar) bar.classList.add(colorClass);
+    if (btn) btn.classList.add(colorClass, shadowClass);
+}
+
+// 모달 닫기
+function closeModal() {
+    const modal = document.getElementById('resultModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+window.closeModal = closeModal;
+
+/* ============================================================
+ * 2. 회원정보 수정
+ * ============================================================ */
+function updateProfile() {
+    const userNameInput = document.getElementById('userName');
+    const userPwInput = document.getElementById('userPw');
+    const userName = userNameInput.value;
+    const userPw = userPwInput.value;
+
+    if (!userName || userName.trim() === "") {
+        showResultModal('warning', '입력 확인', '닉네임을 입력해주세요.', () => userNameInput.focus());
+        return;
+    }
+
+    const requestData = { userName: userName };
+    if (userPw && userPw.trim() !== "") requestData.userPw = userPw;
+
+    const btn = document.querySelector('.btn-primary');
+    let originalText = btn ? btn.innerText : "";
+    if (btn) { btn.innerText = '저장 중...'; btn.disabled = true; }
+
     fetch(contextPath + '/member/updateProfile.ajax', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestData)
     })
         .then(async (res) => {
-            const text = await res.text(); // 1) 응답을 텍스트로 먼저 받음
-            console.log("status:", res.status);
-            console.log("response:", text); // 디버깅용 로그
-
-            try {
-                return JSON.parse(text); // 2) JSON 파싱 시도
-            } catch (e) {
-                // HTML(에러페이지)이 반환된 경우 에러 처리
-                throw new Error("서버 응답이 올바르지 않습니다. (HTML 반환됨)");
-            }
+            try { return JSON.parse(await res.text()); } catch (e) { throw new Error("서버 응답 오류"); }
         })
         .then(data => {
-            // [수정된 부분] 파싱된 데이터를 받아서 처리하는 로직 추가!
-            if (data.ok) {
-                alert(data.message || "회원 정보가 성공적으로 수정되었습니다.");
-                location.reload(); // 성공 시 새로고침
-            } else {
-                alert(data.message || "정보 수정에 실패했습니다.");
-            }
+            if (data.ok) showResultModal('success', '수정 완료', '회원 정보가 성공적으로 수정되었습니다.', () => location.reload());
+            else showResultModal('error', '수정 실패', data.message || "정보 수정에 실패했습니다.");
         })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("서버 통신 중 오류가 발생했습니다: " + error.message);
-        })
-        .finally(() => {
-            // 버튼 상태 원상복구
-            btn.innerText = originalText;
-            btn.disabled = false;
-        });
+        .catch(error => showResultModal('error', '오류 발생', error.message))
+        .finally(() => { if (btn) { btn.innerText = originalText; btn.disabled = false; } });
 }
 
-/**
- * 회원 탈퇴 요청
- */
+/* ============================================================
+ * 3. 회원 탈퇴
+ * ============================================================ */
 function withdrawMember() {
     const passwordInput = document.getElementById('withdrawPassword');
     const password = passwordInput.value;
 
     if (!password) {
-        alert("본인 확인을 위해 비밀번호를 입력해주세요.");
-        passwordInput.focus();
+        showResultModal('warning', '입력 확인', '본인 확인을 위해<br>비밀번호를 입력해주세요.', () => passwordInput.focus());
         return;
     }
 
-    if (!confirm("정말로 탈퇴하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.")) return;
+    showResultModal(
+        'confirm',
+        '탈퇴 확인',
+        '정말로 탈퇴하시겠습니까?<br>삭제된 데이터는 복구할 수 없습니다.',
+        function () {
+            realWithdraw(password);
+        }
+    );
+}
 
+function realWithdraw(password) {
     fetch(contextPath + "/member/withdraw.ajax", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: password })
     })
         .then(async (res) => {
-            // withdrawMember 함수도 안전하게 텍스트로 먼저 받도록 수정
-            const text = await res.text();
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                throw new Error("서버 응답이 올바르지 않습니다.");
-            }
+            try { return JSON.parse(await res.text()); } catch (e) { throw new Error("서버 응답 오류"); }
         })
         .then(data => {
             if (data.ok) {
-                alert("탈퇴 처리가 완료되었습니다. 이용해 주셔서 감사합니다.");
-                location.href = '/'; // 메인 페이지로 이동
+                showResultModal('success', '탈퇴 완료', '이용해 주셔서 감사합니다.', () => {
+                    window.location.href = contextPath + "/";
+                });
             } else {
-                alert(data.message);
+                showResultModal('error', '탈퇴 실패', data.message || '비밀번호가 일치하지 않습니다.');
             }
         })
-        .catch(err => {
-            console.error("Error:", err);
-            alert("오류가 발생했습니다: " + err.message);
-        });
+        .catch(err => showResultModal('error', '오류 발생', err.message));
 }

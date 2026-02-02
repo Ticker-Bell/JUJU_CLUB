@@ -152,13 +152,6 @@
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-gray-100 text-gray-500";
         title.textContent = "다시 생각해볼까요?";
         title.className = "text-2xl font-extrabold text-gray-600 mb-2";
-
-        let feedback = "";
-        if (selectedIdx === 1) feedback = "만유인력은 뉴턴의 사과와 관련이 있죠! 🍎";
-        if (selectedIdx === 3) feedback = "상대성 이론은 아인슈타인의 물리 이론이에요. ⚛️";
-        if (selectedIdx === 4) feedback = "복리는 '이자'와 관련된 개념이에요. 💰";
-
-        desc.innerHTML = `<span class="block mb-2 font-bold text-primary">오답 힌트</span>${feedback}<br>시장에서 물건 가격이 정해지는 원리를 떠올려보세요.`;
         bar.className = "h-2 w-full bg-gray-400";
         btn.textContent = "다시 풀기";
         btn.onclick = closeModal;

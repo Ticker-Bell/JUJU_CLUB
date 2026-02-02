@@ -27,7 +27,8 @@
            hx-get="${cpath}/invest/main.do"
            hx-target="#main"
            hx-swap="innerHTML"
-           hx-push-url="true">
+           hx-push-url="true"
+           hx-indicator="#investLoadingOverlay">
             <div class="nav-icon-box"><img src="${cpath}/resources/images/navIcons/bar-chart.svg" alt="차트아이콘" class="w-5 h-5 stroke-[2]"></div>
             <span class="text-sm font-bold mt-0.5">모의투자</span>
         </a>

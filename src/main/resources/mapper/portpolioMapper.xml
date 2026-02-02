@@ -10,7 +10,7 @@
                  join stock_master sm on mp.stock_seq = sm.stock_seq
         where mp.user_seq = #{user_seq}
           and mp.quantity > 0
-        order by mp.updated_at DESC
+        order by cast(mp.avg_price as unsigned) DESC
     </select>
 
     <select id = "selectPortfolioItem" resultType="com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO">

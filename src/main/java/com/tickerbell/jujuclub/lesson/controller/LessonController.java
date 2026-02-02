@@ -26,7 +26,7 @@ public class LessonController {
   /**
    * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
    *
-   * @param lessonId, session, model
+   * @param lessonId String
    * @return lesson/lessonInfo
    */
   @PostMapping("/lessonInfo")
@@ -69,7 +69,7 @@ public class LessonController {
   /**
    * 레슨 SELECT,MATCH,DRAG,LINK 문항 조회
    *
-   * @param lessonId, questionId, session, model
+   * @param lessonId String, questionId String
    * @return /lesson/qst2,/lesson/qst3,/lesson/qst4,/lesson/qst5,/lesson/error
    */
   @PostMapping("/qst")
@@ -112,7 +112,7 @@ public class LessonController {
   /**
    * 레슨 완료 정보 등록
    *
-   * @param lessonId, session
+   * @param lessonId String
    * @return redirect:/roadMap/main.do
    */
   @PostMapping("/updateLssnInfo")
@@ -133,7 +133,7 @@ public class LessonController {
   /**
    * 챕터 테스트 시작 정보 등록
    *
-   * @param lessonId, session
+   * @param lessonId String
    * @return lesson/chapterTest
    */
   @PostMapping("/chapter-test")
@@ -172,7 +172,7 @@ public class LessonController {
   /**
    * 챕터 테스트 완료 정보 등록
    *
-   * @param chapterId, score, isPass, session, model
+   * @param chapterId String, score Int, isPass, session, model
    *
    */
   @PostMapping("/update-chapter")

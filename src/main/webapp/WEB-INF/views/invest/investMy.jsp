@@ -15,26 +15,20 @@
     }
 
     .container {
-        max-width: 1200px;
+        min-width: 1200px;
+        width: 100%;
         margin: 0 auto;
         padding: 20px;
     }
 
-    /* 단위 */
-    /*.unit {*/
-    /*    font-size: 16px;*/
-    /*    font-weight: 500;*/
-    /*    color: #777;*/
-    /*    margin-left: 4px;*/
-    /*}*/
-
-    /* ===== SUMMARY WRAPPER (전체 큰 박스) ===== */
+    /* SUMMARY WRAPPER (전체 큰 박스) */
     .summary-wrapper {
+        grid-area: summary;
         background: #fff;
         border: 1px solid #e8e8e8;
         border-radius: 16px;
         padding: 24px;
-        margin-bottom: 20px;
+        margin-bottom: 0;
     }
 
     /* 왼쪽(총평가자산 텍스트 영역) + 오른쪽(3카드) */
@@ -54,7 +48,7 @@
     /* 총평가자산 텍스트 블록 */
     .summary-total {
         width: 100%;
-        padding: 6px 0; /* 살짝만 여백 */
+        padding: 6px 8px 6px 0; /* 상 우 하 좌 - 오른쪽에만 약간 여백 */
     }
 
     .summary-total-title {
@@ -86,12 +80,13 @@
         gap: 8px;
         line-height: 1;
         color: #333;
+        white-space: nowrap; /* 줄바꿈 방지 */
     }
 
     /* 단위 */
     .unit {
         margin-left: 0; /* gap으로 spacing 주기 */
-        padding: 0; /* 혹시 들어가있다면 제거 */
+        padding: 0;
         line-height: 1; /* 높이 딱 맞추기 */
         display: inline; /* 박스화 방지 */
         font-size: 18px;
@@ -99,11 +94,11 @@
         color: #777;
     }
 
-    /* ===== RIGHT: 작은 카드 3개 ===== */
+    /* RIGHT: 작은 카드 3개 */
     .summary-right {
-        display: grid !important;
-        gap: 16px !important;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(3, 1fr); /*기본 3열 고정*/
     }
 
     /* 작은 카드 공통 */
@@ -115,7 +110,7 @@
         height: 100%;
     }
 
-    /* 작은 카드 텍스트(예시처럼 좌측정렬) */
+    /* 작은 카드 텍스트 */
     .summary-right .summary-card .label {
         font-size: 13px;
         font-weight: 600;
@@ -127,6 +122,7 @@
         font-size: 24px;
         font-weight: 800;
         color: #333;
+        white-space: nowrap; /*줄바꿈 방지 */
     }
 
     /* 수익률 색상 */
@@ -138,14 +134,14 @@
         color: #1e88e5;
     }
 
-    /* ===== RESPONSIVE ===== */
+    /* RESPONSIVE */
     @media (max-width: 1100px) {
         .summary-cards {
             grid-template-columns: 1fr;
         }
 
         .summary-right {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 1fr); /*3열 유지*/
         }
 
         .summary-total-value {
@@ -155,13 +151,13 @@
 
     @media (max-width: 700px) {
         .summary-right {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 1fr); /*2열 유지*/
         }
     }
 
     @media (max-width: 480px) {
         .summary-right {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr; /*1열 유지*/
         }
 
         .summary-total-value {
@@ -169,20 +165,17 @@
         }
     }
 
-    /* =========================
-       DASHBOARD (보유리스트 / 차트+관심)
-       ========================= */
-
     .dashboard {
         display: grid;
-        grid-template-columns: 3fr 1fr;
-        gap: 20px;
-        align-items: start;
-        grid-template-rows: auto auto; /* 2행 */
-
+        grid-template-columns: 1fr minmax(280px, 320px);
+        grid-template-rows: auto auto auto;
+        gap: 20px 32px;
+        /*align-items: start;*/
         grid-template-areas:
-                "hold chart"
-                "hold watch";
+    "summary chart"
+    "hold    chart"
+    "hold    watch";
+        min-height: 0;
     }
 
     /* 각 카드의 위치 지정 */
@@ -204,11 +197,8 @@
     @media (max-width: 992px) {
         .dashboard {
             grid-template-columns: 1fr;
-            grid-template-rows: auto auto auto;
-            grid-template-areas:
-                  "hold"
-                  "chart"
-                  "watch";
+            grid-template-rows: auto auto auto auto;
+            grid-template-areas: "summary" "hold" "chart" "watch";
         }
     }
 
@@ -289,9 +279,11 @@
     /* 차트 범례 */
     .chart-legend {
         display: flex;
-        justify-content: center;
         gap: 15px;
         flex-wrap: wrap;
+        max-height: 180px;
+        overflow-y: auto;
+        justify-content: flex-start;
     }
 
     .legend-item {
@@ -346,15 +338,6 @@
         color: #1e88e5;
     }
 
-    .holdings-scroll {
-        max-height: calc(60px * 15); /* 15개 높이 */
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0;
-        padding-right: 14px; /* 스크롤바 여유 */
-        scrollbar-gutter: stable;
-    }
-
     /* 빈 상태 메시지 */
     .empty-state {
         text-align: center;
@@ -388,79 +371,121 @@
         text-align: right;
     }
 
-    /*스크롤*/
-    .watchlist-scroll {
-        max-height: calc(60px * 5); /* 5개 높이 */
-        overflow-y: auto;
-        padding-right: 14px; /* 스크롤바랑 내용 간격 */
-        scrollbar-gutter: stable; /* 가능 브라우저에서 레이아웃 흔들림 방지 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid #f0f0f0;
     }
 
+    .pagination button {
+        min-width: 28px;
+        height: 28px;
+        padding: 0 8px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    .pagination button:hover:not(:disabled) {
+        background: #f5f5f5;
+        border-color: #ccc;
+    }
+
+    .pagination button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .pagination button.active {
+        background: #6b5bff;
+        border-color: #6b5bff;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .holdings-scroll {
+        overflow-y: auto;
+        min-height: 0; /* flex/grid 내부 스크롤 살리는 핵심 */
+        padding-right: 10px;
+        scrollbar-gutter: stable;
+        max-height: calc(56px * 12); /* 12줄 정도 보이게 */
+
+    }
+
+    .watchlist-scroll {
+        max-height: calc(56px * 5);
+        overflow-y: auto;
+        min-height: 0;
+        padding-right: 10px;
+        scrollbar-gutter: stable;
+    }
 </style>
 
 <div class="container">
-    <!-- 탭 네비게이션 -->
-    <%--    <nav class="tab-nav">--%>
-    <%--        <a href="${pageContext.request.contextPath}/invest/my" class="active">마이</a>--%>
-    <%--        <a href="${pageContext.request.contextPath}/invest/main.do">투자</a>--%>
-    <%--    </nav>--%>
+    <!-- 메인 콘텐츠 -->
+    <div class="dashboard w-full">
+        <!-- 상단 요약 카드 -->
+        <div class="summary-wrapper">
+            <div class="summary-cards">
 
-    <!-- 상단 요약 카드 -->
-    <div class="summary-wrapper">
-        <div class="summary-cards">
-
-            <!-- LEFT: 큰 카드 -->
-            <div class="summary-left">
-                <div class="summary-total">
-                    <div class="summary-total-title">
-                        <span class="dot"></span>
-                        총 평가자산
-                    </div>
-                    <div class="summary-total-value">
+                <!-- LEFT: 큰 카드 -->
+                <div class="summary-left">
+                    <div class="summary-total">
+                        <div class="summary-total-title">
+                            <span class="dot"></span>
+                            총 평가자산
+                        </div>
+                        <div class="summary-total-value">
                         <span id="totalAsset">
                             <fmt:formatNumber value="${userAsset.totalAsset}" pattern="#,###"/>
                         </span>
-                        <span class="unit">원</span>
+                            <span class="unit">원</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- RIGHT: 작은 카드 3개 묶음 -->
-            <div class="summary-right">
-                <div class="summary-card">
-                    <div class="label">예수금</div>
-                    <div class="value">
+                <!-- RIGHT: 작은 카드 3개 묶음 -->
+                <div class="summary-right">
+                    <div class="summary-card">
+                        <div class="label">예수금</div>
+                        <div class="value">
                         <span id="cashBalance">
                         <fmt:formatNumber value="${userAsset.cashBalance}" pattern="#,###"/>
                         </span>
-                        <span class="unit">원</span>
+                            <span class="unit">원</span>
+                        </div>
                     </div>
-                </div>
 
-                <div class="summary-card">
-                    <div class="label">총 평가금액</div>
-                    <div class="value ">
+                    <div class="summary-card">
+                        <div class="label">총 평가금액</div>
+                        <div class="value ">
                         <span id="totalStockValue">
                         <fmt:formatNumber value="${userAsset.totalStockValue}" pattern="#,###"/>
                         </span>
-                        <span class="unit">원</span>
+                            <span class="unit">원</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="label">총 수익률</div>
+                        <div id="totalReturnPct"
+                             class="value ${userAsset.totalReturnPct > 0 ? 'positive' : (userAsset.totalReturnPct < 0 ? 'negative' : '')}">
+                            <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if>
+                            <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.00"/>%
+                        </div>
                     </div>
                 </div>
 
-                <div class="summary-card">
-                    <div class="label">총 수익률</div>
-                    <div id="totalReturnPct" class="value ${userAsset.totalReturnPct >= 0 ? 'positive' : 'negative'}">
-                        <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if>
-                        <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.0"/>%
-                    </div>
-                </div>
             </div>
-
         </div>
-    </div>
-
-    <!-- 메인 콘텐츠 (재배치된 대시보드) -->
-    <div class="dashboard">
 
         <!-- LEFT: 메인(넓게) - 보유 종목 리스트 -->
         <!-- 보유 종목 리스트 -->
@@ -469,7 +494,7 @@
             마지막 갱신 시간 <span id="test_time">-</span>
             <c:choose>
                 <c:when test="${not empty holdings}">
-                    <div class="holdings-scroll">
+                    <div id="holdingsScroll" class="holdings-scroll">
                         <table class="holdings-table">
                             <thead>
                             <tr>
@@ -480,7 +505,7 @@
                                 <th class="text-right">평가손익(원)</th>
                             </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="holdingStocks">
                             <c:forEach var="holding" items="${holdings}">
                                 <tr class="holding-row" data-code="${holding.stockCode}" data-qty="${holding.quantity}"
                                     data-avg="${holding.avgPrice}">
@@ -503,6 +528,8 @@
                             </c:forEach>
                             </tbody>
                         </table>
+                            <%--다음페이지 로드할 기준점--%>
+                        <div id="holdingsSentinel" style="height:1px;"></div>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -531,7 +558,7 @@
                     <div class="legend-item">
                         <div class="legend-color" style="background-color: ${item.color};"></div>
                         <span>${item.stockName}</span>
-                        <span><fmt:formatNumber value="${item.weightPct}" pattern="#,##0"/>%</span>
+                        <span><fmt:formatNumber value="${item.weightPct}" pattern="#,##0.00"/>%</span>
                     </div>
                 </c:forEach>
             </div>
@@ -542,26 +569,30 @@
             <h3 class="card-title">관심 종목 리스트</h3>
             <c:choose>
                 <c:when test="${not empty watchlist}">
-                    <div class="watchlist-scroll">
-                        <c:forEach var="stock" items="${watchlist}">
-                            <fmt:parseNumber var="changePct" value="${stock.changePct}" type="number"/>
-                            <div class="watchlist-item watch-row" data-code="${stock.stockCode}">
-                                <div class="stock-info">
-                                    <div class="stock-name">${stock.stockName}</div>
-                                    <div class="stock-code">${stock.stockCode}</div>
-                                </div>
-                                <div class="stock-price">
-                                    <div class="price currentPriceValue">
-                                        <fmt:formatNumber value="${stock.currentPrice}"
-                                                          pattern="#,###"/>
+                    <div id="watchlistScroll" class="watchlist-scroll">
+                        <div id="wishStocks">
+                            <c:forEach var="stock" items="${watchlist}">
+                                <fmt:parseNumber var="changePct" value="${stock.changePct}" type="number"/>
+                                <div class="watchlist-item watch-row" data-code="${stock.stockCode}">
+                                    <div class="stock-info">
+                                        <div class="stock-name">${stock.stockName}</div>
+                                        <div class="stock-code">${stock.stockCode}</div>
                                     </div>
-                                    <div class="change ${changePct >= 0 ? 'positive' : 'negative'} pctValue">
-                                        <c:if test="${changePct >= 0}">+</c:if>
-                                        <fmt:formatNumber value="${changePct}" pattern="#,##0.0"/>%
+                                    <div class="stock-price">
+                                        <div class="price currentPriceValue">
+                                            <fmt:formatNumber value="${stock.currentPrice}"
+                                                              pattern="#,###"/>
+                                        </div>
+                                        <div class="change ${changePct >= 0 ? 'positive' : 'negative'} pctValue">
+                                            <c:if test="${changePct >= 0}">+</c:if>
+                                            <fmt:formatNumber value="${changePct}" pattern="#,##0.00"/>%
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </c:forEach>
+                            </c:forEach>
+                        </div>
+                            <%--다음페이지 로드할 기준점--%>
+                        <div id="watchlistSentinel" style="height:1px;"></div>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -570,16 +601,178 @@
             </c:choose>
         </div>
     </div>
-
 </div>
 <script>
     //페이지를 바꿔도 전역변수가 안없어져서 감싸기
     (function () {
-
         const userSeq = "${sessionScope.userSeq}";
 
         //서버에서 전달받은 차트 데이터 : StockMyController에서 전달하는 JSON(chartDataJson)
         const chartDataFromServer = ${empty chartDataJson ? "[]" : chartDataJson};
+
+        //페이징
+        const countPerPage = 12;
+
+        //min 보다 작지 않고 max 보다 크지 않도록
+        // function edit(n, min, max) {
+        //     return Math.max(min, Math.min(max, n));
+        // }
+
+        //페이징 객체
+        // function makePaginator(options) {
+        //     //state = 보유종목 or 관심종목
+        //     const state = {
+        //         currentPage: 1,
+        //         totalPages: 1,
+        //         rows: [],
+        //         pagerEl: null,
+        //         getRows: options.getRows, //() => HTMLElement[]
+        //         pagerId: options.pagerId, //string
+        //         windowSize: options.windowSize || 5
+        //     };
+        //
+        //     //현재 페이지의 열 값들만 리턴
+        //     state.getVisibleRows = function () {
+        //         const start = (state.currentPage - 1) * countPerPage;
+        //         const end = start + countPerPage;
+        //         return state.rows.slice(start, end);
+        //     }
+        //
+        //     state.refresh = function () {
+        //         state.rows = state.getRows() || [];
+        //         state.pagerEl = document.getElementById(state.pagerId);
+        //         // 전체 페이지 수 = (row 개수 / 페이지당 개수) 올림
+        //         state.totalPages = Math.max(1, Math.ceil(state.rows.length / countPerPage));
+        //         // currentPage가 1~totalPages 범위를 벗어나면 안전하게 보정
+        //         state.currentPage = edit(state.currentPage, 1, state.totalPages);
+        //         // 화면에 실제로 보여주는 작업 실행
+        //         state.render();
+        //     };
+        //
+        //     //page를 범위 안으로 보정
+        //     state.goToPage = function (page) {
+        //         state.currentPage = edit(page, 1, state.totalPages);
+        //         state.render();
+        //     };
+        //
+        //     state.render = function () {
+        //         //현재 페이지가 보여줄 행 범위
+        //         //현재 2페이지고, 한 페이지에 5개씩 넣는다 하면
+        //         //start = 5, end = 10
+        //         const start = (state.currentPage - 1) * countPerPage;
+        //         const end = start + countPerPage;
+        //
+        //         // 모든 row를 돌면서 범위 안이면 보여주고, 아니면 숨김
+        //         state.rows.forEach((row, idx) => {
+        //             row.style.display = (idx >= start && idx < end) ? "" : "none";
+        //         });
+        //
+        //         state.renderPagination();
+        //     };
+        //
+        //     state.renderPagination = function () {
+        //         if (!state.pagerEl) return;
+        //         // 기존 버튼 싹 지우고 다시 그리는 방식
+        //         state.pagerEl.innerHTML = "";
+        //         // row가 없으면 버튼도 없음
+        //         if (state.rows.length === 0) return;
+        //
+        //         // 버튼 생성 헬퍼
+        //         const createBtn = (label, disabled, active, onClick) => {
+        //             const btn = document.createElement("button");
+        //             btn.type = "button";
+        //             btn.textContent = label;
+        //             if (disabled) btn.disabled = true;
+        //             if (active) btn.classList.add("active");
+        //             btn.addEventListener("click", onClick);
+        //             return btn;
+        //         };
+        //
+        //         //페이지 번호 만들기
+        //         state.pagerEl.appendChild(
+        //             createBtn("이전", state.currentPage === 1, false, () => state.goToPage(state.currentPage - 1))
+        //         );
+        //
+        //         //보여질 페이지 번호
+        //         let startPage = Math.max(1, state.currentPage - Math.floor(state.windowSize / 2));
+        //         let endPage = startPage + state.windowSize - 1;
+        //
+        //         if (endPage > state.totalPages) {
+        //             endPage = state.totalPages;
+        //             startPage = Math.max(1, endPage - state.windowSize + 1);
+        //         }
+        //
+        //         for (let p = startPage; p <= endPage; p++) {
+        //             state.pagerEl.appendChild(
+        //                 createBtn(String(p), false, p === state.currentPage, () => state.goToPage(p))
+        //             );
+        //         }
+        //
+        //         state.pagerEl.appendChild(
+        //             createBtn("다음", state.currentPage === state.totalPages, false, () => state.goToPage(state.currentPage + 1))
+        //         );
+        //     };
+        //
+        //     return state;
+        // }
+
+        const holdingsState = {
+            loadedCount: countPerPage,
+            rows: () => Array.from(document.querySelectorAll("#holdingStocks .holding-row")),
+        };
+
+        const watchState = {
+            loadedCount: countPerPage,
+            rows: () => Array.from(document.querySelectorAll("#wishStocks .watch-row")),
+        };
+
+        //무한 스크롤
+        function renderInfinite(state) {
+            const rows = state.rows();
+            rows.forEach((row, idx) => {
+                row.style.display = (idx < state.loadedCount) ? "" : "none";
+            });
+        }
+
+        //스크롤 끝까지 내려가면 다시 늘려주기
+        function bindInfiniteScroll(scrollEl, state) {
+
+            if (!scrollEl) {
+                console.warn("스크롤 엘리먼트를 찾지 못함:", state);
+                return;
+            }
+
+            const threshold = 40; // 바닥에서 40px 위쯤
+
+            scrollEl.addEventListener("scroll", () => {
+                const nearBottom = scrollEl.scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight - threshold;
+                if (!nearBottom) return;
+
+                const total = state.rows().length;
+                if (state.loadedCount >= total) return;
+
+                state.loadedCount = Math.min(total, state.loadedCount + countPerPage);
+                renderInfinite(state);
+            });
+        }
+
+        //로드된 양만큼 자동 리프레시 : codes 파라미터 selectedData로 보내기
+        function getLoadedCodes(state, rowSelector) {
+            const rows = state.rows().slice(0, state.loadedCount);
+            return rows.map(r => r.getAttribute("data-code")).filter(Boolean);
+        }
+
+        // const holdingsPaging = makePaginator({
+        //     pagerId: "holdingsPagination",
+        //     getRows: () => Array.from(document.querySelectorAll("#holdingStocks .holding-row")),
+        //     windowSize: 5 //페이지 번호 버튼 5개씩
+        // });
+        //
+        // const watchlistPaging = makePaginator({
+        //     pagerId: "watchlistPagination",
+        //     getRows: () => Array.from(document.querySelectorAll("#wishStocks .watch-row")),
+        //     windowSize: 5 //페이지 번호 버튼 5개씩
+        // });
 
         //보유 종목 없을 경우 차트 메세지 토글
         function setChartEmptyState(isEmpty) {
@@ -593,7 +786,22 @@
 
         let flag = false; //중복 호출 방지
 
+        //로딩
+        function hideInitialLoading() {
+            document.getElementById("investLoadingOverlay")?.classList.remove("is-active");
+        }
+
         function initChart() {
+            //초기화면 띄워주기
+            // holdingsPaging.refresh();
+            // watchlistPaging.refresh();
+
+            renderInfinite(holdingsState);
+            renderInfinite(watchState);
+
+            bindInfiniteScroll(document.getElementById("holdingsScroll"), holdingsState);
+            bindInfiniteScroll(document.getElementById("watchlistScroll"), watchState);
+
             if (Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
                 setChartEmptyState(false);
                 DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
@@ -601,7 +809,7 @@
                 setChartEmptyState(true);
             }
 
-            updateData();
+            updateData().finally(hideInitialLoading);
             //페이지 자동 갱신(1분) 60*1000
             setInterval(updateData, 30 * 1000);
         }
@@ -618,6 +826,7 @@
         //3)setInterval() 1분마다 updateData() 실행
 
         async function updateData() {
+            console.count("updateData called");
 
             //dom에 investMain의 데이터도 올라와 있으므로 my 탭 아닐때 제한하기
             const myJsp = document.getElementById('myJsp');
@@ -628,10 +837,28 @@
             if (flag) return;
             flag = true;
             try {
-                const url =
+                // //현재 리스트에 들어있는 값만 호출하기
+                // const holdingCodes = holdingsPaging.getVisibleRows()
+                //     .map(r => r.dataset.code)
+                //     .join(",");
+                //
+                // const watchCodes = watchlistPaging.getVisibleRows()
+                //     .map(r => r.dataset.code)
+                //     .join(",");
+
+                const holdingCodes = getLoadedCodes(holdingsState).join(",");
+                const watchCodes = getLoadedCodes(watchState).join(",");
+
+                let url =
                     "${pageContext.request.contextPath}/stock/api/invest/selectedData"
                     + "?userSeq=" + userSeq //userSeq (세션 저장 완료시 변경)
                     + "&ts=" + Date.now(); // 캐시 방지용
+                if (holdingCodes) {
+                    url += "&holdingCodes=" + encodeURIComponent(holdingCodes);
+                }
+                if (watchCodes) {
+                    url += "&watchCodes=" + encodeURIComponent(watchCodes);
+                }
 
                 const result = await fetch(url, {cache: "no-store"});
                 if (!result.ok) throw new Error("HTTP " + result.status);
@@ -650,9 +877,6 @@
                 const pctData = document.getElementById("totalReturnPct");
 
                 if (assetData) {
-                    document.getElementById("totalAsset").textContent = Number(assetData.totalAsset).toLocaleString("ko-KR");
-                    document.getElementById("cashBalance").textContent = Number(assetData.cashBalance).toLocaleString("ko-KR");
-                    document.getElementById("totalStockValue").textContent = Number(assetData.totalStockValue).toLocaleString("ko-KR");
 
                     if (pctData) {
                         //null 또는 undefined일 경우 0으로 처리
@@ -670,7 +894,7 @@
                     document.getElementById("test_time").textContent = new Date().toLocaleTimeString();
                 }
                 //관심종목
-                const watchlist = data.watchlistItemList;
+                const watchlist = data.watchlistItemList || [];
                 if (Array.isArray(watchlist)) {
                     watchlist.forEach(item => {
                         const code = item.stockCode;
@@ -757,8 +981,15 @@
                     });
                 }
 
+                //값이 계속 바뀌니까 그려주기
+                // holdingsPaging.render();
+                // watchlistPaging.render();
+
+                renderInfinite(holdingsState);
+                renderInfinite(watchState);
+
                 //마지막 갱신 표시
-                const testEl = document.getElementById("test");
+                const testEl = document.getElementById("test_time");
                 if (testEl) testEl.textContent = new Date().toLocaleTimeString();
 
             } catch (error) {

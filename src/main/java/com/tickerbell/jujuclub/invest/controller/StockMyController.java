@@ -30,10 +30,16 @@ public class StockMyController {
     private final PortfolioService portfolioService;
     private final UserAssetService userAssetService;
 
+    /**
+     * 모의투자 마이 페이지 연결
+     * 마이 탭) 사용자 자산 연결, 사용자 보유 종목 리스트, 보유 종목 도넛 차트, 관심 종목 리스트 조회
+     *
+     * @return invest/investMy
+     */
     @GetMapping("/investMy")
-    public String stockMyPage(HttpSession session, Model model){
+    public String stockMyPage(HttpSession session, Model model) {
         //세션에서 유저 시퀀스 가져오기
-        Integer userSeq = (Integer)session.getAttribute("userSeq");
+        Integer userSeq = (Integer) session.getAttribute("userSeq");
 
         if (userSeq == null) {
             return "redirect:/auth/login";
@@ -46,7 +52,7 @@ public class StockMyController {
         model.addAttribute("holdings", holdings);
         //도넛차트JSON(종목명, Pct, 색상)
         List<Map<String, Object>> chartData = new ArrayList<>();
-        for(int i = 0; i < holdings.size(); i++){
+        for (int i = 0; i < holdings.size(); i++) {
             PortfolioAllocationItemDTO portfolioAllocationItemDTO = holdings.get(i); //보유종목DTO
             Map<String, Object> data = new HashMap<>();
             data.put("stockName", portfolioAllocationItemDTO.getStockName());

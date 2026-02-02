@@ -3,6 +3,7 @@ package com.tickerbell.jujuclub.invest.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
 import com.tickerbell.jujuclub.invest.dto.RankingDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class RankingApiService {
 
     @Value("${kis.appkey}")
@@ -32,8 +34,15 @@ public class RankingApiService {
     @Autowired
     private KISApiService kisApiService;
 
-//    private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * 한국투자 Open API 호출
+     * 국내주식 거래량 순위 REST API 요청 및 응답 return
+     *
+     * @param accessToken string
+     * @return List&lt;RankingDTO&gt;
+     * @throws Exception
+     */
     public List<RankingDTO> getTradingVolumeRanking(String accessToken) throws Exception {
 
         try{
@@ -79,18 +88,25 @@ public class RankingApiService {
                 // 정상 성공
                 // output에는 순위별로 JSON데이터가 여러개 존재
                 return JsonToDto(root.path("output"));
-            }
-            else{
-                System.out.println("Error Code: " + response.getStatusCode());
+            } else{
+                log.error("거래량 순위 api 응답 에러: {}", response.getStatusCode());
                 return null;
             }
 
         } catch(Exception e){
-            e.printStackTrace();
-            return null;
+            log.error("거래량 순위 api 호출 실패");
+            throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 한국투자 Open API 호출
+     * 국내주식 시가총액 상위 REST API 요청 및 응답 return
+     *
+     * @param accessToken string
+     * @return List&lt;RankingDTO&gt;
+     * @throws Exception
+     */
     public List<RankingDTO> getMarketCapRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
@@ -133,23 +149,24 @@ public class RankingApiService {
                 // 정상 성공
                 // output에는 순위별로 JSON데이터가 여러개 존재
                 return JsonToDto(root.path("output"));
-            }
-//            else if ("EGW00123".equals(msgCd)){
-//                System.out.println("토큰 만료됨. 재발급 후 다시 시도");
-//                getAccessToken();
-//                return getTradingVolumeRanking();
-//            }
-            else{
-                System.out.println("Error Code: " + response.getStatusCode());
+            } else{
+                log.error("시가총액 상위 api 응답 에러: {}", response.getStatusCode());
                 return null;
             }
-
         } catch(Exception e){
-            e.printStackTrace();
-            return null;
+            log.error("시가총액 상위 api 호출 실패");
+            throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 한국투자 Open API 호출
+     * 국내주식 상승률 순위 REST API 요청 및 응답 return
+     *
+     * @param accessToken string
+     * @return List&lt;RankingDTO&gt;
+     * @throws Exception
+     */
     public List<RankingDTO> getTopGainersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
@@ -197,23 +214,24 @@ public class RankingApiService {
                 // 정상 성공
                 // output에는 순위별로 JSON데이터가 여러개 존재
                 return JsonToDto2(root.path("output"));
-            }
-//            else if ("EGW00123".equals(msgCd)){
-//                System.out.println("토큰 만료됨. 재발급 후 다시 시도");
-//                getAccessToken();
-//                return getTradingVolumeRanking();
-//            }
-            else{
-                System.out.println("Error Code: " + response.getStatusCode());
+            } else{
+                log.error("상승률 순위 api 응답 에러: {}", response.getStatusCode());
                 return null;
             }
-
         } catch(Exception e){
-            e.printStackTrace();
-            return null;
+            log.error("상승률 순위 api 호출 실패");
+            throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 한국투자 Open API 호출
+     * 국내주식 하락률 순위 REST API 요청 및 응답 return
+     *
+     * @param accessToken string
+     * @return List&lt;RankingDTO&gt;
+     * @throws Exception
+     */
     public List<RankingDTO> getTopLosersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
@@ -261,24 +279,23 @@ public class RankingApiService {
                 // 정상 성공
                 // output에는 순위별로 JSON데이터가 여러개 존재
                 return JsonToDto2(root.path("output"));
-            }
-//            else if ("EGW00123".equals(msgCd)){
-//                System.out.println("토큰 만료됨. 재발급 후 다시 시도");
-//                getAccessToken();
-//                return getTradingVolumeRanking();
-//            }
-            else{
-                System.out.println("Error Code: " + response.getStatusCode());
+            } else{
+                log.error("하락률 순위 api 응답 에러: {}", response.getStatusCode());
                 return null;
             }
 
         } catch(Exception e){
-            e.printStackTrace();
-            return null;
+            log.error("하락률 순위 api 호출 실패");
+            throw new RuntimeException(e);
         }
     }
 
-
+    /**
+     * 한국투자 Open API 요청 응답으로 받아온 데이터를 JSON에서 DTO로 변환하여 return
+     *
+     * @param node JsonNode
+     * @return List&lt;RankingDTO&gt;
+     */
     private List<RankingDTO> JsonToDto(JsonNode node){
         //JsonNode 안에 Json 배열이 랭킹 순으로 들어가 있음
         //각 Json을 DTO로 변환
@@ -297,6 +314,12 @@ public class RankingApiService {
         return rankingDTOList;
     }
 
+    /**
+     * 한국투자 Open API 요청 응답으로 받아온 데이터를 JSON에서 DTO로 변환하여 return
+     *
+     * @param node JsonNode
+     * @return List&lt;RankingDTO&gt;
+     */
     private List<RankingDTO> JsonToDto2(JsonNode node){
         // 등락률 순위를 받아올땐 응답 BODY의 주식 종목 코드의 key값 이름이
         // 'mksc_shrn_iscd'가 아니라 'stck_shrn_iscd'로 달라서
@@ -316,32 +339,27 @@ public class RankingApiService {
         return rankingDTOList;
     }
 
+    /**
+     * 해당 순위별 리스트의 각 종목들 현재가를 가져와 DTO에 추가 후 return
+     *
+     * @param rankingDTOList List&lt;RankingDTO&gt;
+     * @return List&ltRankingDTO&gt;
+     */
     public List<RankingDTO> addKisDataDtoToRankingDto(List<RankingDTO> rankingDTOList){
-        int batchSize = 15;
-        int count = 0;
 
         for(int i=0; i<rankingDTOList.size(); i++){
-            RankingDTO rankingDTO = rankingDTOList.get(i);
-
-            KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
-            // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
-            if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
-                kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
-            }
-            rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
-            rankingDTO.setChangePct(kisDataDTO.getChangePct());
-
-            count++;
-
-            // API호출 최대 1초당 20번이기 때문에
-            // 15개마다 1초 쉬기 (마지막은 제외해도 됨)
-            if(count % batchSize == 0 && i < rankingDTOList.size()-1){
-                try{
-                    Thread.sleep(900);
-                }catch(InterruptedException e){
-                    Thread.currentThread().interrupt();
-                    throw new RuntimeException("API 호출 대기 중 인터럽트 발생",e);
+            try{
+                RankingDTO rankingDTO = rankingDTOList.get(i);
+                KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
+                // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+                if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+                    kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
                 }
+                rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
+                rankingDTO.setChangePct(kisDataDTO.getChangePct());
+            }catch (Exception e){
+                log.error("RankingApiService에서 kisApiService 호출 실패");
+                throw new RuntimeException(e);
             }
         }
         return rankingDTOList;

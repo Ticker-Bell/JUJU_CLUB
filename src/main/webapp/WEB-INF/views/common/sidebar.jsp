@@ -19,7 +19,8 @@
             hx-get="${cpath}/roadMap/main.do"
             hx-target="#main"
             hx-swap="innerHTML"
-            hx-push-url="true">
+            hx-push-url="true"
+            hx-on::after-request="location.reload();">
             <div class="nav-icon-box"><img class="w-5 h-5 stroke-[2]" src="${cpath}/resources/images/navIcons/map.svg" alt="맵아이콘"></div>
             <span class="text-sm font-bold mt-0.5">학습 로드맵</span>
         </a>

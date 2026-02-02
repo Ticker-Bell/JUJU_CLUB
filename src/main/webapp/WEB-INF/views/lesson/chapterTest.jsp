@@ -152,7 +152,7 @@
         </div>
         <h2 class="text-2xl font-extrabold text-gray-900 mb-2">테스트 불합격</h2>
         <p class="text-gray-500 text-sm font-medium mb-8">
-            아쉽게도 <span class="text-red-500 font-bold">3문제 이상</span> 틀려<br>테스트가 종료되었습니다.<br>
+            아쉽게도 <span class="text-red-500 font-bold">4문제 이상</span> 틀려<br>테스트가 종료되었습니다.<br>
             <span class="text-primary font-bold mt-2 block">도전 횟수는 무제한이니 다시 도전해보세요!</span>
         </p>
 

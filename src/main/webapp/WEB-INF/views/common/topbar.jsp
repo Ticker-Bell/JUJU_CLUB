@@ -16,9 +16,9 @@
 </c:if>
 
 <!-- Top Bar -->
-<div class="w-full h-20 flex flex-shrink-0 fixed top-0 z-50">
+<div class="w-full h-20 flex flex-shrink-0 fixed top-0 z-50 bg-[#E6E3F6]">
     <!-- logo -->
-    <div class="w-[220px] bg-primary/10 flex items-center pl-6 transition-all duration-300">
+    <div class="w-[220px] flex items-center pl-6 transition-all duration-300">
         <div class="flex items-center gap-3">
             <div class="w-9 h-9 bg-primary rounded-xl flex items-center justify-center text-white font-bold shadow-lg shadow-primary/30 text-lg">
                 J
@@ -28,7 +28,7 @@
     </div>
 
     <!-- top bar navigation -->
-    <header class="flex-1 bg-primary/10 flex items-center justify-end px-10 gap-6">
+    <header class="flex-1 flex items-center justify-end px-10 gap-6">
         <!-- 로그인 전 -->
         <c:if test="${empty sessionScope.user}">
             <div class="flex gap-4">
@@ -39,7 +39,6 @@
                 </button>
             </div>
         </c:if>
-        <!-- 로그인 후 -->
         <!-- 로그인 후 -->
         <c:if test="${not empty sessionScope.user}">
 

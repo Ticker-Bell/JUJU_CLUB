@@ -13,6 +13,13 @@ public class GetValidApprovalKey {
     private final RequestNewApprovalKey requestNewApprovalKey;
     private final ServletContext servletContext;
 
+    /**
+     * Application scope에 저장된 approval key (Web socket 연결에 사용) 가져오기
+     * 없거만 만료되면 새로 발급
+     *
+     * @return String
+     * @throws Exception
+     */
     public synchronized String getValidApprovalKey() throws Exception {
 
         String key = (String)servletContext.getAttribute("APPROVAL_KEY");

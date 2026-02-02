@@ -5,17 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WatchlistItemDTO {
-
-    private int favoriteSeq;
-    private int stockSeq;
-    private String stockCode;
+@Builder
+public class StockRankingDTO {
     private String stockName;
-    private int currentPrice; //KIS 현재가
-    private String changePct; //등락률
-
+    private String stockCode;
+    private Integer rank;
+    private int currentPrice;
+    private String changePct;
 }

@@ -564,42 +564,6 @@
             </div>
         </div>
 
-        <!-- 관심 종목 리스트 -->
-        <div class="card watch-card">
-            <h3 class="card-title">관심 종목 리스트</h3>
-            <c:choose>
-                <c:when test="${not empty watchlist}">
-                    <div id="watchlistScroll" class="watchlist-scroll">
-                        <div id="wishStocks">
-                            <c:forEach var="stock" items="${watchlist}">
-                                <fmt:parseNumber var="changePct" value="${stock.changePct}" type="number"/>
-                                <div class="watchlist-item watch-row" data-code="${stock.stockCode}">
-                                    <div class="stock-info">
-                                        <div class="stock-name">${stock.stockName}</div>
-                                        <div class="stock-code">${stock.stockCode}</div>
-                                    </div>
-                                    <div class="stock-price">
-                                        <div class="price currentPriceValue">
-                                            <fmt:formatNumber value="${stock.currentPrice}"
-                                                              pattern="#,###"/>
-                                        </div>
-                                        <div class="change ${changePct >= 0 ? 'positive' : 'negative'} pctValue">
-                                            <c:if test="${changePct >= 0}">+</c:if>
-                                            <fmt:formatNumber value="${changePct}" pattern="#,##0.00"/>%
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:forEach>
-                        </div>
-                            <%--다음페이지 로드할 기준점--%>
-                        <div id="watchlistSentinel" style="height:1px;"></div>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="empty-state">관심 종목이 없습니다🥲</div>
-                </c:otherwise>
-            </c:choose>
-        </div>
     </div>
 </div>
 <script>
@@ -613,118 +577,11 @@
         //페이징
         const countPerPage = 12;
 
-        //min 보다 작지 않고 max 보다 크지 않도록
-        // function edit(n, min, max) {
-        //     return Math.max(min, Math.min(max, n));
-        // }
-
-        //페이징 객체
-        // function makePaginator(options) {
-        //     //state = 보유종목 or 관심종목
-        //     const state = {
-        //         currentPage: 1,
-        //         totalPages: 1,
-        //         rows: [],
-        //         pagerEl: null,
-        //         getRows: options.getRows, //() => HTMLElement[]
-        //         pagerId: options.pagerId, //string
-        //         windowSize: options.windowSize || 5
-        //     };
-        //
-        //     //현재 페이지의 열 값들만 리턴
-        //     state.getVisibleRows = function () {
-        //         const start = (state.currentPage - 1) * countPerPage;
-        //         const end = start + countPerPage;
-        //         return state.rows.slice(start, end);
-        //     }
-        //
-        //     state.refresh = function () {
-        //         state.rows = state.getRows() || [];
-        //         state.pagerEl = document.getElementById(state.pagerId);
-        //         // 전체 페이지 수 = (row 개수 / 페이지당 개수) 올림
-        //         state.totalPages = Math.max(1, Math.ceil(state.rows.length / countPerPage));
-        //         // currentPage가 1~totalPages 범위를 벗어나면 안전하게 보정
-        //         state.currentPage = edit(state.currentPage, 1, state.totalPages);
-        //         // 화면에 실제로 보여주는 작업 실행
-        //         state.render();
-        //     };
-        //
-        //     //page를 범위 안으로 보정
-        //     state.goToPage = function (page) {
-        //         state.currentPage = edit(page, 1, state.totalPages);
-        //         state.render();
-        //     };
-        //
-        //     state.render = function () {
-        //         //현재 페이지가 보여줄 행 범위
-        //         //현재 2페이지고, 한 페이지에 5개씩 넣는다 하면
-        //         //start = 5, end = 10
-        //         const start = (state.currentPage - 1) * countPerPage;
-        //         const end = start + countPerPage;
-        //
-        //         // 모든 row를 돌면서 범위 안이면 보여주고, 아니면 숨김
-        //         state.rows.forEach((row, idx) => {
-        //             row.style.display = (idx >= start && idx < end) ? "" : "none";
-        //         });
-        //
-        //         state.renderPagination();
-        //     };
-        //
-        //     state.renderPagination = function () {
-        //         if (!state.pagerEl) return;
-        //         // 기존 버튼 싹 지우고 다시 그리는 방식
-        //         state.pagerEl.innerHTML = "";
-        //         // row가 없으면 버튼도 없음
-        //         if (state.rows.length === 0) return;
-        //
-        //         // 버튼 생성 헬퍼
-        //         const createBtn = (label, disabled, active, onClick) => {
-        //             const btn = document.createElement("button");
-        //             btn.type = "button";
-        //             btn.textContent = label;
-        //             if (disabled) btn.disabled = true;
-        //             if (active) btn.classList.add("active");
-        //             btn.addEventListener("click", onClick);
-        //             return btn;
-        //         };
-        //
-        //         //페이지 번호 만들기
-        //         state.pagerEl.appendChild(
-        //             createBtn("이전", state.currentPage === 1, false, () => state.goToPage(state.currentPage - 1))
-        //         );
-        //
-        //         //보여질 페이지 번호
-        //         let startPage = Math.max(1, state.currentPage - Math.floor(state.windowSize / 2));
-        //         let endPage = startPage + state.windowSize - 1;
-        //
-        //         if (endPage > state.totalPages) {
-        //             endPage = state.totalPages;
-        //             startPage = Math.max(1, endPage - state.windowSize + 1);
-        //         }
-        //
-        //         for (let p = startPage; p <= endPage; p++) {
-        //             state.pagerEl.appendChild(
-        //                 createBtn(String(p), false, p === state.currentPage, () => state.goToPage(p))
-        //             );
-        //         }
-        //
-        //         state.pagerEl.appendChild(
-        //             createBtn("다음", state.currentPage === state.totalPages, false, () => state.goToPage(state.currentPage + 1))
-        //         );
-        //     };
-        //
-        //     return state;
-        // }
-
         const holdingsState = {
             loadedCount: countPerPage,
             rows: () => Array.from(document.querySelectorAll("#holdingStocks .holding-row")),
         };
 
-        const watchState = {
-            loadedCount: countPerPage,
-            rows: () => Array.from(document.querySelectorAll("#wishStocks .watch-row")),
-        };
 
         //무한 스크롤
         function renderInfinite(state) {
@@ -762,17 +619,6 @@
             return rows.map(r => r.getAttribute("data-code")).filter(Boolean);
         }
 
-        // const holdingsPaging = makePaginator({
-        //     pagerId: "holdingsPagination",
-        //     getRows: () => Array.from(document.querySelectorAll("#holdingStocks .holding-row")),
-        //     windowSize: 5 //페이지 번호 버튼 5개씩
-        // });
-        //
-        // const watchlistPaging = makePaginator({
-        //     pagerId: "watchlistPagination",
-        //     getRows: () => Array.from(document.querySelectorAll("#wishStocks .watch-row")),
-        //     windowSize: 5 //페이지 번호 버튼 5개씩
-        // });
 
         //보유 종목 없을 경우 차트 메세지 토글
         function setChartEmptyState(isEmpty) {
@@ -792,15 +638,10 @@
         }
 
         function initChart() {
-            //초기화면 띄워주기
-            // holdingsPaging.refresh();
-            // watchlistPaging.refresh();
 
             renderInfinite(holdingsState);
-            renderInfinite(watchState);
 
             bindInfiniteScroll(document.getElementById("holdingsScroll"), holdingsState);
-            bindInfiniteScroll(document.getElementById("watchlistScroll"), watchState);
 
             if (Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
                 setChartEmptyState(false);
@@ -820,13 +661,8 @@
             initChart();
         }
 
-        //1분마다 데이터 자동 갱신 AJAX
-        //1)fetch(url) 서버에 데이터 요청
-        //2)data=await result.json() json을 js객체로 변환
-        //3)setInterval() 1분마다 updateData() 실행
 
         async function updateData() {
-            console.count("updateData called");
 
             //dom에 investMain의 데이터도 올라와 있으므로 my 탭 아닐때 제한하기
             const myJsp = document.getElementById('myJsp');
@@ -837,17 +673,8 @@
             if (flag) return;
             flag = true;
             try {
-                // //현재 리스트에 들어있는 값만 호출하기
-                // const holdingCodes = holdingsPaging.getVisibleRows()
-                //     .map(r => r.dataset.code)
-                //     .join(",");
-                //
-                // const watchCodes = watchlistPaging.getVisibleRows()
-                //     .map(r => r.dataset.code)
-                //     .join(",");
 
                 const holdingCodes = getLoadedCodes(holdingsState).join(",");
-                const watchCodes = getLoadedCodes(watchState).join(",");
 
                 let url =
                     "${pageContext.request.contextPath}/stock/api/invest/selectedData"
@@ -856,21 +683,10 @@
                 if (holdingCodes) {
                     url += "&holdingCodes=" + encodeURIComponent(holdingCodes);
                 }
-                if (watchCodes) {
-                    url += "&watchCodes=" + encodeURIComponent(watchCodes);
-                }
 
                 const result = await fetch(url, {cache: "no-store"});
                 if (!result.ok) throw new Error("HTTP " + result.status);
                 const data = await result.json();
-
-                // const chartCanvas = document.getElementById("holdingsChart");
-                // //데이터 없다고 표시해주기
-                // setChartEmptyState(!chartDataFromServer || chartDataFromServer.length === 0);
-                // //데이터 있으면 차트 표시
-                // if (chartCanvas && Array.isArray(chartDataFromServer) && chartDataFromServer.length > 0) {
-                //     DonutChart.renderOrUpdateDonut("holdingsChart", chartDataFromServer);
-                // }
 
                 //사용자 자산
                 const assetData = data.userInvestSummeryData;
@@ -893,36 +709,7 @@
                     //test
                     document.getElementById("test_time").textContent = new Date().toLocaleTimeString();
                 }
-                //관심종목
-                const watchlist = data.watchlistItemList || [];
-                if (Array.isArray(watchlist)) {
-                    watchlist.forEach(item => {
-                        const code = item.stockCode;
-                        const row = document.querySelector('.watch-row[data-code="' + code + '"]');
-                        if (!row) return;
 
-                        //현재가
-                        const curData = row.querySelector(".currentPriceValue");
-                        if (curData != null && item.currentPrice != null) {
-                            curData.textContent = Number(item.currentPrice).toLocaleString("ko-KR");
-                        }
-
-                        //등락률
-                        const pctData = row.querySelector(".pctValue");
-                        if (pctData) {
-                            const cp = parseFloat(item.changePct) || 0;
-                            pctData.classList.remove("positive", "negative");
-
-                            if (cp > 0) {
-                                pctData.classList.add("positive");
-                            } else if (cp < 0) {
-                                pctData.classList.add("negative");
-                            }
-                            //보합(0)일 때도 값이 나오도록 보장
-                            pctData.textContent = (cp > 0 ? "+" : "") + cp.toFixed(2) + "%";
-                        }
-                    });
-                }
                 //차트 갱신 + 범례 갱신
                 const newChartData = data.chartData || []; //chartData에 값이 없으면 빈 배열 사용
                 setChartEmptyState(!newChartData || newChartData.length === 0); //없으면 없다고 텍스트 띄우기
@@ -981,12 +768,7 @@
                     });
                 }
 
-                //값이 계속 바뀌니까 그려주기
-                // holdingsPaging.render();
-                // watchlistPaging.render();
-
                 renderInfinite(holdingsState);
-                renderInfinite(watchState);
 
                 //마지막 갱신 표시
                 const testEl = document.getElementById("test_time");

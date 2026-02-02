@@ -3,7 +3,7 @@ package com.tickerbell.jujuclub.mypage.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.auth.dto.AccountDTO;
 import com.tickerbell.jujuclub.auth.service.AccountService;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
+import com.tickerbell.jujuclub.invest.dto.PortfolioDTO;
 import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
@@ -34,8 +34,13 @@ public class MyPageController {
     private final UserAssetService userAssetService;
     private final AccountService accountService;
 
+    @GetMapping("/profile")
+    public String profile(Model model) {
+        return "myPage/myPageProfile";
+    }
+
     /**
-     * [1] 마이페이지 메인 화면 반환 (데이터 로딩 없이 껍데기만)
+     * 마이페이지 메인 화면 반환
      * URL: /myPage/main.do
      */
     @GetMapping("/main.do")
@@ -52,7 +57,7 @@ public class MyPageController {
     }
 
     /**
-     * [2] 자산 정보 및 차트 데이터 조회 (비동기)
+     * 자산 정보 및 차트 데이터 조회
      * URL: /myPage/asset
      */
     @GetMapping("/asset")
@@ -61,10 +66,10 @@ public class MyPageController {
 
         // --- 차트 데이터 로직 ---
         try {
-            List<PortfolioAllocationItemDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
+            List<PortfolioDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
             List<Map<String, Object>> chartData = new ArrayList<>();
             if (holdings != null) {
-                for (PortfolioAllocationItemDTO item : holdings) {
+                for (PortfolioDTO item : holdings) {
                     if (item.getWeightPct() > 0) {
                         Map<String, Object> data = new HashMap<>();
                         data.put("stockName", item.getStockName());
@@ -101,7 +106,7 @@ public class MyPageController {
     }
 
     /**
-     * [3] 미션 정보 조회 (비동기)
+     * 미션 정보 조회
      * URL: /myPage/mission
      */
     @GetMapping("/mission")

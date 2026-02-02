@@ -13,5 +13,6 @@
         FROM MOCK_TRADE join STOCK_MASTER
         ON (MOCK_TRADE.stock_seq = STOCK_MASTER.stock_seq)
         WHERE user_seq = #{userSeq}
+        ORDER BY TRADED_AT DESC
     </select>
 </mapper>

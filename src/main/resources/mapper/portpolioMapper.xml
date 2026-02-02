@@ -4,7 +4,7 @@
 <mapper namespace="com.tickerbell.jujuclub.invest.mapper.PortfolioMapper">
 
     <!-- 유저 포트폴리오, 보유종목리스트 -->
-    <select id = "selectPortfolioList"  parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO" >
+    <select id = "selectPortfolioList"  parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.PortfolioDTO" >
         select mp.stock_seq as stockSeq, sm.stock_code as stockCode, sm.stock_name as stockName, mp.quantity as quantity, mp.avg_price as avgPrice
         from mock_portfolio mp
                  join stock_master sm on mp.stock_seq = sm.stock_seq

@@ -134,10 +134,8 @@ public class StockListController {
       for(MockTradeDTO mockTradeDTO : mockTradeDTOList){
         if(mockTradeDTO.getTradeType() == 'Y'){
           typeDetail = "매수";
-          price = "-" + mockTradeDTO.getTradePrice();
         }else{
           typeDetail = "매도";
-          price = "+" + mockTradeDTO.getTradePrice();
         }
 
         LocalDate localDate = mockTradeDTO.getTradedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -147,7 +145,8 @@ public class StockListController {
                 .type("주식")
                 .typeDetail(typeDetail)
                 .detail(mockTradeDTO.getStockName())
-                .price(price)
+                .price("" + mockTradeDTO.getTradePrice())
+                .quantity(mockTradeDTO.getTradeQuantity())
                 .date(localDate.format(formatter))
                 .build();
         assetDetailDTOList.add(assetDetailDTO);

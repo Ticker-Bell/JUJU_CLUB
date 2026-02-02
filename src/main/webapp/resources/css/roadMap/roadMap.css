@@ -34,10 +34,6 @@
     height: 2px;
     background: #CEC8F6;
     border-radius: 50%;
-
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.1),
-    0 0 0 8px rgba(255,255,255,0.1),
-    0 0 20px rgba(255,255,255,1);
     opacity: 0;
 }
 
@@ -77,21 +73,21 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: auto;
+    width: 95px;
     height: auto;
     z-index: 30;
     pointer-events: none;
 }
 
 /* 깃발 이미지 */
-.flag-div img {
+.flag-img {
     display: block;
     width: 95px;
     height: auto;
 }
 
 /* 깃발 위에 올라갈 텍스트 */
-.flag-div span {
+.flag-text {
     position: absolute;
     top: 30%;
     left: 50%;

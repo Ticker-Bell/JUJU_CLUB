@@ -9,11 +9,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,76 +22,23 @@ public class RoadMapController {
     private final RoadMapService roadMapService;
     private final UserInfoService userInfoService;
 
+    /**
+     * 로드맵 메인화면 정보 조희
+     *
+     * @return /roadMap/roadMapMain
+     */
     @GetMapping("/main.do")
     public String getRoadMap(Model model, HttpSession session) {
-        // 테스트용
-//        Integer levelSeq = 1;
-//        Integer userSeq = 11;
-//        String chapterId = "LV2_CH001";
         
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         Integer userSeq = loginUser.getUserSeq();
 
-
         List<LevelDTO> levelList = roadMapService.levelList();
         List<UserLessonDTO> userLessonList = roadMapService.userLessonList(userSeq);
-        List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList();
-        List<ChapterResultDTO> chapterResultList = roadMapService.chapterTestResult(userSeq);
+        List<LevelChapterLessonDTO> allLearningList = roadMapService.allLearningList(userSeq);
         List<MissionDTO> missionList = roadMapService.missionList(userSeq);
 
         int successCount = (int) missionList.stream().filter(mission -> mission.getIsSuccess().equals("Y")).count();
-
-        // 유저 레슨 진행 상황 저장
-        Map<String, UserLessonDTO> userMap = new HashMap<>();
-        for (UserLessonDTO user : userLessonList) {
-            userMap.put(user.getLessonId(), user);
-        }
-
-        // 유저 챕터 테스트 진행상황 저장
-        Map<String, ChapterResultDTO> resultMap = new HashMap<>();
-        for (ChapterResultDTO result : chapterResultList) {
-            resultMap.put(result.getChapterId(), result);
-        }
-
-
-        // 유저 레슨, 테스트 진행상황 저장
-        boolean isUnlocked = true;
-        for(LevelChapterLessonDTO lesson: allLearningList) {
-            UserLessonDTO user = userMap.get(lesson.getLessonId());
-            ChapterResultDTO result = resultMap.get(lesson.getChapterId());
-
-            boolean isLssnFinished = user != null && user.getEndDate() != null && !user.getEndDate().toString().isEmpty();
-            boolean isLssnCurrent = user != null && user.getStartDate() != null && user.getEndDate() == null;
-
-            boolean isChptFinished = result != null && "Y".equals(result.getIsPass());
-
-            if (!"6".equals(lesson.getLessonId().substring(lesson.getLessonId().length()-1))) {
-                if (isLssnFinished) {
-                    lesson.setStatus("completed");
-                    isUnlocked = true;
-                } else {
-                    if (isUnlocked || isLssnCurrent) {
-                        lesson.setStatus("current");
-                        isUnlocked = false;
-                    } else {
-                        lesson.setStatus("locked");
-                    }
-                }
-            } else {
-                if (isChptFinished) {
-                    lesson.setStatus("completed");
-                    isUnlocked = true;
-                } else {
-                    if (isUnlocked) {
-                        lesson.setStatus("current");
-                        isUnlocked = false;
-                    } else {
-                        lesson.setStatus("locked");
-                    }
-
-                }
-            }
-        }
 
         // 현재 진행하고 있는 유저 레슨/챕터 정보 전달
         LevelChapterLessonDTO userLesson = allLearningList.stream()
@@ -110,6 +57,12 @@ public class RoadMapController {
         return "roadMap/roadMapMain";
     }
 
+
+    /**
+     * 미션 정보 조회
+     *
+     * @return roadMap/missionModal
+     */
     @GetMapping("/mission.do")
     public String getMission(Model model, HttpSession session) {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
@@ -120,6 +73,21 @@ public class RoadMapController {
 
         model.addAttribute("mission", missionList);
         model.addAttribute("successCount", successCount);
+
         return "roadMap/missionModal";
+    }
+
+
+    /**
+     * 레벨에 맞는 챕터 전체 반환
+     *
+     * @param levelId Integer
+     * @return roadMapService.chapterList(levelId)
+     */
+    @ResponseBody
+    @GetMapping("/api/chapters")
+    public List<ChapterDTO> getChapter(@RequestParam("levelId") Integer levelId) {
+
+        return roadMapService.chapterList(levelId);
     }
 }

@@ -18,10 +18,8 @@
             <i data-lucide="book-open" class="w-5 h-5"></i>
         </div>
         <div>
-            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">Current
-                Lesson
-            </div>
-            <div class="text-sm font-extrabold text-gray-900">Chapter 1. 기초 용어</div>
+            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">${titles[0].chapterName}</div>
+            <div class="text-sm font-extrabold text-gray-900">${titles[0].lessonName}</div>
         </div>
     </div>
 
@@ -135,7 +133,7 @@
             <div class="text-2xl font-black text-primary num-font">
                 + <fmt:formatNumber value="${title[0].rewardCash}" type="number"/>원
             </div>
-            <div class="text-xs text-gray-400 mt-2 font-medium">Chapter ${chapterId.substring(8)} 수료 장학금</div>
+            <div class="text-xs text-gray-400 mt-2 font-medium">Chapter ${chapterId.substring(9)} 수료 장학금</div>
         </div>
 
         <button id="goToRoadmapBtn"

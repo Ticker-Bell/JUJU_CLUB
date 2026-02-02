@@ -98,11 +98,12 @@
     </c:forEach>
     </c:forEach>
 
+
     // JS side/name UI 처리
     script.forEach(msg => {
       const isUser = msg.side.trim() === 'user';
       msg.side = isUser ? 'right' : 'left';
-      msg.name = isUser ? '홍길동' : '멘토';
+      msg.name = isUser ? '<c:out value="${userName}" />' : '주주';
     });
 
     const chatList = document.getElementById("chatList");

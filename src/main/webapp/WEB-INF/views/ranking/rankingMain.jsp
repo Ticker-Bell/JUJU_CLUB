@@ -15,7 +15,7 @@
 <c:set var="topLssn" value="${rankingInfo.rankingBorardListOBR}"/>
 <c:set var="listSize" value="${topAsset != null ? fn:length(topAsset) : 0}"/>
 
-<div class="ranking-wrapper" id="rankingMainContent">
+<div class="ranking-wrapper -m-8" id="rankingMainContent">
     <div id="leftAnimZone">
         <div class="text-center px-6">
             <h2 class="text-4xl font-black text-gray-900 mb-4 tracking-tighter">명예의 전당</h2>

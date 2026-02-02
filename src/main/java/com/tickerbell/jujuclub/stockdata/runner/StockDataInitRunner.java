@@ -76,6 +76,14 @@ public class StockDataInitRunner{
             3,1,1,1
     };
 
+    /**
+     * runner main
+     * 한국투자 Open API 사이트에서 종목정보파일(코스피, 코스닥) 다운로드 후
+     * 정목정보파일에서 값 추출 후 DB에 저장 (존재하는 모든 종목)
+     *
+     * @param args String[]
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         // 스프링 컨테이너 로드
@@ -123,6 +131,11 @@ public class StockDataInitRunner{
         System.out.println("DB insert success");
     }
 
+    /**
+     * 한국투자 Open API 사이트에서 코스피 종목정보파일 다운로드 및 압축 해제
+     *
+     * @throws IOException
+     */
     static void downloadAndUnzipKospi() throws IOException { // 한투 사이트에서 코스피종목정보 zip파일 stockInfoFiles폴더에 다운로드 후 압축해제
 
         File dir = new File(BASE_DIR + "/stockInfoFiles");
@@ -149,6 +162,11 @@ public class StockDataInitRunner{
 
     }
 
+    /**
+     * 한국투자 Open API 사이트에서 코스닥 종목정보파일 다운로드 및 압축해제
+     *
+     * @throws IOException
+     */
     static void downloadAndUnzipKosdaq() throws IOException { // 한투 사이트에서 코스닥종목정보 zip파일 stockInfoFiles폴더에 다운로드 후 압축해제
         File dir = new File(BASE_DIR + "/stockInfoFiles");
         if(!dir.exists()) dir.mkdir();
@@ -173,6 +191,12 @@ public class StockDataInitRunner{
         new File(zipPath).delete();
     }
 
+    /**
+     * 저장된 코스피 종목정보파일의 값 parsing
+     *
+     * @return List&lt;Map&lt;String, String&gt;&gt;
+     * @throws IOException
+     */
     static List<Map<String, String>> parseKospiMst() throws IOException { // stockInfoFiles에 저장된 kospi_code.mst 파일 키,값 밸류로 정리
         File file = new File(BASE_DIR + "/stockInfoFiles/kospi_code.mst");
         List<Map<String, String>> result = new ArrayList<>();
@@ -209,6 +233,12 @@ public class StockDataInitRunner{
         return result;
     }
 
+    /**
+     * 저장된 코스닥 종목정보파일의 값 parsing
+     *
+     * @return List&lt;Map&lt;String, String&gt;&gt;
+     * @throws IOException
+     */
     static List<Map<String, String>> parseKosdaqMst() throws IOException { // stockInfoFiles에 저장된 kosdaq_code.mst 파일 키,값 밸류로 정리
         File file = new File(BASE_DIR + "/stockInfoFiles/kosdaq_code.mst");
         List<Map<String, String>> result = new ArrayList<>();

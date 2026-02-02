@@ -41,6 +41,8 @@ public class StockListController {
      * 모의투자 메인 페이지 연결
      * 마이 탭) 사용자 자산 연결, 사용자 보유 종목 리스트, 보유 종목 도넛 차트, 관심 종목 리스트 조회
      * 투자 탭)
+     * 모의투자 페이지 필요 정보 조회
+     * 유저 관심종목, 보유주식, 모의 체결 내역
      *
      * @return invest/investMain
      */
@@ -64,8 +66,6 @@ public class StockListController {
 
             codeKISDataMap.put(stockDTO.getStockCode(), kisDataDTO);
         }
-
-        System.out.println("codeKISDataMap: " + codeKISDataMap);
 
         model.addAttribute("codeKISDataMap", codeKISDataMap);
         model.addAttribute("stockDTOList", stockDTOList);
@@ -137,12 +137,20 @@ public class StockListController {
             }
 
             model.addAttribute("assetDetailDTOList", assetDetailDTOList);
-            System.out.println("assetDetailDTOList" + assetDetailDTOList);
         }
 
         return "invest/investMain";
     }
 
+
+    /**
+     * 모의투자 종목 리스트에서 탭 클릭시 해당 순위대로(30개) 종목 정보 반환
+     * paging으로 10개씩 3번 반환(page = 0,1,2)
+     *
+     * @param sortType string, page int
+     * @return List&lt;RankingDTO&gt;
+     * @throws Exception
+     */
     @GetMapping("/main/stock/list")
     @ResponseBody
     public List<RankingDTO> getStockList(@RequestParam("sortType") String sortType, @RequestParam(value = "page", defaultValue = "0") int page, HttpSession session) throws Exception {
@@ -212,7 +220,12 @@ public class StockListController {
         return slicedList;
     }
 
-
+    /**
+     * 모의투자에서 검색시 입력한 내용을 포함하는 종목들에 대한 정보 반환
+     *
+     * @param keyword string
+     * @return List&lt;StockDTO&gt;
+     */
     @PostMapping("/search/autocomplete")
     @ResponseBody
     public List<StockDTO> autocomplete(@RequestParam("keyword") String keyword) {
@@ -225,11 +238,17 @@ public class StockListController {
         return stockService.getSearchList(keyword);
     }
 
+    /**
+     * 모의투자에서 검색한 종목에 대한 정보 반환
+     *
+     * @param stockCode string, stockName string
+     * @return RankingDTO
+     */
     @PostMapping("/stock/selected")
     @ResponseBody
     public RankingDTO getSelectedStock(@RequestParam("stockCode") String stockCode, @RequestParam("stockName") String stockName) {
         KISDataDTO kisDataDTO = kisApiService.getPriceData(stockCode);
-        // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
+        // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부호 없기때문에 붙여준다.
         if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
             kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
         }

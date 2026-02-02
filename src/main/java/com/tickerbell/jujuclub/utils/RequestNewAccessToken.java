@@ -24,6 +24,13 @@ public class RequestNewAccessToken {
     private String accessToken = null;
     private long tokenExpireTime = 0; //만료시간(토큰 발급시 같이 들어옴)
 
+    /**
+     * 한국투자 Open API에 접근토큰(Access Token) 발급 요청
+     * 발급받은 토큰 return
+     *
+     * @return String
+     * @throws Exception
+     */
     public String getAccessToken() throws Exception {
 
         //토근이 발급됐다면 다시 사용

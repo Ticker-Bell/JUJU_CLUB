@@ -13,6 +13,13 @@ public class GetValidAccessToken {
     private final RequestNewAccessToken requestNewToken;
     private final ServletContext servletContext;
 
+    /**
+     * Application scope에 저장된 access token(Rest API 호출에 사용) 가져오기
+     * 없거나 만료되면 새로 발급
+     *
+     * @return String
+     * @throws Exception
+     */
     public String getValidToken() throws Exception {
 
         String token = (String) servletContext.getAttribute("API_TOKEN");

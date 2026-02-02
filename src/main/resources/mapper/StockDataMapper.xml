@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.tickerbell.jujuclub.stockdata.mapper.StockDataMapper">
-    <!-- DB에 종목정보 insert -->
+    <!-- DB에 종목정보 insert, 이미 존재한다면 update -->
     <insert id="insert" parameterType="com.tickerbell.jujuclub.stockdata.dto.StockDataDTO">
         INSERT INTO STOCK_MASTER(stock_code,
                                  stock_name,

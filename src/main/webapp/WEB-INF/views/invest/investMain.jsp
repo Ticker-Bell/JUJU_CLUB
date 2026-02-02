@@ -56,13 +56,12 @@
     <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
         <button id="myTab" class="active" onclick="changeJsp('my')">마이</button>
-        <%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
         <button id="investTab" onclick="changeJsp('invest')">투자</button>
         <button id="assetDetailTab" onclick="changeJsp('asset')">거래 내역</button>
     </nav>
     <div class="tab-container">
         <div id="myJsp" class="tab-content active">
-           <jsp:include page="investMy.jsp"></jsp:include>
+            <jsp:include page="investMy.jsp"></jsp:include>
         </div>
         <div id="investJsp" class="tab-content">
             <div id="stock" class="flex flex-row justify-between w-full gap-8">
@@ -125,7 +124,7 @@
     }
 
     function changeJsp(type) {
-
+        localStorage.setItem('activeTab', type);
         const myJsp = document.getElementById('myJsp');
         const myTab = document.getElementById('myTab');
         const investJsp = document.getElementById('investJsp');
@@ -143,6 +142,7 @@
             myTab.classList.add('active');
             investTab.classList.remove('active');
             assetDetailTab.classList.remove('active');
+
         } else if (type === 'invest') {
             startWebSocket();
             investJsp.classList.add('active');
@@ -163,6 +163,11 @@
             myTab.classList.remove('active');
         }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const activeTab = localStorage.getItem('activeTab') || 'my';
+        changeJsp(activeTab);
+    })
 
     //stockCorpInfoCard.jsp에 있던 script
     function getSelectedCorpInfo(stockCode) {

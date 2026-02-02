@@ -241,7 +241,12 @@
                 newBtn.disabled = false;
                 newBtn.classList.remove("bg-gray-400", "cursor-not-allowed", "shadow-none");
                 newBtn.classList.add("bg-indigo-600", "hover:bg-indigo-700", "shadow-indigo-200");
-                newBtn.innerText = isChapter ? "시험 응시하기" : (status === 'completed' ? "다시하기" : "시작하기");
+
+                if(isChapter) {
+                    newBtn.innerHTML = '<div class="flex items-center justify-center gap-1 flex-shrink-0"><img class="w-5 h-5 object-contain" src="${cpath}/resources/images/roadMapIcons/money3.png" alt="돈아이콘"> -'+ Number(data.testPay).toLocaleString() + '원</div>';
+                } else {
+                    newBtn.innerText = status === 'completed' ? "다시하기" : "시작하기";
+                }
 
                 newBtn.setAttribute('hx-post', '${cpath}/lesson/' + (isChapter ? 'chapter-test' : 'lessonInfo'));
                 newBtn.setAttribute('hx-target', '#main');
@@ -359,7 +364,7 @@
 
             // 초기 로딩일 때만 현재 위치로 스크롤 & 드롭다운 동기화
             if (isFirstLoad) {
-                const currentNode = nodePositions.find(p => p.data.status === 'current' && p.data.type !== 'TEST');
+                const currentNode = nodePositions.findLast(p => p.data.status === 'current');
 
                 // 만약 'current'가 없으면(다 깼거나 오류) 가장 마지막 완료된 곳이라도 찾음
                 const targetNode = currentNode || nodePositions[nodePositions.length - 1];
@@ -440,8 +445,7 @@
             const mapWidth = document.getElementById('innerContent')?.scrollWidth || window.innerWidth * 5;
             const mapHeight = window.innerHeight;
 
-            // 2. 별 개수 설정 (가로 길이에 비례해서 넉넉하게 생성)
-            // 예: 200px 당 1개꼴로 생성
+            // 2. 별 개수 설정
             const starCount = Math.floor(mapWidth / 200);
 
             for (let i = 0; i < starCount; i++) {
@@ -640,7 +644,7 @@
             window.removeEventListener('resize', handleResize);
             window.addEventListener('resize', handleResize);
 
-            // [핵심] 렌더링 안정성을 위해 약간의 지연 후 그리기
+            // 렌더링 안정성을 위해 약간의 지연 후 그리기
             setTimeout(() => {
                 initRoadmap(true); // true = 내 위치로 스크롤 이동
                 initShootingStars();

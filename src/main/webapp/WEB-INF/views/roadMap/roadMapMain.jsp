@@ -108,7 +108,6 @@
         });
         </c:if>
         </c:forEach>
-        // console.log("로드된 노드 개수:", nodesData.length); // 0개면 Controller 확인 필요
 
         let nodePositions = [];
 
@@ -417,15 +416,6 @@
                 d += " L " + next.x + " " + next.y;
             }
 
-            // if (pathBorder) {
-            //     pathBorder.setAttribute('d', d);
-            //     pathBorder.style.stroke = '#ffffff';
-            //     pathBorder.style.fill = 'none';
-            //     pathBorder.style.strokeWidth = "4px";
-            //     pathBorder.style.strokeLinecap = 'round';
-            //     pathBorder.style.strokeDasharray = '5px 20px';
-            //     pathBorder.style.strokeIinejoin = 'round';
-            // }
             if (pathMain) {
                 pathMain.setAttribute('d', d);
                 pathMain.style.stroke = '#ffffff';
@@ -436,25 +426,6 @@
                 pathMain.style.strokeIinejoin = 'round';
                 pathMain.style.filter = 'blur(1px)';
             }
-            // if (pathDashed) pathDashed.setAttribute('d', d);
-            //
-            // if (pathActive) {
-            //     const currentPosIdx = nodePositions.findIndex(p => p.data.status === 'current');
-            //     if (currentPosIdx <= 0) {
-            //         pathActive.setAttribute('d', '');
-            //     } else {
-            //         let activeD = "M " + nodePositions[0].x + " " + nodePositions[0].y;
-            //         for (let i = 0; i < currentPosIdx; i++) {
-            //             const curr = nodePositions[i];
-            //             const next = nodePositions[i + 1];
-            //             const dist = next.x - curr.x;
-            //             const cp1 = {x: curr.x + (dist * 0.5), y: curr.y};
-            //             const cp2 = {x: next.x - (dist * 0.5), y: next.y};
-            //             activeD += " C " + cp1.x + " " + cp1.y + ", " + cp2.x + " " + cp2.y + ", " + next.x + " " + next.y;
-            //         }
-            //         pathActive.setAttribute('d', activeD);
-            //     }
-            // }
         };
 
         // 별똥별 그리기

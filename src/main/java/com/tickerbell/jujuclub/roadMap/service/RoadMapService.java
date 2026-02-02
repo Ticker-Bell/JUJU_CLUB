@@ -22,7 +22,16 @@ public class RoadMapService {
      * @return List&ltLevelDTO&gt
      */
     public List<LevelDTO> levelList() {
-        return roadMapMapper.levelList();
+
+        try {
+            log.info("로드맵 레벨 정보 조회 - 레벨 정보 조회 시작");
+            List<LevelDTO> list = roadMapMapper.levelList();
+            log.info("로드맵 레벨 정보 조회 - 레벨 정보 조회 완료");
+            return list;
+        } catch (Exception e) {
+            log.info("로드맵 레벨 정보 조회 - 레벨 정보 조회 실패");
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -32,7 +41,16 @@ public class RoadMapService {
      * @return List&ltChapterDTO&gt
      */
     public List<ChapterDTO> chapterList(Integer levelId) {
-        return roadMapMapper.chapterList(levelId);
+
+        try {
+            log.info("[{}] 로드맵 챕터 정보 조회 -  챕터 정보 조회 시작", levelId);
+            List<ChapterDTO> list = roadMapMapper.chapterList(levelId);
+            log.info("[{}] 로드맵 챕터 정보 조회 -  챕터 정보 조회 완료", levelId);
+            return list;
+        } catch (Exception e) {
+            log.info("[{}] 로드맵 챕터 정보 조회 -  챕터 정보 조회 실패", levelId);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -42,7 +60,16 @@ public class RoadMapService {
      * @return List&ltUserLessonDTO&gt
      */
     public List<UserLessonDTO> userLessonList(Integer userSeq) {
-        return roadMapMapper.userLessonList(userSeq);
+
+        try {
+            log.info("[{}] user 현재 레슨 진행 정보 조회 - 레슨 진행 정보 조회 시작", userSeq);
+            List<UserLessonDTO> list = roadMapMapper.userLessonList(userSeq);
+            log.info("[{}] 로드맵 챕터 정보 조회 -  레슨 진행 정보 조회 완료", userSeq);
+            return list;
+        } catch (Exception e) {
+            log.info("[{}] 로드맵 챕터 정보 조회 -  레슨 진행 정보 조회 실패", userSeq);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -51,7 +78,16 @@ public class RoadMapService {
      * @return List&ltLevelChapterLessonDTO&gt
      */
     public List<LevelChapterLessonDTO> allLearningList() {
-        return roadMapMapper.allLearningList();
+
+        try {
+            log.info("로드맵 레벨/챕터/레슨 정보 조회 - 레벨/챕터/레슨 정보 조회 시작");
+            List<LevelChapterLessonDTO> list = roadMapMapper.allLearningList();
+            log.info("로드맵 레벨/챕터/레슨 정보 조회 - 레벨/챕터/레슨 정보 조회 완료");
+            return list;
+        } catch (Exception e) {
+            log.info("로드맵 레벨/챕터/레슨 정보 조회 - 레벨/챕터/레슨 정보 조회 실패");
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -61,7 +97,16 @@ public class RoadMapService {
      * @return List&ltChapterResultDTO&gt
      */
     public List<ChapterResultDTO> chapterTestResult(Integer userSeq) {
-        return roadMapMapper.chapterTestResult(userSeq);
+
+        try {
+            log.info("[{}] user chapter test 결과 조회 - chapter test 결과 조회 시작", userSeq);
+            List<ChapterResultDTO> list = roadMapMapper.chapterTestResult(userSeq);
+            log.info("[{}] user chapter test 결과 조회 - chapter test 결과 조회 완료", userSeq);
+            return list;
+        } catch (Exception e) {
+            log.info("[{}] user chapter test 결과 조회 - chapter test 결과 조회 실패", userSeq);
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -70,7 +115,14 @@ public class RoadMapService {
      * @param userSeq Integer
      */
     public void insertInitUserMission(Integer userSeq) {
-        roadMapMapper.insertInitUserMission(userSeq);
+
+        try {
+            log.info("[{}] user 미션 정보 등록 - user 미션 정보 등록 시작", userSeq);
+            roadMapMapper.insertInitUserMission(userSeq);
+            log.info("[{}] user 미션 정보 등록 - user 미션 정보 등록 완료", userSeq);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -80,16 +132,18 @@ public class RoadMapService {
      * @return List&ltMissionDTO&gt
      */
     public List<MissionDTO> missionList(Integer userSeq) {
-        try {
-            log.info("[{}] 유저 미션 데이터 조회 - 유저 미션 DB 조회 시작", userSeq);
-            List<MissionDTO> list = roadMapMapper.missionList(userSeq);
-            log.info("[{}] 유저 미션 데이터 조회 - 유저 미션 DB 조회 완료", userSeq);
+        log.info("[{}] user 미션 데이터 조회 - user 미션 DB 조회 시작", userSeq);
+        List<MissionDTO> list = roadMapMapper.missionList(userSeq);
+        log.info("[{}] user 미션 데이터 조회 - user 미션 DB 조회 완료", userSeq);
 
-            log.info("[{}] 유저 미션 완료 조회 - 유저 미션 완료 DB 조회 시작", userSeq);
-            MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
-            log.info("[{}] 유저 미션 완료 조회 - 유저 미션 완료 DB 조회 완료", userSeq);
+        log.info("[{}] user 미션 완료 조회 - user 미션 완료 DB 조회 시작", userSeq);
+        MissionCheckDTO check = roadMapMapper.missionCheck(userSeq);
+        log.info("[{}] user 미션 완료 조회 - user 미션 완료 DB 조회 완료", userSeq);
 
-            for (MissionDTO mission : list) {
+
+        for (MissionDTO mission : list) {
+            try {
+                log.info("[{}] user 미션 타입에 따른 진행횟수 저장 시작", userSeq);
                 // 미션타입에 따라 진행횟수 저장
                 switch (mission.getType()) {
                     case "lesson":
@@ -122,12 +176,13 @@ public class RoadMapService {
                         }
                     }
                 }
+                log.info("[{}] user 미션 타입에 따른 진행횟수 저장 완료", userSeq);
+            } catch (Exception e) {
+                log.info("[{}] user 미션 타입에 따른 진행횟수 저장 실패", userSeq);
+                throw new RuntimeException(e);
             }
-
-            return list;
-        }catch (Exception e) {
-            throw new RuntimeException(e);
         }
+        return list;
     }
 
     /**
@@ -139,7 +194,20 @@ public class RoadMapService {
      */
     @Transactional
     public void insertInitUserLesson(Integer userSeq, Integer userLevel) {
-        roadMapMapper.insertInitUserLesson(userSeq, userLevel);
-        roadMapMapper.insertInitCurrentUserLesson(userSeq, userLevel);
-    };
+
+        try {
+            log.info("[{}] 온보딩 후 레벨에 맞는 레슨 정보 등록 - 레슨 정보 등록 시작: [{}]", userLevel, userSeq);
+             roadMapMapper.insertInitUserLesson(userSeq, userLevel);
+            log.info("[{}] 온보딩 후 레벨에 맞는 레슨 정보 등록 - 레슨 정보 등록 완료: [{}]", userLevel, userSeq);
+
+            log.info("[{}] 온보딩 후 최초 시작 레슨 정보 등록 - 최초 레슨 정보 등록 시작: [{}]", userLevel, userSeq);
+            roadMapMapper.insertInitCurrentUserLesson(userSeq, userLevel);
+            log.info("[{}] 온보딩 후 최초 시작 레슨 정보 등록 - 최초 레슨 정보 등록 완료: [{}]", userLevel, userSeq);
+        } catch (Exception e) {
+            log.info("[{}] 온보딩 후 레벨에 맞는 레슨 정보 등록 - 레슨 정보 등록 실패: [{}]", userLevel, userSeq);
+            throw new RuntimeException(e);
+        }
+    }
+
+    ;
 }

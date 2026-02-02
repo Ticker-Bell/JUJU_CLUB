@@ -19,7 +19,8 @@
             hx-get="${cpath}/roadMap/main.do"
             hx-target="#main"
             hx-swap="innerHTML"
-            hx-push-url="true">
+            hx-push-url="true"
+            hx-on::after-request="location.reload();">
             <div class="nav-icon-box"><img class="w-5 h-5 stroke-[2]" src="${cpath}/resources/images/navIcons/map.svg" alt="맵아이콘"></div>
             <span class="text-sm font-bold mt-0.5">학습 로드맵</span>
         </a>
@@ -59,3 +60,60 @@
         </div>
     </footer>
 </aside>
+
+<!-- 마이페이지 dotlottie 충돌 방지 스크립트 -->
+<script>
+    (function () {
+        if (window.__jujuGlobalEnhancersBound) return;
+        window.__jujuGlobalEnhancersBound = true;
+
+        function kickDotLottie(root) {
+            const scope = root || document;
+            const els = scope.querySelectorAll('dotlottie-wc');
+            if (!els || els.length === 0) return;
+
+            els.forEach(el => {
+                const src = el.getAttribute('src');
+                if (src) el.setAttribute('src', src);
+                try { if (el.load) el.load(); } catch(e) {}
+                try { if (el.play) el.play(); } catch(e) {}
+            });
+        }
+
+        function ensureDotLottieReady(root) {
+            if (!window.customElements || !customElements.whenDefined) {
+                setTimeout(() => kickDotLottie(root), 80);
+                return;
+            }
+            customElements.whenDefined('dotlottie-wc').then(() => {
+                requestAnimationFrame(() => kickDotLottie(root));
+            }).catch(() => setTimeout(() => kickDotLottie(root), 120));
+        }
+
+        function refreshLucide(root) {
+            if (!window.lucide) return;
+            try { lucide.createIcons(root || document); } catch(e) {}
+        }
+
+        // 최초 1회
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshLucide(document);
+            ensureDotLottieReady(document);
+        });
+
+        // ✅ HTMX로 main이 교체될 때마다 dotlottie + lucide 보장
+        document.body.addEventListener('htmx:afterSwap', (evt) => {
+            if (evt.detail && evt.detail.target && evt.detail.target.id === 'main') {
+                refreshLucide(evt.detail.target);
+                ensureDotLottieReady(evt.detail.target);
+            }
+        });
+
+        document.body.addEventListener('htmx:load', (evt) => {
+            if (evt.target && evt.target.id === 'main') {
+                refreshLucide(evt.target);
+                ensureDotLottieReady(evt.target);
+            }
+        });
+    })();
+</script>

@@ -30,6 +30,7 @@ public class StockListController {
   private final GetValidAccessToken getValidAccessToken;
 
   private final UserAssetService userAssetService;
+  private final PortfolioService portfolioService;
 
   //자산 상세 내용
   private final AssetDetailService assetDetailService;
@@ -43,47 +44,35 @@ public class StockListController {
   @GetMapping("main.do")
   public String investMain(Model model, HttpSession session) {
 
+    return "invest/investMain";
+  }
+
+  /**
+   * 마이 TAB
+   */
+  @GetMapping("/tab/my")
+  public String getMyTabFragment(Model model, HttpSession session) {
     Integer userSeq = (Integer) session.getAttribute("userSeq");
 
-    // 해당하는 유저의 관심종목들의 종목정보 리스트 반환
-    List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
-
-    Map<String, KISDataDTO> codeKISDataMap = new HashMap<String, KISDataDTO>();
-
-    // 리스트를 처음 띄울때의 현재가와 등락률은 restAPI로 호출해서 출력한다.
-    for (StockDTO stockDTO : stockDTOList) {
-      KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
-      // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
-      if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
-        kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
-      }
-
-      codeKISDataMap.put(stockDTO.getStockCode(), kisDataDTO);
-    }
-
-    model.addAttribute("codeKISDataMap", codeKISDataMap);
-    model.addAttribute("stockDTOList", stockDTOList);
-
-    //마이페이지 my.jsp에 필요한 데이터 - StockMyController 내용들
     if (userSeq != null) {
 
-      //5. 사용자 자산 요약
-      UserInvestSummeryDTO userAssetSummary = userAssetService.getUserInvestSummary(userSeq);
-      List<PortfolioDTO> holdings = userAssetSummary.getItemDTOList();
+      // 2. 보유주식 리스트
+      List<PortfolioDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
+      model.addAttribute("holdings", holdings);
 
-      //3. 차트 데이터 생성 (도넛 차트용)
+      // 3. 차트 데이터 생성 (도넛 차트용)
       List<Map<String, Object>> chartData = new ArrayList<>();
       for (PortfolioDTO item : holdings) {
         Map<String, Object> data = new HashMap<>();
         data.put("stockName", item.getStockName());
-        data.put("stockCode", item.getStockCode()); // JS 업데이트용 코드 추가
+        data.put("stockCode", item.getStockCode());
         data.put("weightPct", item.getWeightPct());
         data.put("color", ColorUtil.colorByStockCode(item.getStockCode()));
         chartData.add(data);
       }
-      model.addAttribute("chartData", chartData); // 범례용
+      model.addAttribute("chartData", chartData);
 
-      //4. 차트 데이터 JSON 변환 (Chart.js용)
+      // 4. 차트 데이터 JSON 변환 (Chart.js용)
       ObjectMapper objectMapper = new ObjectMapper();
       try {
         model.addAttribute("chartDataJson", objectMapper.writeValueAsString(chartData));
@@ -91,47 +80,81 @@ public class StockListController {
         model.addAttribute("chartDataJson", "[]");
       }
 
+      // 5. 사용자 자산 요약
+      UserInvestSummeryDTO userAssetSummary = userAssetService.getUserInvestSummary(userSeq);
       model.addAttribute("userAsset", userAssetSummary);
-      model.addAttribute("holdings", holdings);
+    }
+    return "invest/investMy";
+  }
+
+  /**
+   * 투자 TAB
+   */
+  @GetMapping("/tab/invest")
+  public String getInvestTabFragment(Model model, HttpSession session) {
+    Integer userSeq = (Integer) session.getAttribute("userSeq");
+
+    // 해당하는 유저의 관심종목들의 종목정보 리스트 반환
+    List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
+
+    Map<String, KISDataDTO> codeKISDataMap = new HashMap<>();
+
+    // 리스트를 처음 띄울때의 현재가와 등락률은 restAPI로 호출해서 출력한다.
+    for(StockDTO stockDTO : stockDTOList) {
+      KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
+      // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부호가 없기때문에 붙여준다.
+      if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
+        kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
+      }
+      codeKISDataMap.put(stockDTO.getStockCode(), kisDataDTO);
     }
 
-    // 자산 상세내역에 들어갈 내용
-    if (userSeq != null) {
-      List<AssetDetailDTO> assetDetailDTOList = new ArrayList<>();
+    model.addAttribute("codeKISDataMap", codeKISDataMap);
+    model.addAttribute("stockDTOList", stockDTOList);
 
+    return "invest/investTab";
+  }
+
+  /**
+   * 거래내역 TAB
+   *
+   */
+  @GetMapping("/tab/history")
+  public String getHistoryTabFragment(Model model, HttpSession session) {
+    Integer userSeq = (Integer) session.getAttribute("userSeq");
+
+    if(userSeq != null){
+      List<AssetDetailDTO> assetDetailDTOList = new ArrayList<>();
       List<MockTradeDTO> mockTradeDTOList = assetDetailService.findUserTrades(userSeq);
 
       String typeDetail = null;
       String price = null;
 
       // 받아온 MockTradeDTO를 화면에 표시할 형식인 assetDetailDTO로 변경
-      for (MockTradeDTO mockTradeDTO : mockTradeDTOList) {
-        if (mockTradeDTO.getTradeType() == 'Y') {
+      for(MockTradeDTO mockTradeDTO : mockTradeDTOList){
+        if(mockTradeDTO.getTradeType() == 'Y'){
           typeDetail = "매수";
           price = "-" + mockTradeDTO.getTradePrice();
-        } else {
+        }else{
           typeDetail = "매도";
           price = "+" + mockTradeDTO.getTradePrice();
         }
 
-        LocalDate localDate = mockTradeDTO.getTradedAt().toInstant().atZone(ZoneId.systemDefault())
-            .toLocalDate();
+        LocalDate localDate = mockTradeDTO.getTradedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        AssetDetailDTO assetDetailDTO = AssetDetailDTO.builder()
-            .type("주식")
-            .typeDetail(typeDetail)
-            .detail(mockTradeDTO.getStockName())
-            .price(price)
-            .date(localDate.format(formatter))
-            .build();
+        AssetDetailDTO assetDetailDTO =  AssetDetailDTO.builder()
+                .type("주식")
+                .typeDetail(typeDetail)
+                .detail(mockTradeDTO.getStockName())
+                .price(price)
+                .date(localDate.format(formatter))
+                .build();
         assetDetailDTOList.add(assetDetailDTO);
       }
-
       model.addAttribute("assetDetailDTOList", assetDetailDTOList);
     }
-
-    return "invest/investMain";
+    return "invest/assetDetail";
   }
 
 

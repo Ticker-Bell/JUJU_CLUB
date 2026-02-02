@@ -3,11 +3,23 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+<script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.8.11/dist/dotlottie-wc.js" type="module"></script>
+
 <%@ include file="/WEB-INF/views/lesson/common/resultModal.jsp" %>
 
-
 <style>
-    /* 탭 네비게이션 */
+
+    .indicator-center-down{
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;   /* 세로 중앙 */
+        align-items: center;       /* 가로 중앙 */
+        transform: translateY(60px); /* 아래로 이동 (원하는 만큼 조절) */
+    }
+
+    /* 탭 네비게이션 스타일 */
     .tab-nav {
         display: flex;
         border-bottom: 2px solid #E6E7EB;
@@ -17,8 +29,10 @@
 
     .tab-container {
         position: relative;
+        min-height: 600px; /* 로딩 중 레이아웃 무너짐 방지 */
     }
 
+    /* 탭 컨텐츠 전환 애니메이션 */
     .tab-content {
         position: absolute;
         top: 0;
@@ -34,157 +48,162 @@
         opacity: 1;
         transform: translateY(0);
         pointer-events: auto;
-        transition: opacity 0.25s ease,
-        transform 0.25s ease;
     }
 
+    /* 탭 버튼 스타일 */
     .tab-nav button {
         text-decoration: none;
         color: #888888;
         font-size: 24px;
         font-weight: 700;
         padding: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
     }
 
     .tab-nav button.active {
         color: #3819E6;
         border-bottom: 3px solid #3819E6;
     }
+
+    /* HTMX 로딩 인디케이터 스타일 (Lottie 적용) */
+    .htmx-indicator {
+        display: none; /* 기본적으로 숨김 */
+        width: 100%;
+        height: 500px;
+        flex-direction: column; /* 세로 정렬 */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease-in;
+    }
+
+    /* HTMX 요청 중일 때 표시 (flex로 변경) */
+    .htmx-request .htmx-indicator {
+        display: flex;
+        opacity: 1;
+    }
+    .htmx-request.htmx-indicator {
+        display: flex;
+        opacity: 1;
+    }
+
+    /* 로딩 텍스트 애니메이션 */
+    .loading-text {
+        margin-top: -20px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #5E45EB;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
 </style>
 
 <div class="w-full flex flex-col px-[24]">
-    <!-- 탭 네비게이션 -->
     <nav class="tab-nav">
-        <button id="myTab" class="active" onclick="changeJsp('my')">마이</button>
-        <%--    <button id="myTab" class="active" hx-get="${pageContext.request.contextPath}/invest/my" hx-target="#myJsp" hx-push-url="false">마이</button>--%>
-        <button id="investTab" onclick="changeJsp('invest')">투자</button>
-        <button id="assetDetailTab" onclick="changeJsp('asset')">거래 내역</button>
+        <button id="myTab" class="active" onclick="changeTab('my')">마이</button>
+
+        <button id="investTab"
+                hx-get="${pageContext.request.contextPath}/invest/tab/invest"
+                hx-target="#investJsp"
+                hx-trigger="click once"
+                onclick="changeTab('invest')">
+            투자
+        </button>
+
+        <button id="assetDetailTab"
+                hx-get="${pageContext.request.contextPath}/invest/tab/history"
+                hx-target="#assetDetailJsp"
+                hx-trigger="click once"
+                onclick="changeTab('asset')">
+            거래 내역
+        </button>
     </nav>
+
     <div class="tab-container">
-        <div id="myJsp" class="tab-content active">
-           <jsp:include page="investMy.jsp"></jsp:include>
-        </div>
-        <div id="investJsp" class="tab-content">
-            <div id="stock" class="flex flex-row justify-between w-full gap-8">
-                <div id="investComponents" class="flex flex-col gap-8">
-                    <jsp:include page="investStockList.jsp"></jsp:include>
-                </div>
-                <div class="flex flex-col w-full items-center gap-4 p-2 bg-[#FBFBFB] rounded-[12px] outline outline-2 outline-[#E6E7EB]">
-                    <jsp:include page="investChart.jsp"></jsp:include>
-                    <div id="stockCorpInfo-container" class="w-full">
-                        <jsp:include page="stockCorpInfoCard.jsp"></jsp:include>
-                    </div>
-                </div>
+        <div id="myJsp" class="tab-content active"
+             hx-get="${pageContext.request.contextPath}/invest/tab/my"
+             hx-trigger="load"
+             hx-swap="innerHTML">
+
+            <div class="htmx-indicator indicator-center-down">
+                <dotlottie-wc src="https://lottie.host/9e98724c-0c84-4ae2-9077-a73ca14f2509/g4PyzuhGLb.lottie"
+                              style="width: 300px; height: auto;"
+                              autoplay loop>
+                </dotlottie-wc>
+                <p class="loading-text" style="margin-top: 0px;">고객님의 자산을 분석중입니다...</p>
             </div>
         </div>
+
+        <div id="investJsp" class="tab-content">
+            <div class="htmx-indicator">
+                <dotlottie-wc src="https://lottie.host/9e98724c-0c84-4ae2-9077-a73ca14f2509/g4PyzuhGLb.lottie"
+                              style="width: 300px; height: auto;"
+                              autoplay loop>
+                </dotlottie-wc>
+                <p class="loading-text">실시간 시장 데이터를 분석중입니다...</p>
+            </div>
+        </div>
+
         <div id="assetDetailJsp" class="tab-content">
-            <jsp:include page="assetDetail.jsp"></jsp:include>
+            <div class="htmx-indicator">
+                <dotlottie-wc src="https://lottie.host/9e98724c-0c84-4ae2-9077-a73ca14f2509/g4PyzuhGLb.lottie"
+                              style="width: 300px; height: auto;"
+                              autoplay loop>
+                </dotlottie-wc>
+                <p class="loading-text">거래 기록을 분석하여 가져오는 중입니다...</p>
+            </div>
         </div>
     </div>
 </div>
+
 <script>
-    //페이지를 나갈 때
-    window.addEventListener('beforeunload', function () {
-        disconnectWebsocket();
-    });
+    // 탭 UI 전환 함수
+    function changeTab(type) {
+        const tabs = ['my', 'invest', 'asset'];
 
-    //웹소켓 연결 로직
-    function startWebSocket() {
-        let initialCodes = [];
-        $('.stock-item').each(function () {
-            initialCodes.push($(this).data('code'));
-        });
+        tabs.forEach(t => {
+            const content = document.getElementById(t + 'Jsp');
 
-        if (initialCodes.length > 0) {
-            initListSocket(initialCodes);
-        }
-    }
+            // 버튼 ID 매핑 (asset -> assetDetailTab)
+            let btnId = t + 'Tab';
+            if (t === 'asset') btnId = 'assetDetailTab';
 
-    //웹소켓 구독 해제
-    function unsubscribeAll() {
-        //구독 해제
-        if (typeof StockSocket !== 'undefined') {
-            const currentCodes = Array.from(StockSocket.subscribeCodes.keys());
+            const btn = document.getElementById(btnId);
 
-            if (currentCodes.length > 0) {
-                StockSocket.unsubscribe(currentCodes);
+            if (t === type) {
+                if(content) content.classList.add('active');
+                if(btn) btn.classList.add('active');
+            } else {
+                if(content) content.classList.remove('active');
+                if(btn) btn.classList.remove('active');
             }
-        }
-
+        });
     }
 
-    //웹소켓 연결 종료 로직
-    function disconnectWebsocket() {
-        unsubscribeAll();
-
-        // 소켓 연결 물리적 종료
-        //특정 함수가 존재하고, 실행 가능한 상태인지 확인
-        if (typeof StockSocket !== 'undefined' && typeof StockSocket.disconnect === 'function') {
-            StockSocket.disconnect();
-        }
-    }
-
-    function changeJsp(type) {
-
-        const myJsp = document.getElementById('myJsp');
-        const myTab = document.getElementById('myTab');
-        const investJsp = document.getElementById('investJsp');
-        const investTab = document.getElementById('investTab');
-        const assetDetailJsp = document.getElementById('assetDetailJsp');
-        const assetDetailTab = document.getElementById('assetDetailTab');
-
-        //탭 전환
-        if (type === 'my') {
-            unsubscribeAll();
-            myJsp.classList.add('active');
-            investJsp.classList.remove('active');
-            assetDetailJsp.classList.remove('active');
-
-            myTab.classList.add('active');
-            investTab.classList.remove('active');
-            assetDetailTab.classList.remove('active');
-        } else if (type === 'invest') {
-            startWebSocket();
-            investJsp.classList.add('active');
-            myJsp.classList.remove('active');
-            assetDetailJsp.classList.remove('active');
-
-            investTab.classList.add('active');
-            myTab.classList.remove('active');
-            assetDetailTab.classList.remove('active');
-        } else {
-            unsubscribeAll();
-            assetDetailJsp.classList.add('active');
-            investJsp.classList.remove('active');
-            myJsp.classList.remove('active');
-
-            assetDetailTab.classList.add('active');
-            investTab.classList.remove('active');
-            myTab.classList.remove('active');
-        }
-    }
-
-    //stockCorpInfoCard.jsp에 있던 script
+    // stockCorpInfoCard.jsp 등에서 사용하는 함수 (호환성 유지)
     function getSelectedCorpInfo(stockCode) {
-        //fetch로 html을 받아와서 stockCorpInfo-container 안에 넣어준다.
-        fetch('${cpath}' + '/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
-            .then(res =>
-                res.text() //html 값 요청, 다음 then으로 결과 토스
-            )
+        fetch('${cpath}/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
+            .then(res => res.text())
             .then(html => {
-                //html 갈기(화면바꾸기)
-                document.getElementById('stockCorpInfo-container').innerHTML = html;
-                //시간찍기(html이랑 순서 바뀌면, 표시 X)
+                const container = document.getElementById('stockCorpInfo-container');
+                if(container) container.innerHTML = html;
+
+                // 시간 업데이트
                 const now = new Date();
                 const timeString = now.toLocaleTimeString('ko-KR', {hour12: false});
                 const timeEl = document.getElementById('update_time');
-                if (timeEl) {
-                    timeEl.innerText = timeString;
-                }
+                if(timeEl) timeEl.innerText = timeString;
             })
             .catch(error => {
                 console.error('기업정보로딩실패 : ', error);
-                document.getElementById('stockCorpInfo-container').innerHTML = '<p style="padding:10px;">정보를 불러오지 못했습니다.</p>';
+                const container = document.getElementById('stockCorpInfo-container');
+                if(container) container.innerHTML = '<p style="padding:10px;">정보를 불러오지 못했습니다.</p>';
             });
     }
 </script>

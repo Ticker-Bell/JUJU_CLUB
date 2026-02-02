@@ -475,11 +475,10 @@
                     </div>
 
                     <div class="summary-card">
-                        <div class="label">총 수익률</div>
+                        <div class="label">투자 총 수익률</div>
                         <div id="totalReturnPct"
                              class="value ${userAsset.totalReturnPct > 0 ? 'positive' : (userAsset.totalReturnPct < 0 ? 'negative' : '')}">
-                            <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if>
-                            <fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.00"/>%
+                            <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if><fmt:formatNumber value="${userAsset.totalReturnPct}" pattern="#,##0.00"/>%
                         </div>
                     </div>
                 </div>

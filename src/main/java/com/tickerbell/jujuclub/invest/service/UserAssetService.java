@@ -43,20 +43,26 @@ public class UserAssetService {
       //2.총 주식평가금액
       long totalStockValue = 0L;
 
+      //3.총 주식 매수금액(투자원금) 합산
+      long totalBuyPrice = 0L;
+
       List<PortfolioDTO> portfolioList = portfolioService.getPortfolioAllocationItems(
-          userSeq);
+              userSeq);
       log.info("[{}] 유저 자산 정보 조회 - 포트폴리오 항목 조회 종료 items={}", userSeq, portfolioList);
       if (portfolioList != null) {
         for (PortfolioDTO data : portfolioList) {
           totalStockValue += (long) data.getQuantity() * data.getCurrentPrice();
+          totalBuyPrice += (long) data.getQuantity() * data.getAvgPrice();
         }
       }
 
-      //3.총 평가자산
+      //4.순수 주식 손익 총 합
+      long totalProfit = totalStockValue - totalBuyPrice;
+
+      //5.총 평가자산
       long totalAsset = cashBalance + totalStockValue;
 
-      //4.원금(초기자금 + 보상금 - 미션, 테스트 등)
-//        Long totalReward = userAssetMapper.selectChapTestReward(userSeq) + userAssetMapper.selectMissionReward(userSeq);
+      //6.원금(초기자금 + 보상금 - 미션, 테스트 등)
       log.info("[{}] 유저 자산 정보 조회 - 누적 보상금 DB 조회 시작", userSeq);
       Long totalReward = userAssetMapper.selectUserTotalReward(userSeq); //보상금
       if (totalReward == null) {
@@ -66,25 +72,24 @@ public class UserAssetService {
 
       long totalPrincipal = initial_cash + totalReward;
 
-      //5.총 수익률(총 평가자산 - 원금)
-      long totalProfit = totalAsset - totalPrincipal; //총 수익금
+      //7.총 수익률 (순수 주식 손익 총 합 / 총 주식 매수금액(투자원금) 합산) * 100
       double totalReturnProfit = 0.0;
-      if (totalPrincipal > 0) {
-        totalReturnProfit = ((double) totalProfit / totalPrincipal) * 100;
+      if(totalBuyPrice > 0){
+        totalReturnProfit = ((double) totalProfit / totalBuyPrice) * 100; // 오직 내가 실제로 투자한 주식의 성과 수익률
       }
 
       log.info(
-          "[{}] 유저 자산 정보 계산 완료 - totalAsset={}, cashBalance={}, totalStockValue={}, totalPrincipal={}, totalProfit={}, totalReturnPct={}",
-          userSeq, totalAsset, cashBalance, totalStockValue, totalPrincipal, totalProfit,
-          totalReturnProfit);
+              "[{}] 유저 자산 정보 계산 완료 - totalAsset={}, cashBalance={}, totalStockValue={}, totalPrincipal={}, totalProfit={}, totalReturnPct={}",
+              userSeq, totalAsset, cashBalance, totalStockValue, totalPrincipal, totalProfit,
+              totalReturnProfit);
 
       return UserInvestSummeryDTO.builder()
-          .totalAsset(totalAsset) //총 평가자산
-          .cashBalance(cashBalance) //예수금
-          .totalStockValue(totalStockValue) //총 평가금액
-          .totalReturnPct(totalReturnProfit) //총 수익률
-          .itemDTOList(portfolioList)
-          .build();
+              .totalAsset(totalAsset) //총 평가자산
+              .cashBalance(cashBalance) //예수금
+              .totalStockValue(totalStockValue) //총 평가금액
+              .totalReturnPct(totalReturnProfit) //총 수익률
+              .itemDTOList(portfolioList)
+              .build();
 
     } catch (Exception e) {
       log.error("[{}] 유저 자산 정보 조회, 계산 실패", userSeq, e);

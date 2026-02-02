@@ -8,11 +8,18 @@ public interface AccountMapper {
     int checkAccountExist(Integer userSeq);
 
     /**
-     * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
+     * 유저 계좌 등록
      *
      * @param account AccountDTO
      * @return int
      */
     int insertAccount(AccountDTO account);
+
+    /**
+     * 유저 계좌 조회
+     *
+     * @param userSeq Integer
+     * @return AccountDTO
+     */
     AccountDTO selectAccountByUserSeq(Integer userSeq);
 }

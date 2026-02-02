@@ -23,7 +23,7 @@ public interface SignupMapper {
     int existsByUserId(String userId);
 
     /**
-     * 레슨 문항 조회
+     * 유저 정보 등록
      *
      * @param signupDTO SignupDTO
      * @return int

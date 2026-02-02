@@ -40,7 +40,7 @@ public class MyPageController {
     }
 
     /**
-     * [1] 마이페이지 메인 화면 반환 (데이터 로딩 없이 껍데기만)
+     * 마이페이지 메인 화면 반환
      * URL: /myPage/main.do
      */
     @GetMapping("/main.do")
@@ -57,7 +57,7 @@ public class MyPageController {
     }
 
     /**
-     * [2] 자산 정보 및 차트 데이터 조회 (비동기)
+     * 자산 정보 및 차트 데이터 조회
      * URL: /myPage/asset
      */
     @GetMapping("/asset")
@@ -106,7 +106,7 @@ public class MyPageController {
     }
 
     /**
-     * [3] 미션 정보 조회 (비동기)
+     * 미션 정보 조회
      * URL: /myPage/mission
      */
     @GetMapping("/mission")

@@ -44,14 +44,10 @@ public class MemberController {
         }
 
         try {
-            log.info("[{}] 유저 정보 수정 시작", loginUser.getUserId());
-
             String userName = request.get("userName");
             String userPw = request.get("userPw");
 
-            log.info("[{}],[{}],[{}] 유저 정보 수정 - 유저 닉네임, 비밀번호 수정 시작", loginUser.getUserId(), userName, userPw);
             memberService.updateProfile(loginUser.getUserId(), userName, userPw);
-            log.info("[{}],[{}],[{}] 유저 정보 수정 - 유저 닉네임, 비밀번호 수정 종료", loginUser.getUserId(), userName, userPw);
 
             if (StringUtils.hasText(userName))
                 loginUser.setUserName(userName);
@@ -62,7 +58,6 @@ public class MemberController {
             response.put("message", "회원 정보가 성공적으로 수정되었습니다.");
 
         } catch (Exception e) {
-            log.info("[{}] 유저 정보 수정 종료", loginUser.getUserId());
             response.put("ok", false);
             response.put("message", "수정 중 오류가 발생했습니다.");
         }
@@ -89,7 +84,6 @@ public class MemberController {
         }
 
         try {
-            log.info("[{}],[{}] 유저 정보 수정 (이미지) 시작", loginUser.getUserId(), userImage);
 
             if (userImage == null || userImage.isEmpty()) {
                 response.put("ok", false);
@@ -111,15 +105,12 @@ public class MemberController {
                 return response;
             }
 
-            log.info("[{}],[{}] 유저 정보 수정 (이미지) 시작", loginUser.getUserId(), userImage);
             memberService.updateProfileImage(loginUser.getUserId(), userImage.getBytes());
-            log.info("[{}],[{}] 유저 정보 수정 (이미지) 종료", loginUser.getUserId(), userImage);
 
             response.put("ok", true);
             response.put("message", "프로필 이미지가 저장되었습니다.");
 
         } catch (Exception e) {
-            log.error("[{}],[{}] 유저 정보 수정 (이미지) 실패", loginUser.getUserId(), userImage);
 
             response.put("ok", false);
             response.put("message", "이미지 저장 중 오류가 발생했습니다.");
@@ -138,10 +129,8 @@ public class MemberController {
         MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
         if (loginUser == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 
-        log.info("유저 정보 (이미지) 가져오기 - DB에서 가져오기 시작");
         MemberDTO dbUser = memberService.selectUserById(loginUser.getUserId());
         byte[] img = (dbUser != null) ? dbUser.getUserImage() : null;
-        log.info("유저 정보 (이미지) 가져오기 - DB에서 가져오기 종료");
 
         return buildImageResponse(img, request);
     }

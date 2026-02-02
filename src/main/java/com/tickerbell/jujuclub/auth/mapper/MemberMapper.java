@@ -8,31 +8,30 @@ import org.apache.ibatis.annotations.Param;
 public interface MemberMapper {
 
     /**
-     * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
+     * 유저 정보 조회 (userId)
      *
-     * @param account AccountDTO
-     * @return int
+     * @param userId String
+     * @return MemberDTO
      */
     MemberDTO selectUserById(String userId);
 
     /**
-     * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
+     * 유저 정보 조회 (userSeq)
      *
-     * @param account AccountDTO
-     * @return int
+     * @param userSeq int
+     * @return MemberDTO
      */
     MemberDTO selectUserBySeq(@Param("userSeq") int userSeq);
 
     /**
-     * 레슨 CONCEPT 문항 조회 및 레슨 시작 정보 등록
+     * 유저 정보 삭제
      *
-     * @param account AccountDTO
-     * @return int
+     * @param userId String
      */
     void deleteUser(String userId);
 
     /**
-     * 유저 정보 수정(닉네임, 비밀번호, 프로필 이미지)
+     * 유저 정보 수정
      *
      * @param memberDTO MemberDTO
      */

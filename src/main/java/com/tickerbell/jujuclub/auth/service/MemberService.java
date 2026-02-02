@@ -22,29 +22,36 @@ public class MemberService {
      * 유저 정보 조회 (userId)
      *
      * @param userId String
-     * @return memberMapper.selectUserById(userId) MemberDTO
+     * @return user MemberDTO
      */
     @Transactional
     public MemberDTO selectUserById(String userId) {
-        return memberMapper.selectUserById(userId);
+        log.info("[{}] 유저 정보 조회 (userId) 시작", userId);
+        MemberDTO user = memberMapper.selectUserById(userId);
+        log.info("[{}] 유저 정보 조회 (userId) 종료", userId);
+
+        return user;
     }
 
     /**
      * 유저 정보 조회 (userSeq)
      *
      * @param userSeq int
-     * @return memberMapper.selectUserBySeq(userSeq) MemberDTO
+     * @return user MemberDTO
      */
     @Transactional
     public MemberDTO selectUserBySeq(int userSeq) {
-        return memberMapper.selectUserBySeq(userSeq);
+        log.info("[{}] 유저 정보 조회 (userSeq) 시작", userSeq);
+        MemberDTO user = memberMapper.selectUserBySeq(userSeq);
+        log.info("[{}] 유저 정보 조회 (userSeq) 종료", userSeq);
+
+        return user;
     }
 
     /**
      * 유저 정보 수정 (닉네임, 비밀번호)
      *
-     * @param userId String
-     * @return memberMapper.selectUserById(userId) MemberDTO
+     * @param userId String, newName String, newPw String
      */
     @Transactional
     public void updateProfile(String userId, String newName, String newPw) {
@@ -64,28 +71,36 @@ public class MemberService {
     /**
      * 유저 정보 수정 (이미지)
      *
-     * @param userId String
-     * @return memberMapper.selectUserById(userId) MemberDTO
+     * @param userId String, imageBytes byte[]
      */
     @Transactional
     public void updateProfileImage(String userId, byte[] imageBytes) {
         MemberDTO updateDto = new MemberDTO();
         updateDto.setUserId(userId);
         updateDto.setUserImage(imageBytes);
+
+        log.info("[{}] 유저 정보 수정 (이미지) 시작", updateDto);
         memberMapper.updateUser(updateDto);
+        log.info("[{}] 유저 정보 수정 (이미지) 종료", updateDto);
     }
 
     /**
      * 유저 정보 삭제
      *
-     * @param userId String
-     * @return memberMapper.selectUserById(userId) MemberDTO
+     * @param userId String, inputPassword String
      */
     public void withdraw(String userId, String inputPassword) {
+
+        log.info("[{}] 유저 정보 삭제 - 유저 정보 조회 시작", userId);
         MemberDTO user = memberMapper.selectUserById(userId);
+        log.info("[{}] 유저 정보 삭제 - 유저 정보 조회 종료", userId);
+
         if (user == null || !passwordEncoder.matches(inputPassword, user.getUserPw())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+
+        log.info("[{}] 유저 정보 삭제 시작", userId);
         memberMapper.deleteUser(userId);
+        log.info("[{}] 유저 정보 삭제 종료", userId);
     }
 }

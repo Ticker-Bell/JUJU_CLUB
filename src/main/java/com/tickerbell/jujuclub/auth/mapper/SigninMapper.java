@@ -7,7 +7,19 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface SigninMapper {
+
+  /**
+   * 닉네임 중복 확인
+   *
+   * @param userId String
+   * @return MemberDTO
+   */
   MemberDTO selectUserById(String userId);
 
+  /**
+   * 유저 레벨 등록
+   *
+   * @param userSeq Integer, level Integer
+   */
   void updateUserLevel(@Param("userSeq") Integer userSeq, @Param("level") Integer level);
 }

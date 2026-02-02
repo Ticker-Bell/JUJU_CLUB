@@ -63,10 +63,10 @@ public class SignupController {
 
     // 1. 이메일 중복 확인 API
     /**
-     * 유저 정보 수정 (이미지) - 기본 이미지 처리, 파일 형식 확인, 캐시 방지 처리
+     * 이메일 중복 확인
      *
-     * @param img byte[]
-     * @return new ResponseEntity&lt;&gt;(out, headers, HttpStatus.OK) Map&lt;String, Object&gt;
+     * @param email String
+     * @return new {@code ResponseEntity<>(out, headers, HttpStatus.OK)} {@code Map<String, Object>}
      */
     @GetMapping("/check-email")
     @ResponseBody
@@ -85,10 +85,10 @@ public class SignupController {
 
     // 2. 닉네임 중복 확인 API
     /**
-     * 유저 정보 수정 (이미지) - 기본 이미지 처리, 파일 형식 확인, 캐시 방지 처리
+     * 닉네임 중복 확인
      *
-     * @param img byte[]
-     * @return new ResponseEntity&lt;&gt;(out, headers, HttpStatus.OK) Map&lt;String, Object&gt;
+     * @param nickname String
+     * @return map {@code Map<String, Object>}
      */
     @GetMapping("/check-nickname")
     @ResponseBody
@@ -105,6 +105,9 @@ public class SignupController {
         return map;
     }
 
+    /**
+     * 회원가입 요청 DTO
+     */
     public static class SignupAjaxRequest {
         private String email;
         private String username;

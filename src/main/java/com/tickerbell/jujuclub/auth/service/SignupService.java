@@ -3,6 +3,7 @@ package com.tickerbell.jujuclub.auth.service;
 import com.tickerbell.jujuclub.auth.dto.SignupDTO;
 import com.tickerbell.jujuclub.auth.mapper.SignupMapper;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.extern.slf4j.XSlf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,7 +14,7 @@ import java.util.Map;
 
 @NoArgsConstructor
 @Service
-@XSlf4j
+@Slf4j
 public class SignupService {
 
     @Autowired
@@ -48,30 +49,34 @@ public class SignupService {
         signupDTO.setUserPw(bCryptPasswordEncoder.encode(signupDTO.getUserPw()));
 
         // 저장
-        log.info("[{}] 유저 계좌 생성 - 유저 일일 미션 등록 종료", signupDTO);
+        log.info("[{}] 회원가입 - 유저 정보 등록 시작", signupDTO);
         signupMapper.insertUser(signupDTO);
-        log.info("[{}] 유저 계좌 생성 - 유저 일일 미션 등록 종료", signupDTO);
+        log.info("[{}] 회원가입 - 유저 정보 등록 종료", signupDTO);
     }
 
     /**
      * 이메일 중복 확인
      *
      * @param email String
-     * return signupMapper.existsByUserId(email) boolean
+     * return result boolean
      */
     public boolean isEmailDuplicate(String email) {
-        return signupMapper.existsByUserId(email) > 0;
+        log.info("[{}] 이메일 중복 확인 시작", email);
+        boolean result = signupMapper.existsByUserId(email) > 0;
+        log.info("[{}] 이메일 중복 확인 종료", email);
+        return result;
     }
 
     /**
      * 닉네임 중복 확인
      *
      * @param nickname String
-     * return signupMapper.existsByUserName(nickname) boolean
+     * return result boolean
      */
     public boolean isNicknameDuplicate(String nickname) {
-
-        // 닉네임
-        return signupMapper.existsByUserName(nickname) > 0;
+        log.info("[{}] 닉네임 중복 확인 시작", nickname);
+        boolean result = signupMapper.existsByUserName(nickname) > 0;
+        log.info("[{}] 닉네임 중복 확인 종료", nickname);
+        return result;
     }
 }

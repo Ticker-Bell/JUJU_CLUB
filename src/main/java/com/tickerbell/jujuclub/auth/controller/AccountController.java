@@ -44,11 +44,8 @@ public class AccountController {
         }
 
         try {
-            log.info("[{}] 유저 계좌 생성 시작", loginUser.getUserSeq());
             // 서비스에서 생성된 계좌번호를 받음
-            log.info("[{}] 유저 계좌 생성  - 등록된 유저 계좌에서 계좌번호 받기 시작", loginUser.getUserSeq());
             String createdAccountNo = accountService.createAccount(loginUser.getUserSeq());
-            log.info("[{}] 유저 계좌 생성  - 등록된 유저 계좌에서 계좌번호 받기 종료", loginUser.getUserSeq());
 
             if (createdAccountNo != null) {
 
@@ -57,16 +54,11 @@ public class AccountController {
                 response.put("accountNo", createdAccountNo);
 
                 try {
-                    log.info("[{}] 유저 계좌 생성 - 유저 일일 미션 등록 시작", loginUser.getUserSeq());
                     roadMapService.insertInitUserMission(loginUser.getUserSeq());
-                    log.info("[{}] 유저 계좌 생성 - 유저 일일 미션 등록 종료", loginUser.getUserSeq());
 
-                    log.info("[{}] 유저 계좌 생성 - 유저 레슨 등록 시작 [{}]", loginUser.getUserSeq(), loginUser.getUserLevel());
                     if (loginUser.getUserLevel() > 1)
                         roadMapService.insertInitUserLesson(loginUser.getUserSeq(), loginUser.getUserLevel());
-                    log.info("[{}] 유저 계좌 생성 - 유저 레슨 등록 종료 [{}]", loginUser.getUserSeq(), loginUser.getUserLevel());
                 } catch(Exception e) {
-                    log.error("유저 계좌 생성 실패 (미션, 레슨)");
                     throw new RuntimeException(e);
                 }
             } else {
@@ -78,7 +70,6 @@ public class AccountController {
             response.put("ok", false);
             response.put("message", "계좌 생성 중 오류 발생: " + e.getMessage());
 
-            log.info("[{}] 유저 계좌 생성 실패", loginUser.getUserSeq());
         }
 
         return response;

@@ -17,11 +17,15 @@ public class AccountService {
      * 유저 계좌 조회
      *
      * @param userSeq Integer
-     * @return accountMapper.selectAccountByUserSeq(userSeq) AccountDTO
+     * @return accountDTO AccountDTO
      */
     public AccountDTO getMyAccount(Integer userSeq) {
 
-        return accountMapper.selectAccountByUserSeq(userSeq);
+        log.info("[{}] 유저 계좌 조회 시작", userSeq);
+        AccountDTO accountDTO = accountMapper.selectAccountByUserSeq(userSeq);
+        log.info("[{}] 유저 계좌 조회 종료", userSeq);
+
+        return accountDTO;
     }
 
     /**
@@ -30,21 +34,21 @@ public class AccountService {
      * @param userSeq Integer
      * @return accountNo String
      */
-    // [수정] void -> Long (생성된 계좌번호 반환)
     public String createAccount(Integer userSeq) {
 
         String accountNo = generateRandomAccountNo();
 
         try {
-            log.info("[{}] 유저 계좌 생성  - 유저 계좌 유효성 검사 DB 조회 시작", userSeq);
+            log.info("[{}] 유저 계좌 생성 시작", userSeq);
 
-            // 중복된 유저 계좌 확인
-            if (accountMapper.checkAccountExist(userSeq) > 0) {
+            log.info("[{}] 이메일 중복 확인 시작", userSeq);
+            boolean exist = accountMapper.checkAccountExist(userSeq) > 0;
+            log.info("[{}] 이메일 중복 확인 시작", userSeq);
 
+            if (exist) {
                 // 유저 계좌가 존재하면 null 반환
                 return null;
             }
-            log.info("[{}] 유저 계좌 생성  - 유저 계좌 유효성 검사 DB 조회 종료", userSeq);
 
             // AccountDTO 생성 및 cashBalance를 1,000,000으로 설정
             AccountDTO account = AccountDTO.builder()
@@ -62,6 +66,7 @@ public class AccountService {
             throw new RuntimeException(e);
         }
 
+        log.info("[{}] 유저 계좌 생성 종료", userSeq);
         // 계좌번호를 반환
         return accountNo;
     }

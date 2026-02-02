@@ -21,6 +21,12 @@ public class SigninController {
     private final SigninService signinService;
 
     // 1. 로그인 요청 처리
+    /**
+     * 닉네임 중복 확인
+     *
+     * @param req SigninAjaxRequest
+     * @return res {@code Map<String, Object>}
+     */
     @PostMapping(value = "/login.ajax", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> SinginAjax(@RequestBody SigninAjaxRequest req,
@@ -57,6 +63,11 @@ public class SigninController {
     }
 
     // 2. [추가] 로그아웃 기능
+    /**
+     * 로그아웃
+     *
+     * @return redirect:/
+     */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         // 세션 무효화 (로그인 정보 삭제)
@@ -67,6 +78,12 @@ public class SigninController {
     }
 
     // 3. 레벨 업데이트 기능 (계좌 생성은 AccountController에서 담당)
+    /**
+     * 닉네임 중복 확인
+     *
+     * @param req {@code Map<String, Integer}
+     * @return res {@code Map<String, Object>}
+     */
     @PostMapping(value = "/updateLevel.ajax", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public Map<String, Object> updateLevelAjax(@RequestBody Map<String, Integer> req, HttpSession session) {
@@ -101,6 +118,9 @@ public class SigninController {
         return res;
     }
 
+    /**
+     * 로그인 요청 DTO
+     */
     public static class SigninAjaxRequest {
         private String email; private String password;
         public String getEmail() { return email; } public void setEmail(String email) { this.email = email; }

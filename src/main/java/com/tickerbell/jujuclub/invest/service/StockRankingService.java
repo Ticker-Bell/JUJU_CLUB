@@ -2,7 +2,7 @@ package com.tickerbell.jujuclub.invest.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
-import com.tickerbell.jujuclub.invest.dto.RankingDTO;
+import com.tickerbell.jujuclub.invest.dto.StockRankingDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class RankingApiService {
+public class StockRankingService {
 
     @Value("${kis.appkey}")
     private String appkey;
@@ -43,7 +43,7 @@ public class RankingApiService {
      * @return List&lt;RankingDTO&gt;
      * @throws Exception
      */
-    public List<RankingDTO> getTradingVolumeRanking(String accessToken) throws Exception {
+    public List<StockRankingDTO> getTradingVolumeRanking(String accessToken) throws Exception {
 
         try{
             // URL 및 쿼리 파라미터 설정
@@ -107,7 +107,7 @@ public class RankingApiService {
      * @return List&lt;RankingDTO&gt;
      * @throws Exception
      */
-    public List<RankingDTO> getMarketCapRanking(String accessToken) throws Exception {
+    public List<StockRankingDTO> getMarketCapRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -167,7 +167,7 @@ public class RankingApiService {
      * @return List&lt;RankingDTO&gt;
      * @throws Exception
      */
-    public List<RankingDTO> getTopGainersRanking(String accessToken) throws Exception {
+    public List<StockRankingDTO> getTopGainersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -232,7 +232,7 @@ public class RankingApiService {
      * @return List&lt;RankingDTO&gt;
      * @throws Exception
      */
-    public List<RankingDTO> getTopLosersRanking(String accessToken) throws Exception {
+    public List<StockRankingDTO> getTopLosersRanking(String accessToken) throws Exception {
         try{
             // URL 및 쿼리 파라미터 설정
             URI uri = UriComponentsBuilder.fromHttpUrl(baseurl)
@@ -296,22 +296,22 @@ public class RankingApiService {
      * @param node JsonNode
      * @return List&lt;RankingDTO&gt;
      */
-    private List<RankingDTO> JsonToDto(JsonNode node){
+    private List<StockRankingDTO> JsonToDto(JsonNode node){
         //JsonNode 안에 Json 배열이 랭킹 순으로 들어가 있음
         //각 Json을 DTO로 변환
 
-        List<RankingDTO> rankingDTOList = new ArrayList<>();
+        List<StockRankingDTO> stockRankingDTOList = new ArrayList<>();
 
         for(JsonNode item : node){
-            RankingDTO rankingDTO = RankingDTO.builder()
+            StockRankingDTO stockRankingDTO = StockRankingDTO.builder()
                     .stockName(item.path("hts_kor_isnm").asText())
                     .stockCode(item.path("mksc_shrn_iscd").asText())
                     .rank(item.path("data_rank").asInt())
                     .build();
-            rankingDTOList.add(rankingDTO);
+            stockRankingDTOList.add(stockRankingDTO);
         }
 
-        return rankingDTOList;
+        return stockRankingDTOList;
     }
 
     /**
@@ -320,49 +320,49 @@ public class RankingApiService {
      * @param node JsonNode
      * @return List&lt;RankingDTO&gt;
      */
-    private List<RankingDTO> JsonToDto2(JsonNode node){
+    private List<StockRankingDTO> JsonToDto2(JsonNode node){
         // 등락률 순위를 받아올땐 응답 BODY의 주식 종목 코드의 key값 이름이
         // 'mksc_shrn_iscd'가 아니라 'stck_shrn_iscd'로 달라서
         // JsonToDto로는 불가능하기 때문에 구현
 
-        List<RankingDTO> rankingDTOList = new ArrayList<>();
+        List<StockRankingDTO> stockRankingDTOList = new ArrayList<>();
 
         for(JsonNode item : node){
-            RankingDTO rankingDTO = RankingDTO.builder()
+            StockRankingDTO stockRankingDTO = StockRankingDTO.builder()
                     .stockName(item.path("hts_kor_isnm").asText())
                     .stockCode(item.path("stck_shrn_iscd").asText())
                     .rank(item.path("data_rank").asInt())
                     .build();
-            rankingDTOList.add(rankingDTO);
+            stockRankingDTOList.add(stockRankingDTO);
         }
 
-        return rankingDTOList;
+        return stockRankingDTOList;
     }
 
     /**
      * 해당 순위별 리스트의 각 종목들 현재가를 가져와 DTO에 추가 후 return
      *
-     * @param rankingDTOList List&lt;RankingDTO&gt;
+     * @param stockRankingDTOList List&lt;RankingDTO&gt;
      * @return List&ltRankingDTO&gt;
      */
-    public List<RankingDTO> addKisDataDtoToRankingDto(List<RankingDTO> rankingDTOList){
+    public List<StockRankingDTO> addKisDataDtoToRankingDto(List<StockRankingDTO> stockRankingDTOList){
 
-        for(int i=0; i<rankingDTOList.size(); i++){
+        for(int i=0; i< stockRankingDTOList.size(); i++){
             try{
-                RankingDTO rankingDTO = rankingDTOList.get(i);
-                KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
+                StockRankingDTO stockRankingDTO = stockRankingDTOList.get(i);
+                KISDataDTO kisDataDTO = kisApiService.getPriceData(stockRankingDTO.getStockCode());
                 // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
                 if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
                     kisDataDTO.setChangePct("+" + kisDataDTO.getChangePct());
                 }
-                rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
-                rankingDTO.setChangePct(kisDataDTO.getChangePct());
+                stockRankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
+                stockRankingDTO.setChangePct(kisDataDTO.getChangePct());
             }catch (Exception e){
                 log.error("RankingApiService에서 kisApiService 호출 실패");
                 throw new RuntimeException(e);
             }
         }
-        return rankingDTOList;
+        return stockRankingDTOList;
     }
 
 }

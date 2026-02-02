@@ -1,7 +1,7 @@
 package com.tickerbell.jujuclub.invest.service;
 
 import com.tickerbell.jujuclub.invest.dto.KISDataDTO;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
+import com.tickerbell.jujuclub.invest.dto.PortfolioDTO;
 import com.tickerbell.jujuclub.invest.mapper.PortfolioMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +27,10 @@ public class PortfolioService {
      * @param userSeq int
      * @return List &lt;PortfolioAllocationItemDTO&gt;
      */
-    public List<PortfolioAllocationItemDTO> getPortfolioAllocationItems(int userSeq) {
+    public List<PortfolioDTO> getPortfolioAllocationItems(int userSeq) {
         try {
             log.info("[{}] 포트폴리오 항목 조회 - mock_portfolio DB 조회 시작", userSeq);
-            List<PortfolioAllocationItemDTO> items = portfolioMapper.selectPortfolioList(userSeq);
+            List<PortfolioDTO> items = portfolioMapper.selectPortfolioList(userSeq);
             log.info("[{}] 포트폴리오 항목 조회 - mock_portfolio DB 조회 종료 items={}", userSeq, (items == null ? 0 : items.size()));
 
             if (items == null || items.isEmpty()) {
@@ -42,7 +42,7 @@ public class PortfolioService {
             int index = 1;
 
             //현재가, 평가손익, 전체금액 합산 구하기
-            for (PortfolioAllocationItemDTO data : items) {
+            for (PortfolioDTO data : items) {
                 log.info("[{}] 포트폴리오 항목 처리 시작 - [{}] stockCode={}", userSeq, index, data.getStockCode());
                 //KIS 현재가 조회
                 KISDataDTO kisDataDTO = kisApiService.getPriceData(data.getStockCode());
@@ -77,14 +77,14 @@ public class PortfolioService {
             //totalStockPrice가 0이하면 비중 0으로 처리
             if (totalStockPrice <= 0L) {
                 log.warn("[{}] totalStockPrice <= 0 이므로 weightPct를 0으로 설정", userSeq);
-                for (PortfolioAllocationItemDTO data : items) {
+                for (PortfolioDTO data : items) {
                     data.setWeightPct(0.0);
                 }
                 return items;
             }
             //pnl
             //종목별 비중계산
-            for (PortfolioAllocationItemDTO data : items) {
+            for (PortfolioDTO data : items) {
                 long currentValue = (long) data.getCurrentPrice() * data.getQuantity();
 
                 double weightPct = BigDecimal.valueOf(currentValue)

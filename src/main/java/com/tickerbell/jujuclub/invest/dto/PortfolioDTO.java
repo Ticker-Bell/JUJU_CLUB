@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PortfolioAllocationItemDTO {
+public class PortfolioDTO {
 
     // 응답형태 : List<PortfolioAllocationItemDTO>
     // 예) 삼성전자 32% -> 삼성전자 한 줄이 DTO 1개

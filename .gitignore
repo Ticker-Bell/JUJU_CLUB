@@ -102,3 +102,4 @@ application-dev.properties
 *.rar
 stockInfoFiles/
 *.mst
+dartInfoFiles/

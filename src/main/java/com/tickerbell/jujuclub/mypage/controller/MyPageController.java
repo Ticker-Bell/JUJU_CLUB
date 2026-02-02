@@ -3,7 +3,7 @@ package com.tickerbell.jujuclub.mypage.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.auth.dto.AccountDTO;
 import com.tickerbell.jujuclub.auth.service.AccountService;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
+import com.tickerbell.jujuclub.invest.dto.PortfolioDTO;
 import com.tickerbell.jujuclub.invest.dto.UserInvestSummeryDTO;
 import com.tickerbell.jujuclub.invest.service.PortfolioService;
 import com.tickerbell.jujuclub.invest.service.UserAssetService;
@@ -61,10 +61,10 @@ public class MyPageController {
 
         // --- 차트 데이터 로직 ---
         try {
-            List<PortfolioAllocationItemDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
+            List<PortfolioDTO> holdings = portfolioService.getPortfolioAllocationItems(userSeq);
             List<Map<String, Object>> chartData = new ArrayList<>();
             if (holdings != null) {
-                for (PortfolioAllocationItemDTO item : holdings) {
+                for (PortfolioDTO item : holdings) {
                     if (item.getWeightPct() > 0) {
                         Map<String, Object> data = new HashMap<>();
                         data.put("stockName", item.getStockName());

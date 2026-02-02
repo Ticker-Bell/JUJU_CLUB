@@ -1,7 +1,7 @@
 package com.tickerbell.jujuclub.invest.mapper;
 
 import com.tickerbell.jujuclub.invest.dto.MockPortfolioDTO;
-import com.tickerbell.jujuclub.invest.dto.PortfolioAllocationItemDTO;
+import com.tickerbell.jujuclub.invest.dto.PortfolioDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,7 +16,7 @@ public interface PortfolioMapper {
      * @param userSeq int
      * @return List&ltPortfolioAllocationItemDTO&gt;
      */
-    List<PortfolioAllocationItemDTO> selectPortfolioList(@Param("user_seq") int userSeq);
+    List<PortfolioDTO> selectPortfolioList(@Param("user_seq") int userSeq);
 
     /**
      * 사용자, 종목코드 기준 보유 종목 리스트 단건 조회

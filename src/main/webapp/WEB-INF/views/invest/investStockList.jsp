@@ -1400,7 +1400,7 @@
                 tradeQuantity: amount
             };
 
-            fetch(`${pageContext.request.contextPath}/trade/BuySell`, {
+            fetch(`${pageContext.request.contextPath}/invest/BuySell`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)

@@ -23,6 +23,7 @@
   background-color: rgba(94,69,235,0.05);
 }
 .drop-zone.filled {
+  cursor: pointer;
   border-style: solid;
   border-color: transparent;
   background: transparent;
@@ -30,12 +31,14 @@
   min-width: 80px;
 }
 
+
 .draggable-item {
   display: inline-flex;
-  padding: 8px 16px;
+  padding: 4px 16px;
   background-color: #FFFFFF;
   border: 1px solid #E5E7EB;
   border-radius: 12px;
+  align-items: center;
   font-weight: 700;
   color: #4B5563;
   cursor: grab;

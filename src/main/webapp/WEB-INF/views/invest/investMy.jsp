@@ -108,6 +108,12 @@
         border-radius: 14px;
         padding: 18px;
         height: 100%;
+        transition: all 0.2s ease;
+    }
+
+    .summary-right .summary-card:hover {
+        background: #f8f9ff;
+        border-color: #6b5bff;
     }
 
     /* 작은 카드 텍스트 */
@@ -188,6 +194,7 @@
 
     .chart-card {
         grid-area: chart;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
     }
 
     .watch-card {
@@ -271,7 +278,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #fafafa;
+        background: #fff;
+        border: 1px solid #f0f0f0;
         border-radius: 8px;
         margin-bottom: 20px;
     }
@@ -379,6 +387,14 @@
         font-size: 12px;
         color: #999;
         margin-top: 2px;
+    }
+
+    .holdings-table tbody tr{
+        transition: background 0.15s ease;
+    }
+
+    .holdings-table tbody tr:hover{
+        background: #f8f9ff;
     }
 
     .holdings-table .profit.positive {
@@ -526,7 +542,7 @@
                 <!-- RIGHT: 작은 카드 3개 묶음 -->
                 <div class="summary-right">
                     <div class="summary-card">
-                        <div class="label">예수금</div>
+                        <div class="label">💰 예수금</div>
                         <div class="value">
                         <span id="cashBalance">
                         <fmt:formatNumber value="${userAsset.cashBalance}" pattern="#,###"/>
@@ -536,7 +552,7 @@
                     </div>
 
                     <div class="summary-card">
-                        <div class="label">총 평가금액</div>
+                        <div class="label">📊 총 평가금액</div>
                         <div class="value ">
                         <span id="totalStockValue">
                         <fmt:formatNumber value="${userAsset.totalStockValue}" pattern="#,###"/>
@@ -546,7 +562,7 @@
                     </div>
 
                     <div class="summary-card">
-                        <div class="label">투자 총 수익률</div>
+                        <div class="label">📈 투자 총 수익률</div>
                         <div id="totalReturnPct"
                              class="value ${userAsset.totalReturnPct > 0 ? 'positive' : (userAsset.totalReturnPct < 0 ? 'negative' : '')}">
                             <c:if test="${userAsset.totalReturnPct >= 0}">+</c:if><fmt:formatNumber

@@ -685,7 +685,7 @@
       if (roadmapBtn) {
         roadmapBtn.onclick = () => {
           submitQuizResults(chapterId, true);
-          location.href = '${cpath}/roadMap/main.do';
+          window.location.replace('${cpath}/roadMap/main.do');
         };
       }
 
@@ -767,7 +767,7 @@
 
   // 나가기 모달 열기/닫기
   function handleFailExit() {
-    location.href = '${cpath}/roadMap/main.do';
+    window.location.replace('${cpath}/roadMap/main.do');
   }
 
   function openExitModal() {

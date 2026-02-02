@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -129,5 +130,17 @@ public class RoadMapController {
         model.addAttribute("successCount", successCount);
 
         return "roadMap/missionModal";
+    }
+
+    /**
+     * 레벨에 맞는 챕터 전체 반환
+     *
+     * @param levelId Integer
+     * @return roadMapService.chapterList(levelId)
+     */
+    @GetMapping("/api/chapters")
+    public List<ChapterDTO> getChapter(@RequestParam("levelId") Integer levelId) {
+
+        return roadMapService.chapterList(levelId);
     }
 }

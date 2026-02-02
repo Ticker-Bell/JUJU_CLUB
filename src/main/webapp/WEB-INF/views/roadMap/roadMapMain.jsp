@@ -144,7 +144,7 @@
             const chapterSpan = chapterBtn.querySelector('.btn-text');
             const chapterListUl = document.getElementById('chapterListContainer');
 
-            return fetch('${cpath}/roadMapApi/chapters?levelId=' + levelId)
+            return fetch('${cpath}/roadMap/api/chapters?levelId=' + levelId)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response');
                     return response.json();
@@ -303,7 +303,6 @@
                 const centerY = vh / 2;
                 const y = centerY + (Math.sin(progress * 2 * Math.PI) * -amplitude);
 
-                console.log("nodePositions x: " + x + ", y: " + y + ", data: " + node);
                 nodePositions.push({x, y, data: node});
             });
 
@@ -338,7 +337,7 @@
                     const chapterText = "챕터 " + parseInt(data.chapterId.replace(/[^0-9]/g, '').slice(-3));
 
                     flagDiv.classList.add('flag-div');
-                    flagDiv.innerHTML = '<img src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span>' + chapterText + '</span>';
+                    flagDiv.innerHTML = '<img class="flag-img" src="${cpath}/resources/images/roadMapIcons/flag.png" alt="깃발"><span class="flag-text">' + chapterText + '</span>';
 
                     flagDiv.style.left = (pos.x - 100) + "px";
                     flagDiv.style.top = (pos.y - 100) + "px";
@@ -346,12 +345,8 @@
                     nodesLayer.appendChild(flagDiv);
                 }
 
-
-
                 el.style.left = (pos.x - (isChapter ? 40 : 30)) + "px";
                 el.style.top = (pos.y - (isChapter ? 40 : 36)) + "px";
-
-                console.log("el.style.left: " + el.style.left + ", el.style.top: " + el.style.top);
 
                 el.onclick = (e) => {
                     e.stopPropagation();

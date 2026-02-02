@@ -41,9 +41,7 @@
                             Final Question
                         </span>
             <h2 class="text-2xl font-bold text-gray-900 leading-snug">
-                왼쪽의 <span class="text-primary">투자 용어</span>와 오른쪽의 <span
-                    class="text-blue-500">올바른 뜻</span>을<br>
-                클릭하여 선으로 이어주세요.
+                서로 <span class="text-primary">관련 있는 항목</span>끼리 <span class="text-blue-500">알맞게</span> 연결해 보세요.
             </h2>
         </div>
 

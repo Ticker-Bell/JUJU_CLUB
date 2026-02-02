@@ -16,34 +16,18 @@
 <c:set var="cpath" value="${pageContext.request.contextPath}"/>
 <c:set var="defaultProfile" value="${cpath}/resources/images/default-profile.png"/>
 
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>마이페이지 | JUJU CLUB</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-
-<link rel="stylesheet" as="style" crossorigin
-      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css"/>
-
-<!-- ✅ dotlottie 유지: 새로고침(풀 로드)에서는 이 스크립트가 정상 실행됨 -->
-<script type="module" id="dotlottie-wc-module"
-        src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
-
-<script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                fontFamily: {sans: ['Pretendard', 'sans-serif']},
-                colors: {primary: '#5E45EB', secondary: '#F8FAFC'}
-            }
-        }
-    };
-</script>
-
 <style>
+    /* 로딩 텍스트 애니메이션 */
+    .loading-text {
+        font-size: 18px;
+        font-weight: 700;
+        color: #5E45EB;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
     .mypage-loading-dots{
         display: inline-block;
         min-width: 1.8em;
@@ -51,61 +35,17 @@
         white-space: pre;
     }
 
-    dotlottie-wc{
+    dotlottie-wc {
         display: block;
         width: 150px;
         height: 150px;
         flex: 0 0 150px;
     }
-
-    .mypage-scrollbar {
-        overflow-y: auto !important;
-        scrollbar-width: thin;
-        scrollbar-color: transparent transparent;
-    }
-    .mypage-scrollbar:hover { scrollbar-color: #cbd5e1 transparent; }
-    .mypage-scrollbar::-webkit-scrollbar { width: 4px; }
-    .mypage-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .mypage-scrollbar::-webkit-scrollbar-thumb {
-        background-color: transparent;
-        border-radius: 4px;
-    }
-    .mypage-scrollbar:hover::-webkit-scrollbar-thumb { background-color: #cbd5e1; }
 </style>
-
-<!-- ✅ 핵심: HTMX 스왑 진입 시에도 dotlottie를 강제로 로드/업그레이드 -->
-<!--    (스크립트 태그는 innerHTML로 삽입 시 실행되지 않으니, head에 동적 주입) -->
-<div id="dotlottieBoot"
-     hx-on:htmx:load="
-        (function(){
-          try {
-            // 1) dotlottie-wc가 아직 등록 안 되었으면 head에 module 스크립트 주입
-            if(!customElements.get('dotlottie-wc')){
-              if(!document.getElementById('dotlottie-wc-module-dynamic')){
-                var s = document.createElement('script');
-                s.type = 'module';
-                s.id   = 'dotlottie-wc-module-dynamic';
-                s.src  = 'https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js';
-                document.head.appendChild(s);
-              }
-            }
-
-            // 2) 등록 완료되면, 현재 DOM에 있는 dotlottie-wc들을 즉시 렌더 트리거
-            customElements.whenDefined('dotlottie-wc').then(function(){
-              document.querySelectorAll('dotlottie-wc').forEach(function(el){
-                var src = el.getAttribute('src');
-                if(src) el.setAttribute('src', src); // 재적용으로 렌더 트리거
-              });
-            });
-          } catch(e) {}
-        })();
-     ">
-</div>
 
 <div class="w-full max-w-[1600px] mx-auto h-full flex flex-col p-5">
     <div class="flex-1 grid grid-cols-2 grid-rows-2 gap-5 min-h-0">
 
-        <!-- 프로필 -->
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-xl font-extrabold text-gray-900">프로필</h3>
@@ -146,7 +86,6 @@
 
             <div class="flex w-full border-t border-slate-100 pt-5 mt-4">
 
-                <!-- 총 자산 -->
                 <div class="flex-1 flex items-center justify-center gap-2 border-r border-slate-100 pr-4">
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-bold text-gray-500 whitespace-nowrap">총 자산 :</span>
@@ -156,13 +95,13 @@
                              hx-trigger="load"
                              hx-select="#totalAssetPartial"
                              hx-swap="innerHTML">
-                            <span class="text-lg font-bold text-slate-400">계산 중</span>
-                            <span class="text-lg font-bold text-slate-400 mypage-loading-dots"></span>
+                            <span class="loading-text text-slate-400">
+                                계산 중...
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 예수금 -->
                 <div class="flex-1 flex items-center justify-center gap-2 pl-4">
                     <div class="flex items-center gap-2">
                         <span class="text-lg font-bold text-gray-500 whitespace-nowrap">예수금 :</span>
@@ -179,7 +118,6 @@
             </div>
         </div>
 
-        <!-- 내 포트폴리오 -->
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-xl font-extrabold text-gray-900">내 포트폴리오</h3>
@@ -199,9 +137,8 @@
                             loop>
                     </dotlottie-wc>
 
-                    <p class="text-lg font-bold text-slate-400">
-                        분석 중
-                        <span class="mypage-loading-dots"></span>
+                    <p class="loading-text -mt-5">
+                        분석 중...
                     </p>
                 </div>
             </div>
@@ -209,7 +146,6 @@
 
         <jsp:include page="myPageMission.jsp"/>
 
-        <!-- 획득 뱃지 -->
         <div class="bg-white rounded-[24px] border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.02)] p-6 h-full flex flex-col relative overflow-hidden">
             <div class="flex items-center justify-between mb-2 shrink-0">
                 <h3 class="text-xl font-extrabold text-gray-900">획득 뱃지</h3>
@@ -228,12 +164,7 @@
 
 <script>
     (function () {
-        // ✅ 아이콘은 HTMX 진입에서도 다시 찍히도록
-        function refreshIcons() {
-            if (window.lucide) lucide.createIcons();
-        }
-
-        // ✅ "." -> ".." -> "..." 무한 반복
+        // dots 애니메이션
         function initLoadingDots() {
             if (window.__mypageDotsInterval) return;
 
@@ -251,38 +182,50 @@
                 idx = (idx + 1) % states.length;
                 render();
             }, 500);
-
-            document.body.addEventListener("htmx:load", render);
-            document.body.addEventListener("htmx:afterSwap", render);
         }
 
-        // ✅ dotlottie가 이미 등록된 상태라면(새로고침 등) 즉시 업그레이드 트리거
-        function kickDotLottieIfReady() {
-            if (customElements.get('dotlottie-wc')) {
-                document.querySelectorAll('dotlottie-wc').forEach(el => {
-                    const src = el.getAttribute('src');
-                    if (src) el.setAttribute('src', src);
-                });
+        // dotlottie 강제 재생
+        function kickDotLottie(scope) {
+            const root = scope || document;
+            const els = root.querySelectorAll("dotlottie-wc");
+            if (!els || els.length === 0) return;
+
+            els.forEach(el => {
+                const src = el.getAttribute("src");
+                if (src) el.setAttribute("src", src); // 렌더 트리거
+                try { if (el.load) el.load(); } catch (e) {}
+                try { if (el.play) el.play(); } catch (e) {}
+            });
+        }
+
+        function ensureDotLottieReady(scope) {
+            if (!window.customElements || !customElements.whenDefined) {
+                setTimeout(() => kickDotLottie(scope), 80);
+                return;
             }
+
+            customElements.whenDefined("dotlottie-wc")
+                .then(() => requestAnimationFrame(() => kickDotLottie(scope)))
+                .catch(() => setTimeout(() => kickDotLottie(scope), 120));
         }
 
-        refreshIcons();
+        // lucide 아이콘도 방어적으로(있으면)
+        function refreshIcons(scope) {
+            if (!window.lucide) return;
+            try { lucide.createIcons(scope || document); } catch (e) {}
+        }
+
+        // ✅ fragment 환경에서도 즉시 실행 1회
         initLoadingDots();
-        kickDotLottieIfReady();
+        refreshIcons(document);
+        ensureDotLottieReady(document);
 
-        // HTMX로 들어올 때마다(스왑 후) 아이콘/도트/로티 재확인
-        document.body.addEventListener("htmx:load", function () {
-            refreshIcons();
-            kickDotLottieIfReady();
-        });
-        document.body.addEventListener("htmx:afterSwap", function () {
-            refreshIcons();
-            kickDotLottieIfReady();
-        });
-
-        document.body.addEventListener('profile-image-updated', function () {
-            const img = document.getElementById('mainProfileImg');
-            if (img) img.src = '${cpath}/member/profile-image?ts=' + Date.now();
+        // ✅ HTMX swap 후에도 다시
+        document.body.addEventListener("htmx:afterSwap", function (evt) {
+            const target = evt.detail && evt.detail.target ? evt.detail.target : document;
+            initLoadingDots();
+            refreshIcons(target);
+            ensureDotLottieReady(target);
         });
     })();
 </script>

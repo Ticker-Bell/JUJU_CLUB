@@ -45,7 +45,9 @@
         </div>
     </div>
 
-    <div id="chatScroll" class="flex-1 min-h-0 overflow-y-auto px-6 py-5 bg-white">
+    <div id="chatScroll"
+         class="flex-1 min-h-0 overflow-y-auto px-6 py-5 bg-white"
+         tabindex="-1">
         <div id="chatList" class="flex flex-col gap-4"></div>
 
         <div id="typingRow" class="mt-4 hidden">
@@ -107,10 +109,18 @@
     });
 
     const chatList = document.getElementById("chatList");
+    const chatScroll = document.getElementById("chatScroll");
     const nextBtn = document.getElementById("nextBtn");
     const skipBtn = document.getElementById("skipBtn");
     const resetBtn = document.getElementById("resetBtn");
     let idx = 0;
+
+    function focusToChat() {
+      if (!chatScroll) return;
+
+      chatScroll.focus({ preventScroll: true });
+      chatScroll.scrollTop = chatScroll.scrollHeight;
+    }
 
     function scrollToBottom() {
       chatScroll.scrollTop = chatScroll.scrollHeight;
@@ -143,7 +153,7 @@
       wrap.appendChild(bubbleWrap);
       row.appendChild(wrap);
       chatList.appendChild(row);
-      chatList.scrollTop = chatList.scrollHeight;
+      focusToChat();
     }
 
     function step() {

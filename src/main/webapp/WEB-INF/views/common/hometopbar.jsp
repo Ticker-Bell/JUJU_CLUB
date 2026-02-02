@@ -1,11 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 퍼스트존 아카데미02
-  Date: 2026-01-13
-  Time: 오후 2:42
-  To change this template use File | Settings | File Templates.
---%>
-<%-- 1. 라이브러리 선언은 유지 (에러 방지) --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>

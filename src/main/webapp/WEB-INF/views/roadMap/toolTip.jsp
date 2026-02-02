@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: 퍼스트존 아카데미02
-  Date: 2026-01-22
-  Time: 오전 9:22
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <div id="tooltip" class="tip">
     <div class="flex flex-col gap-2 w-full">

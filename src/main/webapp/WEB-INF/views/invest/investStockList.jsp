@@ -373,6 +373,7 @@
                             type="number"
                             id="buyAmountInput"
                             alt="수량 입력창"
+                            min="0"
                     />
                 </div>
                 <div id="buy-form-item" class="flex justify-between">
@@ -410,6 +411,7 @@
                             type="number"
                             id="sellAmountInput"
                             alt="수량 입력창"
+                            min="0"
                     />
                 </div>
                 <div id="sell-form-item" class="flex justify-between">
@@ -1268,7 +1270,6 @@
         document.addEventListener('click', (e) => {
             if (e.target.id === 'doBuyButton') {
                 trade(code);
-                console.log('매수');
             }
             if (e.target.id === 'doSellButton') {
                 trade(code);
@@ -1302,7 +1303,7 @@
             return document.getElementById('investJsp')?.classList.contains('active');
         }
 
-        // 구매 버튼 비활성화 (독립)
+        // 구매 버튼 비활성화
         function resetBuyButton() {
             const buyBtn = document.getElementById('doBuyButton');
             buyBtn.classList.remove('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
@@ -1310,18 +1311,12 @@
             document.getElementById('buyExpectedPrice').innerText = '-';
         }
 
-// 판매 버튼 비활성화 (독립)
+        // 판매 버튼 비활성화
         function resetSellButton() {
             const sellBtn = document.getElementById('doSellButton');
             sellBtn.classList.remove('bg-[#EB3A3E]', 'text-[F4F4F4]', 'hover:bg-[#C12F33]');
             sellBtn.classList.add('bg-[#E6E7EB]', 'text-[#999999]');
             document.getElementById('sellExpectedPrice').innerText = '-';
-        }
-
-// 모달 닫을 때 등 전체 초기화가 필요할 때 사용
-        function resetInvestButtons() {
-            resetBuyButton();
-            resetSellButton();
         }
 
         function buyExpectedPrice() {
@@ -1348,7 +1343,7 @@
             let total = price * amount;
 
             // 조건 검사: 값이 없거나 0이면 비활성화 함수 호출
-            if (!total || isNaN(total) || !isInvestTabActive()) {
+            if (!total || isNaN(total)) {
                 resetSellButton();
                 return;
             }
@@ -1431,12 +1426,8 @@
                         });
 
                         document.getElementById('modalActionBtn').onclick = () => {
-                            const container = document.getElementById('investBuySell');
-                            const inputs = container.querySelectorAll('input, select, textarea');
-                            inputs.forEach(input => input.value = '');
-                            hasQuantity(stockCode)
-                            resetInvestButtons();
                             closeModal();
+                            location.reload();
                         };
                     } else {
                         openResultModal({

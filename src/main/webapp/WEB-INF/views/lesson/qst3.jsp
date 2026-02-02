@@ -152,6 +152,7 @@
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-gray-100 text-gray-500";
         title.textContent = "다시 생각해볼까요?";
         title.className = "text-2xl font-extrabold text-gray-600 mb-2";
+        desc.innerHTML = "";
         bar.className = "h-2 w-full bg-gray-400";
         btn.textContent = "다시 풀기";
         btn.onclick = closeModal;

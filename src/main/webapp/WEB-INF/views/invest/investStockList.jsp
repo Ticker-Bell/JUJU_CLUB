@@ -869,8 +869,10 @@
                     if (!data || data.length === 0) {
                         if (sortType === 'interest') {
                             $container.html('<div style="padding:20px; text-align:center;">관심종목이 없습니다. 관심종목을 추가해보세요.</div>');
+                            unlockTabs();
                         } else {
                             $container.html('<div style="padding:20px; text-align:center;">데이터가 없습니다.</div>');
+                            unlockTabs();
                         }
                         return;
                     }

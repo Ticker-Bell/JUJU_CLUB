@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <style>
     /* CSS 변수 선언으로 유지보수 용이성 확보 */
@@ -77,18 +78,18 @@
     }
 
     .col.date {
-        flex-basis: 20%;
+        flex-basis: 15%;
         text-align: center;
         color: var(--sub-text-color);
         font-size: 14px;
     }
 
     .col.type {
-        flex-basis: 15%;
+        flex-basis: 8%;
     }
 
     .col.typeDetail {
-        flex-basis: 15%;
+        flex-basis: 9%;
     }
 
     .col.detail {
@@ -99,7 +100,15 @@
         text-overflow: ellipsis;  /* 칸 넘어가는 부분 ... 처리 */
     }
 
+    .col.quantity {
+        flex-basis: 8%;
+    }
+
     .col.price {
+        flex-basis: 15%
+    }
+
+    .col.totalPrice {
         flex-basis: 15%;
         text-align: center;
         font-weight: 600;
@@ -118,7 +127,9 @@
         <span class="col type">유형</span>
         <span class="col typeDetail">유형상세</span>
         <span class="col detail">상세내용</span>
-        <span class="col price">금액</span>
+        <span class="col quantity">수량</span>
+        <span class="col price">가격</span>
+        <span class="col totalPrice">총 금액</span>
     </div>
 
     <div class="history-list">
@@ -126,18 +137,23 @@
             <div class="history-item">
                 <span class="col date">${history.date}</span>
                 <span class="col type">${history.type}</span>
+
                 <c:if test="${history.typeDetail == '매수'}">
                     <span class="col typeDetail negative">${history.typeDetail}</span>
                 </c:if>
                 <c:if test="${history.typeDetail == '매도'}">
                     <span class="col typeDetail positive">${history.typeDetail}</span>
                 </c:if>
+
                 <span class="col detail" title="${history.detail}">${history.detail}</span>
+                <sapn class="col quantity">${history.quantity}</sapn>
+                <span class="col price"><fmt:formatNumber value="${history.price}" type="number"/></span>
+
                 <c:if test="${history.typeDetail == '매수'}">
-                    <span class="col price negative">${history.price}</span>
+                    <span class="col totalPrice negative">-<fmt:formatNumber value="${history.price * history.quantity}" type="number"/></span>
                 </c:if>
                 <c:if test="${history.typeDetail == '매도'}">
-                    <span class="col price positive">${history.price}</span>
+                    <span class="col totalPrice positive">+<fmt:formatNumber value="${history.price * history.quantity}" type="number"/></span>
                 </c:if>
 
             </div>

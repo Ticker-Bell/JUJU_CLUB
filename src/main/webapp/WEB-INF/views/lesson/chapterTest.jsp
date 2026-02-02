@@ -152,7 +152,7 @@
         </div>
         <h2 class="text-2xl font-extrabold text-gray-900 mb-2">테스트 불합격</h2>
         <p class="text-gray-500 text-sm font-medium mb-8">
-            아쉽게도 <span class="text-red-500 font-bold">3문제 이상</span> 틀려<br>테스트가 종료되었습니다.<br>
+            아쉽게도 <span class="text-red-500 font-bold">4문제 이상</span> 틀려<br>테스트가 종료되었습니다.<br>
             <span class="text-primary font-bold mt-2 block">도전 횟수는 무제한이니 다시 도전해보세요!</span>
         </p>
 
@@ -286,6 +286,7 @@
     checkBtn.className =
         "px-10 py-4 rounded-2xl bg-gray-200 text-gray-400 font-bold text-lg transition-all flex items-center gap-2 cursor-not-allowed";
 
+    var html = ''; // ✅ 반드시 필요
     var guideText = "", guideIcon = "";
     if (data.questionType === 'SELECT') {
       guideText = "보기 중 정답을 하나 선택해주세요.";
@@ -306,12 +307,14 @@
         '<i data-lucide="' + guideIcon + '" class="w-5 h-5 text-primary"></i>' +
         '<span>' + guideText + '</span></div>';
 
-    var html = '<div class="text-center mb-10 fade-in">';
-    html += '<span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-extrabold mb-4 border border-primary/20">';
-    html += 'Question ' + (currentIndex + 1) + '</span>';
-    html += '<h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-snug break-keep">'
-        + data.questionText + '</h2></div>';
-    html += '<div class="flex-1 w-full max-w-3xl mx-auto fade-in flex flex-col justify-center">';
+      html += '<div class="text-center mb-10 fade-in">';
+      html += '<span class="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-extrabold mb-4 border border-primary/20">';
+      html += 'Question ' + (currentIndex + 1) + '</span>';
+    if (data.questionType === 'SELECT' || data.questionType === 'LINK') {
+      html += '<h2 class="text-2xl md:text-3xl font-extrabold text-gray-900 leading-snug break-keep">';
+      html += data.questionText;
+      html += '</h2></div>';
+    }
 
     if (data.questionType === 'SELECT') {
       html += '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
@@ -321,10 +324,9 @@
         html += '<div class="w-6 h-6 rounded-full border-2 border-gray-300 flex items-center justify-center check-circle transition-colors"></div></button>';
       }
       html += '</div>';
-    } else if (data.questionType === 'MATCH') {
+    }
 
-      // {{blank}} 개수 계산
-      var blankCount = (data.questionText.match(/\{\{blank\}\}/g) || []).length;
+    else if (data.questionType === 'MATCH') {
 
       // {{blank}} → blank-box 치환
       var sentence = data.questionText.replace(/\{\{blank\}\}/g,

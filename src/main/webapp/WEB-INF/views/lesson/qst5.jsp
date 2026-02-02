@@ -287,8 +287,6 @@
         // Wrong
         icon.textContent = "🤔";
         icon.className = "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-yellow-100 text-yellow-600";
-        title.textContent = correctCount + "개만 맞았습니다"
-        title.className = "text-2xl font-extrabold text-gray-700 mb-2";
         desc.innerHTML = `정답을 다시 확인하고 연결해보세요.`;
         bar.className = "h-2 w-full bg-yellow-400";
         btn.textContent = "다시 시도하기";

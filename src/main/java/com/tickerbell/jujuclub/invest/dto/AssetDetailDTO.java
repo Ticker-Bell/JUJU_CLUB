@@ -16,5 +16,6 @@ public class AssetDetailDTO {
     private String typeDetail;
     private String detail;
     private String price;
+    private int quantity;
     private String date;
 }

@@ -201,4 +201,53 @@ public class MemberController {
 
         return new ResponseEntity<>(out, headers, HttpStatus.OK);
     }
+
+    /**
+     * 회원 정보 삭제
+     *
+     */
+    @PostMapping("/withdraw.ajax")
+    @ResponseBody
+    public Map<String, Object> withdraw(@RequestBody Map<String, String> requestBody, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 1. 세션에서 로그인된 사용자 정보 가져오기 (loginUser 키 사용)
+        MemberDTO loginUser = (MemberDTO) session.getAttribute("loginUser");
+
+        // 세션이 만료되었거나 로그인하지 않은 경우 방어 로직
+        if (loginUser == null) {
+            response.put("ok", false);
+            response.put("message", "로그인 정보가 만료되었습니다. 다시 로그인 해주세요.");
+            return response;
+        }
+
+        String userId = loginUser.getUserId();
+        String inputPassword = requestBody.get("password"); // JS에서 보낸 키값 "password"
+
+        try {
+            // 2. 서비스 로직 호출 (비밀번호 검증 및 삭제)
+            memberService.withdraw(userId, inputPassword);
+
+            // 3. 탈퇴 성공 시 세션 무효화 (로그아웃 효과)
+            session.invalidate();
+
+            // 4. 성공 응답 생성
+            response.put("ok", true);
+            response.put("message", "탈퇴 처리가 완료되었습니다.");
+
+        } catch (IllegalArgumentException e) {
+            // 서비스에서 비밀번호 불일치 시 던진 예외 처리
+            log.warn("[{}] 회원탈퇴 실패 - 비밀번호 불일치", userId);
+            response.put("ok", false);
+            response.put("message", e.getMessage()); // "비밀번호가 일치하지 않습니다."
+
+        } catch (Exception e) {
+            // 기타 DB 오류 등 예상치 못한 예외 처리
+            log.error("[{}] 회원탈퇴 중 시스템 오류 발생", userId, e);
+            response.put("ok", false);
+            response.put("message", "탈퇴 처리 중 오류가 발생했습니다. 관리자에게 문의하세요.");
+        }
+
+        return response;
+    }
 }

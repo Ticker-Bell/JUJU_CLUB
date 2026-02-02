@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: JHH
-  Date: 2026-01-13
-  Time: 오후 4:00
-  To change this template use File | Settings | File Templates.
---%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <link rel="stylesheet" type="text/css" href="${cpath}/resources/css/lesson/lesson.css">
@@ -14,14 +7,13 @@
 
 <c:if test="${!empty titles}">
     <div class="mb-6 px-1 flex items-end relative min-h-[50px]">
-        <div>
-            <div class="text-[11px] font-extrabold text-gray-400 flex items-center gap-2 mb-1">
-                <span class="w-2 h-2 rounded-full bg-primary"></span>
-                챕터명: ${titles[0].chapterName}
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-primary shadow-sm">
+                <i data-lucide="book-open" class="w-5 h-5"></i>
             </div>
-
-            <div class="text-lg font-extrabold text-gray-900">
-                레슨명: ${titles[0].lessonName}
+            <div>
+                <div class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">${titles[0].chapterName}</div>
+                <div class="text-sm font-extrabold text-gray-900">${titles[0].lessonName}</div>
             </div>
         </div>
 

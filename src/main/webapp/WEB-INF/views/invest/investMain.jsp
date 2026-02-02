@@ -163,30 +163,107 @@
 </div>
 
 <script>
-    // 탭 UI 전환 함수
+    // ==========================================
+    // ✅ 1. 웹소켓 관리 로직 (과거 코드 복원 및 수정)
+    // ==========================================
+
+    // 웹소켓 연결 시작
+    function startWebSocket() {
+        // HTMX로 로드된 컨텐츠 내부에서 .stock-item을 찾아 초기 구독
+        let initialCodes = [];
+        // jQuery($) 대신 바닐라 JS 사용 권장 (HTMX와 혼용 시)
+        document.querySelectorAll('.stock-item').forEach(function (el) {
+            const code = el.getAttribute('data-code');
+            if(code) initialCodes.push(code);
+        });
+
+        if (initialCodes.length > 0) {
+            // initListSocket 함수는 외부 JS나 로드된 페이지에 정의되어 있다고 가정
+            if(typeof initListSocket === 'function') {
+                initListSocket(initialCodes);
+            }
+        }
+    }
+
+    // 웹소켓 구독 해제 및 연결 종료
+    function disconnectWebsocket() {
+        // 1) 구독 해제
+        if (typeof StockSocket !== 'undefined') {
+            const currentCodes = Array.from(StockSocket.subscribeCodes.keys());
+            if (currentCodes.length > 0) {
+                StockSocket.unsubscribe(currentCodes);
+            }
+            // 2) 연결 물리적 종료
+            if (typeof StockSocket.disconnect === 'function') {
+                StockSocket.disconnect();
+            }
+        }
+    }
+
+    // 페이지를 완전히 떠날 때 연결 종료
+    window.addEventListener('beforeunload', function () {
+        disconnectWebsocket();
+    });
+
+
+    // ==========================================
+    // ✅ 2. 탭 UI 전환 및 웹소켓 제어
+    // ==========================================
     function changeTab(type) {
         const tabs = ['my', 'invest', 'asset'];
 
+        // 탭 전환 처리
         tabs.forEach(t => {
-            const content = document.getElementById(t + 'Jsp');
+            // 1. 컨텐츠 ID 매핑 수정 (asset -> assetDetailJsp)
+            let contentId = t + 'Jsp';
+            if (t === 'asset') contentId = 'assetDetailJsp';
 
-            // 버튼 ID 매핑 (asset -> assetDetailTab)
+            const content = document.getElementById(contentId);
+
+            // 2. 버튼 ID 매핑
             let btnId = t + 'Tab';
             if (t === 'asset') btnId = 'assetDetailTab';
 
             const btn = document.getElementById(btnId);
 
             if (t === type) {
+                // 해당 탭 활성화
                 if(content) content.classList.add('active');
                 if(btn) btn.classList.add('active');
             } else {
+                // 다른 탭 비활성화
                 if(content) content.classList.remove('active');
                 if(btn) btn.classList.remove('active');
             }
         });
+
+        // 웹소켓 제어 로직
+        if (type === 'invest') {
+            setTimeout(startWebSocket, 100);
+        } else {
+            disconnectWebsocket();
+        }
     }
 
-    // stockCorpInfoCard.jsp 등에서 사용하는 함수 (호환성 유지)
+
+    // ==========================================
+    // ✅ 3. HTMX 이벤트 연동 (중요)
+    // ==========================================
+
+    // HTMX가 "투자" 탭 내용을 서버에서 가져와 교체(Swap)한 직후 실행
+    document.body.addEventListener('htmx:afterSwap', function(evt) {
+        // 교체된 타겟이 investJsp인 경우에만 웹소켓 시작
+        if (evt.detail.target.id === 'investJsp') {
+            startWebSocket();
+        }
+    });
+
+
+    // ==========================================
+    // ✅ 4. 기존 유틸리티 함수들
+    // ==========================================
+
+    // stockCorpInfoCard.jsp 등에서 사용하는 함수
     function getSelectedCorpInfo(stockCode) {
         fetch('${cpath}/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
             .then(res => res.text())

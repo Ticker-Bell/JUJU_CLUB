@@ -18,14 +18,20 @@ public class StockCorpInfoController {
     private final StockCorpInfoService stockCorpInfoService;
     private final DARTApiService dartApiService;
 
+    /**
+     * 모의투자 투자 페이지
+     * 투자 탭 기업정보 및 재무 스냅샷 데이터 연결
+     *
+     * @param stockCode String
+     * @return invest/stockCorpInfoCard
+     */
     @GetMapping("/corpInfo")
-    public String corpInfoPage(@RequestParam("stockCode")String stockCode, Model model) throws Exception {
-        System.out.println("들어온 stockCode:"+stockCode);
+    public String corpInfoPage(@RequestParam("stockCode") String stockCode, Model model) throws Exception {
 
         StockCorpInfoDTO stockCorpInfoDTO = stockCorpInfoService.getConvertStockCorpInfoData(stockCode);
         model.addAttribute("stockCorpInfo", stockCorpInfoDTO);
 
-        return "invest/stockCorpInfoCard"; //jsp 페이지 리턴
+        return "invest/stockCorpInfoCard";
     }
 
 }

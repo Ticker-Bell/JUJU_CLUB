@@ -2,7 +2,6 @@ package com.tickerbell.jujuclub.invest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tickerbell.jujuclub.invest.dto.*;
-import com.tickerbell.jujuclub.invest.mapper.AssetDetailMapper;
 import com.tickerbell.jujuclub.invest.service.*;
 import com.tickerbell.jujuclub.utils.ColorUtil;
 import com.tickerbell.jujuclub.utils.GetValidAccessToken;
@@ -38,10 +37,17 @@ public class StockListController {
     //자산 상세 내용
     private final AssetDetailService assetDetailService;
 
+    /**
+     * 모의투자 메인 페이지 연결
+     * 마이 탭) 사용자 자산 연결, 사용자 보유 종목 리스트, 보유 종목 도넛 차트, 관심 종목 리스트 조회
+     * 투자 탭)
+     *
+     * @return invest/investMain
+     */
     @GetMapping("main.do")
-    public String investMain(Model model, HttpSession session){
+    public String investMain(Model model, HttpSession session) {
 
-        Integer userSeq = (Integer)session.getAttribute("userSeq");
+        Integer userSeq = (Integer) session.getAttribute("userSeq");
 
         // 해당하는 유저의 관심종목들의 종목정보 리스트 반환
         List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
@@ -49,7 +55,7 @@ public class StockListController {
         Map<String, KISDataDTO> codeKISDataMap = new HashMap<String, KISDataDTO>();
 
         // 리스트를 처음 띄울때의 현재가와 등락률은 restAPI로 호출해서 출력한다.
-        for(StockDTO stockDTO : stockDTOList) {
+        for (StockDTO stockDTO : stockDTOList) {
             KISDataDTO kisDataDTO = kisApiService.getPriceData(stockDTO.getStockCode());
             // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
             if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
@@ -99,7 +105,7 @@ public class StockListController {
         }
 
         // 자산 상세내역에 들어갈 내용
-        if(userSeq != null){
+        if (userSeq != null) {
             List<AssetDetailDTO> assetDetailDTOList = new ArrayList<>();
 
             List<MockTradeDTO> mockTradeDTOList = assetDetailService.findUserTrades(userSeq);
@@ -108,11 +114,11 @@ public class StockListController {
             String price = null;
 
             // 받아온 MockTradeDTO를 화면에 표시할 형식인 assetDetailDTO로 변경
-            for(MockTradeDTO mockTradeDTO : mockTradeDTOList){
-                if(mockTradeDTO.getTradeType() == 'Y'){
+            for (MockTradeDTO mockTradeDTO : mockTradeDTOList) {
+                if (mockTradeDTO.getTradeType() == 'Y') {
                     typeDetail = "매수";
                     price = "-" + mockTradeDTO.getTradePrice();
-                }else{
+                } else {
                     typeDetail = "매도";
                     price = "+" + mockTradeDTO.getTradePrice();
                 }
@@ -120,7 +126,7 @@ public class StockListController {
                 LocalDate localDate = mockTradeDTO.getTradedAt().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-                AssetDetailDTO assetDetailDTO =  AssetDetailDTO.builder()
+                AssetDetailDTO assetDetailDTO = AssetDetailDTO.builder()
                         .type("주식")
                         .typeDetail(typeDetail)
                         .detail(mockTradeDTO.getStockName())
@@ -147,7 +153,7 @@ public class StockListController {
 
         switch (sortType) {
             case "interest":  //관심종목
-                Integer userSeq = (Integer)session.getAttribute("userSeq");
+                Integer userSeq = (Integer) session.getAttribute("userSeq");
                 List<StockDTO> stockDTOList = stockService.findStockListFromUserWatchList(userSeq);
 
                 // List<RankingDTO>를 반환해야하기에 stockDTO에 있는 Name과 Code를 넣어서 RankingDTO로 전환한다.
@@ -189,8 +195,8 @@ public class StockListController {
         List<RankingDTO> slicedList = rankingDTOList.subList(startIdx, endIdx);
 
         // 추출한 10개에 대해서만 외부 API 호출
-        if("interest".equals(sortType)) {
-            for(RankingDTO rankingDTO : slicedList) {
+        if ("interest".equals(sortType)) {
+            for (RankingDTO rankingDTO : slicedList) {
                 KISDataDTO kisDataDTO = kisApiService.getPriceData(rankingDTO.getStockCode());
                 // KISDataDTO의 changePct 값은 음수일때만 - 붙어 있고 그 외엔 부혹 없기때문에 붙여준다.
                 if (!kisDataDTO.getChangePct().startsWith("-") && !kisDataDTO.getChangePct().equals("0.00")) {
@@ -199,7 +205,7 @@ public class StockListController {
                 rankingDTO.setCurrentPrice(kisDataDTO.getCurrentPrice());
                 rankingDTO.setChangePct(kisDataDTO.getChangePct());
             }
-        }else{
+        } else {
             slicedList = rankingApiService.addKisDataDtoToRankingDto(slicedList);
         }
 

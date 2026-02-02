@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tickerbell.jujuclub.invest.mapper.UserAssetMapper">
     <!--보유 이용가능자금 조회-->
-    <select id="selectCashBalance" parameterType="int" resultType="long">
+    <select id="selectCashBalance" resultType="long">
         select cash_balance
         from user_account
         where user_seq = #{user_seq}
@@ -13,32 +13,48 @@
     <select id="selectChapTestReward" parameterType="int" resultType="long">
         select coalesce(sum(lc.reward_cash), 0) as chapter_reward
         from user_test_result utr
-        join learning_chapter lc on utr.chapter_id = lc.chapter_id
+                 join learning_chapter lc on utr.chapter_id = lc.chapter_id
         where utr.user_seq = #{user_seq}
-        and utr.is_pass = 'Y'
+          and utr.is_pass = 'Y'
     </select>
 
     <!--2)미션을 깬 경우의 리워드 합을 구하는 쿼리 : mission_reward값이 null이면 0을 반환-->
-    <select id="selectMissionReward" parameterType="int" resultType = "long">
+    <select id="selectMissionReward" parameterType="int" resultType="long">
         select coalesce(sum(m.mission_reward), 0) as mission_reward
         from user_mission um
-        join mission m on um.mission_seq = m.mission_seq
+                 join mission m on um.mission_seq = m.mission_seq
         where um.user_seq = #{user_seq}
-        and um.is_completed = 'Y'
+          and um.is_completed = 'Y'
     </select>
 
-    <select id="selectUserTotalReward" parameterType="int" resultType = "long">
-        select aa.chapter_reward+bb.mission_reward
-        from ( select utr.user_seq, coalesce(sum(lc.reward_cash), 0) as chapter_reward
-               from user_test_result utr
-                        join learning_chapter lc on utr.chapter_id = lc.chapter_id
-               where utr.user_seq = #{user_seq}
-                 and utr.is_pass = 'Y') aa left  outer join (select um.user_seq, coalesce(sum(m.mission_reward), 0) as mission_reward
-                                                             from user_mission um
-                                                                      join mission m on um.mission_seq = m.mission_seq
-                                                             where um.user_seq = #{user_seq}
-                                                               and um.is_completed = 'Y') bb
-        on aa.user_seq = bb.user_seq;
+    <select id="selectUserTotalReward" resultType="long">
+        select (select coalesce(sum(lc.reward_cash), 0)
+                from user_test_result utr
+                         join learning_chapter lc on utr.chapter_id = lc.chapter_id
+                where utr.user_seq = #{user_seq}
+                  and utr.is_pass = 'Y')
+                   +
+               (select coalesce(sum(m.mission_reward), 0)
+                from user_mission um
+                         join mission m on um.mission_seq = m.mission_seq
+                where um.user_seq = #{user_seq}
+                  and um.is_completed = 'Y')
+                   as total_reward
+    </select>
+
+    <select id="selectUserTotalReward2" resultType="long">
+        select aa.chapter_reward + coalesce(bb.mission_reward, 0) as total_reward
+        from (select #{user_seq} as user_seq, coalesce(sum(lc.reward_cash), 0) as chapter_reward
+              from user_test_result utr
+                       join learning_chapter lc on utr.chapter_id = lc.chapter_id
+              where utr.user_seq = #{user_seq}
+                and utr.is_pass = 'Y') aa
+                 left join (select #{user_seq} as user_seq, coalesce(sum(m.mission_reward), 0) as mission_reward
+                            from user_mission um
+                                     join mission m on um.mission_seq = m.mission_seq
+                            where um.user_seq = #{user_seq}
+                              and um.is_completed = 'Y') bb
+                           on aa.user_seq = bb.user_seq;
     </select>
 
 </mapper>

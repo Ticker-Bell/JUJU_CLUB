@@ -20,12 +20,16 @@ public class SignupController {
         this.signupService = signupService;
     }
 
+    /**
+     * 회원가입
+     *
+     * @return map {@code Map<String, Object>}
+     */
     @PostMapping(
             value = "/signin.ajax",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-
     @ResponseBody
     public Map<String, Object> signupAjax(@RequestBody SignupAjaxRequest request) {
 
@@ -58,6 +62,12 @@ public class SignupController {
     }
 
     // 1. 이메일 중복 확인 API
+    /**
+     * 이메일 중복 확인
+     *
+     * @param email String
+     * @return new {@code ResponseEntity<>(out, headers, HttpStatus.OK)} {@code Map<String, Object>}
+     */
     @GetMapping("/check-email")
     @ResponseBody
     public Map<String, Object> checkEmail(@RequestParam String email) {
@@ -74,6 +84,12 @@ public class SignupController {
     }
 
     // 2. 닉네임 중복 확인 API
+    /**
+     * 닉네임 중복 확인
+     *
+     * @param nickname String
+     * @return map {@code Map<String, Object>}
+     */
     @GetMapping("/check-nickname")
     @ResponseBody
     public Map<String, Object> checkNickname(@RequestParam String nickname) {
@@ -89,6 +105,9 @@ public class SignupController {
         return map;
     }
 
+    /**
+     * 회원가입 요청 DTO
+     */
     public static class SignupAjaxRequest {
         private String email;
         private String username;

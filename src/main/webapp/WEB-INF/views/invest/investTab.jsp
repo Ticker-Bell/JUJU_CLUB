@@ -14,6 +14,5 @@
         <div id="stockCorpInfo-container" class="w-full">
             <jsp:include page="stockCorpInfoCard.jsp" ></jsp:include>
         </div>
-
     </div>
 </div>

@@ -5,7 +5,7 @@
     .container {
         width: min(1200px, 100%);
         margin: 0 auto;
-        padding: 0 20px; /* 양쪽 여백 확보 */
+        /*padding: 0 20px; !* 양쪽 여백 확보 *!*/
         min-width: 0;
     }
 

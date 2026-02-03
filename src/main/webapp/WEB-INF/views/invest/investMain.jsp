@@ -136,7 +136,34 @@
                               style="width: 300px; height: auto;"
                               autoplay loop>
                 </dotlottie-wc>
-                <p class="loading-text" style="margin-top: 0px;">내 자산 보러 가는중🪙...</p>
+                <p class="loading-text" style="margin-top: 0px;">
+                    <%--inline scriptlet - 로딩 문구 랜덤으로 띄우기--%>
+                    <%
+                        String[] messages = {
+                                "내 자산 보러 가는중 🪙...",
+                                "투자 금고를 열고 있어요 💰",
+                                "내 보물을 확인하는 중이에요 ✨",
+                                "포트폴리오를 불러오고 있어요 📊",
+                                "수익률을 계산하고 있어요 🧮",
+                                "주식 요정이 데이터를 가져오는 중 🧚‍♀️",
+                                "내 재산을 정리하고 있어요 📦",
+                                "투자 일기장을 펼치는 중 📖",
+                                "돈 주머니를 꺼내고 있어요 👛",
+                                "금고 문을 여는 중이에요 🔐",
+                                "보물 상자를 확인하는 중 🎁",
+                                "내 재산을 세는 중이에요 🪙",
+                                "투자 레벨을 확인하고 있어요 ⭐",
+                                "오늘의 수익을 집계하는 중 📈",
+                                "부자가 되는 중입니다 💎",
+                                "잠시만요, 거의 다 왔어요! 🚀",
+                                "내 통장을 들여다보는 중 💳",
+                                "수익 현황판을 켜는 중 💡",
+                                "투자 일지를 펼치고 있어요 📝",
+                                "돈나무를 확인하는 중 🌳"
+                        };
+                        out.print(messages[(int)(Math.random() * messages.length)]);
+                    %>
+                </p>
             </div>
         </div>
 
@@ -263,7 +290,7 @@
     // ✅ 4. 기존 유틸리티 함수들
     // ==========================================
 
-    // stockCorpInfoCard.jsp 등에서 사용하는 함수
+    // stockCorpInfoCard.jsp에서 사용하는 함수
     function getSelectedCorpInfo(stockCode) {
         fetch('${cpath}/invest/corpInfo?stockCode=' + encodeURIComponent(stockCode))
             .then(res => res.text())

@@ -60,6 +60,13 @@ public class StockMyRestController {
             chartDataList.add(chartData);
         }
 
+        //정렬
+        chartDataList.sort((a, b) ->{
+            Double pctA = (Double)  a.get("weightPct");
+            Double pctB = (Double)  b.get("weightPct");
+            return Double.compare(pctB, pctA);
+        });
+
         //응답에 추가
         myData.put("chartData", chartDataList);
 

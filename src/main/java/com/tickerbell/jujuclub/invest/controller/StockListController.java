@@ -70,6 +70,13 @@ public class StockListController {
         data.put("color", ColorUtil.colorByStockCode(item.getStockCode()));
         chartData.add(data);
       }
+
+      //차트 데이터 비중 순 정렬(비중 큰 순서부터)
+      chartData.sort((a, b)-> {
+        Double pctA = (Double)  a.get("weightPct");
+        Double pctB = (Double)  b.get("weightPct");
+        return Double.compare(pctB, pctA);
+      });
       model.addAttribute("chartData", chartData);
 
       // 4. 차트 데이터 JSON 변환 (Chart.js용)

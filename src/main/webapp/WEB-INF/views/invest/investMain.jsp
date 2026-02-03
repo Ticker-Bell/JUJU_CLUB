@@ -136,7 +136,7 @@
                               style="width: 300px; height: auto;"
                               autoplay loop>
                 </dotlottie-wc>
-                <p class="loading-text" style="margin-top: 0px;">고객님의 자산을 분석중입니다...</p>
+                <p class="loading-text" style="margin-top: 0px;">내 자산 보러 가는중🪙...</p>
             </div>
         </div>
 

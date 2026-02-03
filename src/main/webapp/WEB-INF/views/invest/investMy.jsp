@@ -722,9 +722,6 @@
         let flag = false; //중복 호출 방지
 
         //로딩
-        function hideInitialLoading() {
-            document.getElementById("investLoadingOverlay")?.classList.remove("is-active");
-        }
 
         function initChart() {
 
@@ -739,7 +736,7 @@
                 setChartEmptyState(true);
             }
 
-            updateData().finally(hideInitialLoading);
+            updateData();
             //페이지 자동 갱신(1분) 60*1000
             setInterval(updateData, 30 * 1000);
         }

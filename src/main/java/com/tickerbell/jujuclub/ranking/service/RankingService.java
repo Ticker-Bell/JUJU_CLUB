@@ -42,7 +42,7 @@ public class RankingService {
 
       RankingDTO.RankingResponse rankingResponse = rankingMapper.getUserRankingInfo(userSeq);
 
-      log.info("[{}] 유저 랭킹 리스트 조회 - 유저 랭킹 프로필 DB 조회 ", userSeq);
+      log.info("[{}] 유저 랭킹 리스트 조회 - 유저 랭킹 프로필 DB 조회 종료", userSeq);
 
       log.info("[{}] 유저 랭킹 리스트 조회 - 유저 총 자산 순 랭킹 리스트 DB 조회 시작 ", userSeq);
       // 총 자산 기준 정렬

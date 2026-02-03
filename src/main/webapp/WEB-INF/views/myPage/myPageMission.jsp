@@ -39,12 +39,12 @@
                     일일 미션 <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400 group-hover:text-[#5E45EB]"></i>
                 </span>
                 <span class="font-extrabold" style="color:#14B8A6;">
-                    <fmt:formatNumber value="${missionList.size() > 0 ? (missionSuccessCount / missionList.size()) * 100 : 0}" pattern="#,##0"/>%
+                    <fmt:formatNumber value="${missionSuccessCount > 0 ? (missionSuccessCount / 4) * 100 : 0}" pattern="#,##0"/>%
                 </span>
             </div>
 
             <div class="w-full bg-slate-100 rounded-full h-3.5 overflow-hidden">
-                <c:set var="dailyPercent" value="${missionList.size() > 0 ? (missionSuccessCount / missionList.size()) * 100 : 0}"/>
+                <c:set var="dailyPercent" value="${missionSuccessCount > 0 ? (missionSuccessCount / 4) * 100 : 0}"/>
                 <div class="mypage-mission-bar daily" style="width: ${dailyPercent}%"></div>
             </div>
             <p class="text-xs text-gray-400 mt-1.5 truncate">클릭하여 오늘의 미션을 확인하세요.</p>

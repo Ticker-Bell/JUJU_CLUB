@@ -52,6 +52,7 @@ public class StockListController {
    */
   @GetMapping("/tab/my")
   public String getMyTabFragment(Model model, HttpSession session) {
+    // 1. 세션
     Integer userSeq = (Integer) session.getAttribute("userSeq");
 
     if (userSeq != null) {

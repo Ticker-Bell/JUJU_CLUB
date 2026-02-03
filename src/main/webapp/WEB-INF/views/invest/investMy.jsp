@@ -514,6 +514,96 @@
     .card-title.spacious {
         margin-bottom: 24px;
     }
+
+    /* 수익률 TOP/WORST 카드 - 차트 범례 밑에 추가 */
+    .profit-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .profit-card {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+        padding: 16px 12px;
+        border-radius: 10px;
+        transition: all 0.15s ease;
+        cursor: default;
+        background: #fafafa;
+        border: 1px solid #e8e8e8;
+    }
+
+    .profit-card:hover {
+        border-color: #d0d0d0;
+    }
+
+    .profit-card.best:hover {
+        background: #fff5f5;
+        border-color: #ffcdd2;
+    }
+
+    .profit-card.worst:hover {
+        background: #f5f5ff;
+        border-color: #c5cae9;
+    }
+
+    .card-emoji {
+        font-size: 24px;
+        line-height: 1;
+        padding-bottom: 12px;
+    }
+
+    .card-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .card-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: #999;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .profit-card .stock-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .profit-rate {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .profit-rate.positive {
+        color: #e53935;
+    }
+
+    .profit-rate.negative {
+        color: #1e88e5;
+    }
+
+    /* 반응형 */
+    @media (max-width: 480px) {
+        .profit-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .card-emoji {
+            font-size: 20px;
+        }
+    }
 </style>
 
 <div class="container">
@@ -651,8 +741,27 @@
                     </div>
                 </c:forEach>
             </div>
-        </div>
+            <!-- 수익률 TOP/WORST -->
+            <div class="profit-summary" id="profitSummary" style="${empty holdings ? 'display:none;' : ''}">
+                <div class="profit-card best">
+                    <div class="card-emoji">👑</div>
+                    <div class="card-content">
+                        <div class="card-label">오늘의 MVP</div>
+                        <div class="stock-name" id="bestStockName">-</div>
+                        <div class="profit-rate positive" id="bestStockPnl">-</div>
+                    </div>
+                </div>
 
+                <div class="profit-card worst">
+                    <div class="card-emoji">💪</div>
+                    <div class="card-content">
+                        <div class="card-label">제발 올라줘</div>
+                        <div class="stock-name" id="worstStockName">-</div>
+                        <div class="profit-rate negative" id="worstStockPnl">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -855,6 +964,56 @@
                             pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
                         }
                     });
+                }
+
+                //MVP / WORST를 portfolioList로 직접 계산
+                const bestNameEl  = document.getElementById("bestStockName");
+                const bestPnlEl   = document.getElementById("bestStockPnl");
+                const worstNameEl = document.getElementById("worstStockName");
+                const worstPnlEl  = document.getElementById("worstStockPnl");
+                const ps = document.getElementById("profitSummary");
+
+                if (Array.isArray(portfolioList) && portfolioList.length > 0) {
+                    // 숨김 풀기 (초기 holdings 비었으면 display:none 박혀있어서 계속 안 보일 수 있음)
+                    if (ps) {
+                        ps.style.display = "grid";
+                    }
+
+                    let best = null, worst = null;
+
+                    portfolioList.forEach(it => {
+                        const pnl = Number(it.pnl);
+                        if (!Number.isFinite(pnl)) return;
+
+                        if (!best || pnl > best.pnl) best = { name: it.stockName, pnl };
+                        if (!worst || pnl < worst.pnl) worst = { name: it.stockName, pnl };
+                    });
+
+                    if (bestNameEl) {
+                        bestNameEl.textContent = best?.name ?? "-";
+                    }
+                    if (worstNameEl) {
+                        worstNameEl.textContent = worst?.name ?? "-";
+                    }
+
+                    if (bestPnlEl) {
+                        const v = best?.pnl;
+                        bestPnlEl.textContent = Number.isFinite(v)
+                            ? (v >= 0 ? "+" : "") + Math.round(v).toLocaleString("ko-KR") + "원"
+                            : "-";
+                    }
+
+                    if (worstPnlEl) {
+                        const v = worst?.pnl;
+                        worstPnlEl.textContent = Number.isFinite(v)
+                            ? (v >= 0 ? "+" : "") + Math.round(v).toLocaleString("ko-KR") + "원"
+                            : "-";
+                    }
+                } else {
+                    // 보유종목 없으면 숨김
+                    if (ps) {
+                        ps.style.display = "none";
+                    }
                 }
 
                 renderInfinite(holdingsState);

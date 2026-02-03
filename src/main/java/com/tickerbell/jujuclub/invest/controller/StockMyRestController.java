@@ -22,7 +22,6 @@ public class StockMyRestController {
 
     private final UserAssetService userAssetService;
 
-
     /**
      * 모의투자 마이페이지 자동 갱신용 REST API
      *
@@ -71,7 +70,7 @@ public class StockMyRestController {
         myData.put("chartData", chartDataList);
 
         //test
-        System.out.println("시간 체크용 " + chartDataList);
+        //System.out.println("시간 체크용 " + chartDataList);
 
         //map반환(자동으로 json변환)
         return myData;

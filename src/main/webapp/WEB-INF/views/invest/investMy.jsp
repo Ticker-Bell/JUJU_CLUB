@@ -180,7 +180,7 @@
         grid-template-areas:
     "summary chart"
     "hold    chart";
-    /*"hold    watch";*/
+        /*"hold    watch";*/
         min-height: 0;
     }
 
@@ -389,11 +389,11 @@
         margin-top: 2px;
     }
 
-    .holdings-table tbody tr{
+    .holdings-table tbody tr {
         transition: background 0.15s ease;
     }
 
-    .holdings-table tbody tr:hover{
+    .holdings-table tbody tr:hover {
         background: #f8f9ff;
     }
 
@@ -699,9 +699,8 @@
                                     <td class="text-right currentPriceData"><fmt:formatNumber
                                             value="${holding.currentPrice}"
                                             pattern="#,###"/></td>
-                                    <td class="text-right profit ${holding.pnl >= 0 ? 'positive' : 'negative'} pnlData">
-                                        <c:if test="${holding.pnl >= 0}">+</c:if>
-                                        <fmt:formatNumber value="${holding.pnl}" pattern="#,###"/>
+                                    <td class="text-right profit ${holding.pnl > 0 ? 'positive' : (holding.pnl < 0 ? 'negative' : '')} pnlData">
+                                        <c:if test="${holding.pnl > 0}">+</c:if><fmt:formatNumber value="${holding.pnl}" pattern="#,###"/>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -830,8 +829,6 @@
 
         let flag = false; //중복 호출 방지
 
-        //로딩
-
         function initChart() {
 
             renderInfinite(holdingsState);
@@ -957,21 +954,25 @@
                             const pnl = (item.pnl == null) ? 0 : Number(item.pnl);
 
                             pnlEl.classList.remove("positive", "negative");
-                            pnlEl.classList.add(pnl >= 0 ? "positive" : "negative");
-                            pnlEl.textContent = (pnl >= 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
+                            if (pnl > 0) {
+                                pnlEl.classList.add("positive");
+                            } else if (pnl < 0) {
+                                pnlEl.classList.add("negative");
+                            }
+                            pnlEl.textContent = (pnl > 0 ? "+" : "") + Math.round(pnl).toLocaleString("ko-KR"); //trunc에서 round로 바꿈
                         }
                     });
                 }
 
                 //MVP / WORST를 portfolioList로 직접 계산
-                const bestNameEl  = document.getElementById("bestStockName");
-                const bestPnlEl   = document.getElementById("bestStockPnl");
+                const bestNameEl = document.getElementById("bestStockName");
+                const bestPnlEl = document.getElementById("bestStockPnl");
                 const worstNameEl = document.getElementById("worstStockName");
-                const worstPnlEl  = document.getElementById("worstStockPnl");
+                const worstPnlEl = document.getElementById("worstStockPnl");
                 const ps = document.getElementById("profitSummary");
 
                 if (Array.isArray(portfolioList) && portfolioList.length > 0) {
-                    // 숨김 풀기 (초기 holdings 비었으면 display:none 박혀있어서 계속 안 보일 수 있음)
+                    //숨김 풀기 (초기 holdings 비었으면 display:none 박혀있어서 계속 안 보일 수 있음)
                     if (ps) {
                         ps.style.display = "grid";
                     }
@@ -982,8 +983,8 @@
                         const pnl = Number(it.pnl);
                         if (!Number.isFinite(pnl)) return;
 
-                        if (!best || pnl > best.pnl) best = { name: it.stockName, pnl };
-                        if (!worst || pnl < worst.pnl) worst = { name: it.stockName, pnl };
+                        if (!best || pnl > best.pnl) best = {name: it.stockName, pnl};
+                        if (!worst || pnl < worst.pnl) worst = {name: it.stockName, pnl};
                     });
 
                     if (bestNameEl) {
@@ -1007,7 +1008,7 @@
                             : "-";
                     }
                 } else {
-                    // 보유종목 없으면 숨김
+                    //보유종목 없으면 숨김
                     if (ps) {
                         ps.style.display = "none";
                     }

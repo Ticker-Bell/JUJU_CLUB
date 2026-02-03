@@ -18,7 +18,7 @@
         min-width: 1200px;
         width: 100%;
         margin: 0 auto;
-        padding: 20px;
+        /*padding: 20px;*/
     }
 
     /* SUMMARY WRAPPER (전체 큰 박스) */
@@ -483,7 +483,7 @@
         min-height: 0; /* flex/grid 내부 스크롤 살리는 핵심 */
         padding-right: 10px;
         scrollbar-gutter: stable;
-        max-height: calc(56px * 6); /* 12줄 정도 보이게 */
+        max-height: calc(56px * 7); /* 7줄 정도 보이게 */
 
     }
 
@@ -664,7 +664,7 @@
         const chartDataFromServer = ${empty chartDataJson ? "[]" : chartDataJson};
 
         //페이징
-        const countPerPage = 6;
+        const countPerPage = 7;
 
         const holdingsState = {
             loadedCount: countPerPage,

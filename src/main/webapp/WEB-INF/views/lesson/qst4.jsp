@@ -74,7 +74,7 @@
         }
         document.getElementById('questionText').innerHTML = renderedQuestion;
 
-        // 2️⃣ 옵션 렌더링
+        // 옵션 렌더링
         const dragSource = document.getElementById('dragSource');
         const words = question.optionList.map((text, idx) => ({id: idx, text}));
         words.sort(() => Math.random() - 0.5);

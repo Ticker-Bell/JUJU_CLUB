@@ -57,12 +57,6 @@ public class RankingDTO {
   @AllArgsConstructor
   public static class RankingListOBR {
 
-    //    private int userSeq;
-//    private String userId;
-//    private String userName;
-//    private int userRevenueRank;
-//    private int totalAsset;
-//    private double totalRevenueRate;
     private int userSeq;
     private String userName;
     private int cashBalance;

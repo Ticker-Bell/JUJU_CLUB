@@ -133,14 +133,7 @@
             "w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5 text-4xl shadow-lg bg-orange-100 text-orange-500";
         title.textContent = "아쉽네요!";
         title.className = "text-2xl font-extrabold text-orange-500 mb-2";
-
-        let feedback = "";
-        if (selectedIdx === 1) feedback = "선택하신 것은 '채권'에 대한 설명이에요.";
-        if (selectedIdx === 3) feedback = "선택하신 것은 '예금'에 대한 설명이에요.";
-        if (selectedIdx === 4) feedback = "주식이 무조건 오르진 않아요. 위험 자산입니다.";
-
-        desc.innerHTML = `힘내세요! 다시 한 번 생각해볼까요?<br>
-        <span class="text-sm text-gray-500 mt-1 block">${feedback}</span>`;
+        desc.innerHTML = `힘내세요! 다시 한 번 생각해볼까요?`;
         bar.className = "h-2 w-full bg-orange-500";
         btn.textContent = "다시 풀기";
         btn.onclick = closeModal;
@@ -162,7 +155,6 @@
       document.getElementById('resultModal').classList.add('hidden');
     }
 
-    // 🔥 htmx inline onclick을 위해 필요한 함수만 전역 노출
     window.selectOption = selectOption;
     window.checkAnswer = checkAnswer;
     window.closeModal = closeModal;

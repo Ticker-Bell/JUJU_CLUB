@@ -113,29 +113,4 @@ public class MyPageController {
 
         return "myPage/myPageAsset";
     }
-
-    /**
-     * 미션 정보 조회
-     * URL: /myPage/mission
-     */
-//    @GetMapping("/mission")
-//    public String getUserMission(HttpSession session, Model model) {
-//        Integer userSeq = (Integer) session.getAttribute("userSeq");
-//
-//        try {
-//            List<MissionDTO> missionList = roadMapService.missionList(userSeq);
-//            int successCount = (int) missionList.stream()
-//                    .filter(m -> m.getCount() <= m.getProgress())
-//                    .count();
-//
-//            model.addAttribute("missionList", missionList);
-//            model.addAttribute("missionSuccessCount", successCount);
-//        } catch (Exception e) {
-//            log.error("미션 정보 조회 실패", e);
-//            model.addAttribute("missionList", new ArrayList<>());
-//            model.addAttribute("missionSuccessCount", 0);
-//        }
-//
-//        return "myPage/missionSection";
-//    }
 }

@@ -49,9 +49,11 @@
     <tr>
       <td>프론트엔드</td>
       <td>
-        <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=flat&logo=javascript-F7DF1E&logoColor=white"/>
-                <img src="https://img.shields.io/badge/Html5-E34F26?style=flat&logo=html5-E34F26&logoColor=white"/>
-
+        <img src="https://img.shields.io/badge/Javascript?style=flat&logo=javascript-F7DF1E&logoColor=white"/>
+       <img src="https://img.shields.io/badge/Html-E34F26?style=flat&logo=html5-E34F26&logoColor=white"/>
+       <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jQuery-0769AD&logoColor=white"/>
+       <img src="https://img.shields.io/badge/Htmx-3366CC?style=flat&logo=htmx-3366CC&logoColor=white"/>
+       <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=flat&logo=tailwind-06B6D4&logoColor=white"/>
       </td>
     </tr>
   </tbody>

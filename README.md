@@ -85,7 +85,88 @@
 
 2. **투자의 두려움 해소** 
 
-3. **확장 가능성 확보** 
+3. **확장 가능성 확보**
+
+
+## 📌 주요 기능
+
+### **0. 홈**
+
+<div align="center">
+<img src ="https://github.com/user-attachments/assets/52f3e766-82ed-4270-8fbd-5571eb3188c8"/>
+</div>
+
+### **1. 회원가입 | 로그인**
+
+#### **회원가입**
+
+<div align="center">
+  
+</div>
+
+#### **로그인**
+
+<div align="center">
+  
+</div>
+
+#### **레벨테스트**
+
+<div align="center">
+  
+</div>
+
+#### **온보딩**
+
+<div align="center">
+  
+</div>
+
+### **2.로드맵**
+
+#### **로드맵**
+<div align="center">
+  
+</div>
+
+#### **레슨**
+<div align="center">
+  
+</div>
+
+#### **챕터테스트**
+<div align="center">
+  
+</div>
+
+### **3.모의투자**
+
+#### **마이**
+<div align="center">
+  
+</div>
+
+#### **투자**
+<div align="center">
+  
+</div>
+
+#### **거래내역**
+<div align="center">
+  
+</div>
+
+### **4.랭킹**
+<div align="center">
+  
+</div>
+
+### **5.마이페이지**
+<div align="center">
+  
+</div>
+
+
 
 ## ⚙️ 프로젝트 구조
 ```
@@ -384,82 +465,3 @@ src
  ┃ ┃ ┃ ┃ ┗ home.jsp
  ┃ ┃ ┃ ┗ web.xml
 ```
-
-## 📌 주요 기능
-
-### **0. 홈**
-
-<div align="center">
-<img src ="https://github.com/user-attachments/assets/c8c991a7-f979-4e71-8e01-75e04cc87fc4"/>
-</div>
-
-### **1. 회원가입 | 로그인**
-
-#### **회원가입**
-
-<div align="center">
-  
-</div>
-
-#### **로그인**
-
-<div align="center">
-  
-</div>
-
-#### **레벨테스트**
-
-<div align="center">
-  
-</div>
-
-#### **온보딩**
-
-<div align="center">
-  
-</div>
-
-### **2.로드맵**
-
-#### **로드맵**
-<div align="center">
-  
-</div>
-
-#### **레슨**
-<div align="center">
-  
-</div>
-
-#### **챕터테스트**
-<div align="center">
-  
-</div>
-
-### **3.모의투자**
-
-#### **마이**
-<div align="center">
-  
-</div>
-
-#### **투자**
-<div align="center">
-  
-</div>
-
-#### **거래내역**
-<div align="center">
-  
-</div>
-
-### **4.랭킹**
-<div align="center">
-  
-</div>
-
-### **5.마이페이지**
-<div align="center">
-  
-</div>
-

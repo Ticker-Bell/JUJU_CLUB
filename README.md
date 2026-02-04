@@ -53,7 +53,7 @@
        <img src="https://img.shields.io/badge/Html-E34F26?style=flat&logo=html5&logoColor=white"/>
        <img src="https://img.shields.io/badge/jQuery-0769AD?style=flat&logo=jQuery&logoColor=white"/>
        <img src="https://img.shields.io/badge/Htmx-3366CC?style=flat&logo=htmx&logoColor=white"/>
-       <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=flat&logo=tailwind&logoColor=white"/>
+       <img src="https://img.shields.io/badge/Tailwind-06B6D4?style=flat&logo=tailwindcss&logoColor=white"/>
       </td>
     </tr>
     <tr>
@@ -71,7 +71,7 @@
      <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/>
     <img src="https://img.shields.io/badge/Slack-4A154B?style=flat&logo=slack&logoColor=white"/>
        <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white"/>
-       <img src="https://img.shields.io/badge/Intellij-000000?style=flat&logo=intellij&logoColor=white"/>
+       <img src="https://img.shields.io/badge/Intellij-000000?style=flat&logo=intellijidea&logoColor=white"/>
       </td>
     </tr>
   </tbody>

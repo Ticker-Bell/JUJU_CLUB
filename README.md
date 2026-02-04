@@ -10,7 +10,6 @@
 - **목표:** 레슨과 테스트를 통해 단계적으로 금융 개념을 학습하고, 가상 시드머니를 활용한 모의 투자 경험을 통해 실제 투자 흐름을 이해
 - **주요 타겟 사용자:**  금융 투자 경험이 없는 사용자
 
----
 
 ## ✍️ 프로젝트 소개
 
@@ -24,7 +23,6 @@
 
 **JUJUCLUB**은 위 문제를 해결하기 위해 단계 시스템을 도입하여 초보자도 눈높이에 맞는 교육을 제공하고 모의 자금으로 부담없이 투자할 수 있는 기회를 제공하여 주식 투자에 대한 부담과 두려움을 없애고자 하였습니다.
 
----
 ## 🧑‍💻 팀원 소개
 
 | **이름**    | **역할**        | 
@@ -36,7 +34,7 @@
 |이유경      | 공통 레이아웃, 로드맵 메인 페이지, 일일 미션| 
 |김윤선      | 모의투자 실시간 주식 차트, 주식 매수| 
 
----
+
 
 ## ⚙️ 기술 스택
 
@@ -51,14 +49,15 @@
     <tr>
       <td>프론트엔드</td>
       <td>
-        <img src="https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=white"/>
-        <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white"/>
+        <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=flat&logo=javascript-F7DF1E&logoColor=white"/>
+                <img src="https://img.shields.io/badge/Html5-E34F26?style=flat&logo=html5-E34F26&logoColor=white"/>
+
       </td>
     </tr>
   </tbody>
 </table>
 
----
+
 
 ## 🚀 프로젝트 목표
 
@@ -67,7 +66,6 @@
 2. **투자의 두려움 해소** 
 
 3. **확장 가능성 확보** 
----
 
 ## ⚙️ 프로젝트 구조
 ├─.idea                          
@@ -164,60 +162,7 @@
 │  │              ├─myPage   
 │  │              ├─ranking     
 │  │              └─roadMap               
-│  └─test
-│      └─resources            
-└─target
-    ├─classes  
-    │  ├─com
-    │  │  └─tickerbell
-    │  │      └─jujuclub
-    │  │          ├─auth
-    │  │          │  ├─controller  
-    │  │          │  ├─dto
-    │  │          │  ├─mapper  
-    │  │          │  └─service    
-    │  │          ├─common
-    │  │          │  ├─controller  
-    │  │          │  ├─dto  
-    │  │          │  ├─mapper     
-    │  │          │  └─service     
-    │  │          ├─config      
-    │  │          ├─dartdata
-    │  │          │  ├─dto    
-    │  │          │  ├─mapper     
-    │  │          │  ├─runner   
-    │  │          │  └─service      
-    │  │          ├─index   
-    │  │          ├─invest
-    │  │          │  ├─controller
-    │  │          │  ├─dto
-    │  │          │  ├─mapper   
-    │  │          │  └─service   
-    │  │          ├─lesson
-    │  │          │  ├─controller    
-    │  │          │  ├─dto 
-    │  │          │  ├─mapper    
-    │  │          │  └─service    
-    │  │          ├─mypage
-    │  │          │  └─controller
-    │  │          ├─ranking
-    │  │          │  ├─controller    
-    │  │          │  ├─dto    
-    │  │          │  ├─mapper      
-    │  │          │  └─service          
-    │  │          ├─roadMap
-    │  │          │  ├─controller    
-    │  │          │  ├─dto  
-    │  │          │  ├─mapper    
-    │  │          │  └─service      
-    │  │          ├─stockdata
-    │  │          │  ├─dto     
-    │  │          │  ├─mapper
-    │  │          │  ├─runner      
-    │  │          │  └─service       
-    │  │          └─utils            
-    │  └─mapper
----
+
 
 ## 📌 주요 기능
 

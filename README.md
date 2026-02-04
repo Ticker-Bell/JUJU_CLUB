@@ -97,29 +97,8 @@
 </div>
 
 ### **1. 회원가입 | 로그인**
-
-#### **회원가입**
-
 <div align="center">
-  
-</div>
-
-#### **로그인**
-
-<div align="center">
-  
-</div>
-
-#### **레벨테스트**
-
-<div align="center">
-  
-</div>
-
-#### **온보딩**
-
-<div align="center">
-  
+ <img src = "https://github.com/user-attachments/assets/09be4790-8bce-47d0-b951-5ef16976293e"/>
 </div>
 
 ### **2.로드맵**

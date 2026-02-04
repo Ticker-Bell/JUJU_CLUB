@@ -390,7 +390,7 @@ src
 ### **0. 홈**
 
 <div align="center">
-  
+  ![제목 없는 비디오 - Clipchamp로 제작](https://github.com/user-attachments/assets/c8c991a7-f979-4e71-8e01-75e04cc87fc4)
 </div>
 
 ### **1. 회원가입 | 로그인**

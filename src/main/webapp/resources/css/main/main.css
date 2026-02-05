@@ -1,0 +1,45 @@
+
+/* 로딩 CSS */
+
+/* 기본은 무조건 숨김 */
+#investLoadingOverlay {
+    display: none !important;
+}
+
+/* 모의투자 버튼 눌러서 요청 중일 때만 표시 */
+#investLoadingOverlay.htmx-request {
+    display: flex !important;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.5);
+}
+
+#investLoadingOverlay .loading-panel{
+    width: min(900px, 92vw);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+#investLoadingOverlay .loading-image{
+    width:100%;
+    height:auto;
+    display:block;
+}
+
+#investLoadingOverlay.is-active { display:flex !important; }
+
+
+#investLoadingOverlay.loading-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+}
+
+
+

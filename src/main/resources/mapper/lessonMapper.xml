@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.lesson.mapper.LessonMapper">
+
+  <insert id="insertLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    INSERT INTO USER_QUESTION_RESULT
+        (USER_SEQ
+        ,lesson_id
+    )
+    VALUES(
+           #{userSeq}
+          ,#{lessonId}
+          )
+  </insert>
+  <insert id="insertChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    INSERT INTO user_test_result (chapter_id, user_seq, tested_at)
+    VALUES
+        (#{chapterId}
+        ,#{userSeq}
+        ,CURRENT_TIMESTAMP)
+  </insert>
+
+  <update id="updateLssnInfo" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_QUESTION_RESULT
+    SET FINISHED_AT =CURRENT_TIMESTAMP
+    WHERE USER_SEQ = #{userSeq}
+    AND LESSON_ID = #{lessonId}
+  </update>
+
+  <update id="updateChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_TEST_RESULT
+    SET SCORE     = #{score}
+      , IS_PASS   = #{isPass}
+      , TESTED_AT = CURRENT_TIMESTAMP
+    WHERE USER_SEQ = #{userSeq}
+      AND CHAPTER_ID = #{chapterId}
+  </update>
+
+  <update id="updateChapterRwd" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest">
+    UPDATE USER_ACCOUNT UA
+      LEFT OUTER JOIN USER_TEST_RESULT UTR
+      ON UA.USER_SEQ = UTR.USER_SEQ
+      LEFT OUTER JOIN LEARNING_CHAPTER LC
+      ON UTR.CHAPTER_ID = LC.CHAPTER_ID
+    SET CASH_BALANCE = CASH_BALANCE + REWARD_CASH
+    WHERE UA.USER_SEQ = #{userSeq}
+      AND LC.chapter_id = #{chapterId}
+  </update>
+
+  <update id="updateChapterPay" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest" >
+    UPDATE USER_ACCOUNT UA
+      LEFT OUTER JOIN USER_TEST_RESULT UTR
+      ON UA.USER_SEQ = UTR.USER_SEQ
+      LEFT OUTER JOIN LEARNING_CHAPTER LC
+      ON UTR.CHAPTER_ID = LC.CHAPTER_ID
+    SET CASH_BALANCE = CASH_BALANCE - TEST_PAY
+    WHERE UA.USER_SEQ = #{userSeq}
+      AND LC.chapter_id = #{chapterId}
+  </update>
+
+  <select id="selectQstChat" parameterType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO$QstChatMsgRequest"
+    resultType="com.tickerbell.jujuclub.lesson.dto.QstChatMsgDTO">
+    SELECT OPTIONS
+    FROM LEARNING_QUESTION
+    WHERE LESSON_ID = #{lessonId}
+    AND question_id = #{questionId}
+  </select>
+
+  <select id="selectLssnTitle" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonTitle">
+    SELECT CHAPTER_NAME
+         ,LL.LESSON_NAME
+         ,SUBSTRING(QUESTION_ID,4) AS questionId
+         , LC.REWARD_CASH
+         , LC.TEST_PAY
+    FROM LEARNING_LESSON LL
+    LEFT OUTER JOIN LEARNING_CHAPTER LC ON LL.CHAPTER_ID = LC.CHAPTER_ID
+    LEFT OUTER JOIN LEARNING_QUESTION LQ ON LL.LESSON_ID = LQ.LESSON_ID
+    WHERE LL.LESSON_ID = #{lessonId}
+  </select>
+
+  <select id="selectQSt" parameterType="String"
+    resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
+    SELECT QUESTION_TYPE
+         ,QUESTION_TEXT
+         , OPTIONS
+         , ANSWER
+    FROM LEARNING_QUESTION
+    WHERE LESSON_ID = #{lessonId}
+    AND QUESTION_ID NOT LIKE '%Q001'
+  </select>
+
+  <select id="countUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+          resultType="int">
+    SELECT COUNT(LESSON_ID)
+    FROM USER_QUESTION_RESULT
+    WHERE USER_SEQ = #{userSeq}
+    AND LESSON_ID = #{lessonId}
+  </select>
+
+  <select id="selectUsrLssnRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+          resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonResponse">
+    SELECT RESULT_SEQ
+         , USER_SEQ
+         , LESSON_ID
+         , STARTED_AT
+         , FINISHED_AT
+    FROM USER_QUESTION_RESULT
+    WHERE USER_SEQ = #{userSeq}
+      AND LESSON_ID = #{lessonId}
+  </select>
+  <select id="getChapterTestQst" parameterType="String"
+          resultType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonQst">
+    SELECT *
+    FROM LEARNING_QUESTION
+           LEFT OUTER JOIN LEARNING_LESSON ON LEARNING_QUESTION.LESSON_ID = LEARNING_LESSON.LESSON_ID
+           LEFT OUTER JOIN LEARNING_CHAPTER ON LEARNING_LESSON.CHAPTER_ID = LEARNING_CHAPTER.CHAPTER_ID
+    WHERE LEARNING_LESSON.CHAPTER_ID = #{chapterId}
+      AND SUBSTRING(QUESTION_ID, 20) != '1';
+
+  </select>
+  <select id="countUserChapterRslt" parameterType="com.tickerbell.jujuclub.lesson.dto.LessonDTO$LessonRequest"
+    resultType="int">
+    SELECT COUNT(*)
+    FROM USER_TEST_RESULT
+    WHERE USER_SEQ = #{userSeq}
+    AND CHAPTER_ID = #{chapterId}
+  </select>
+
+
+</mapper>

@@ -1,158 +1,177 @@
-CREATE TABLE USERS (
-    user_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '유저 시퀀스',
-    user_id VARCHAR(20) NOT NULL COMMENT '유저ID',
-    user_pw VARCHAR(20) NOT NULL COMMENT '유저PW',
-    user_name VARCHAR(50) NOT NULL COMMENT '유저 이름',
-    user_level INT UNSIGNED NOT NULL DEFAULT 1 COMMENT '유저 레벨',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '가입 일시',
-    PRIMARY KEY (user_seq)
-)
-    comment '유저';
+-- 1. 유저
+CREATE TABLE `USERS` (
+                         `USER_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                         `USER_ID`	VARCHAR(60)	NOT NULL	COMMENT '이메일',
+                         `USER_PW`	VARCHAR(60)	NOT NULL,
+                         `USER_NAME`	VARCHAR(50)	NOT NULL,
+                         `CREATED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                         `USER_LEVEL`	TINYINT UNSIGNED	NULL	DEFAULT NULL	COMMENT '1/2/3',
+                         `USER_IMAGE`	MEDIUMBLOB	NULL	DEFAULT NULL,
+                         PRIMARY KEY (`USER_SEQ`)
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE STOCK_MASTER (
-    stock_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '종목 시퀀스',
-    stock_code VARCHAR(20) COMMENT '종목 코드',
-    stock_name VARCHAR(50) NOT NULL COMMENT '종목명',
-    market_type VARCHAR(20) NOT NULL COMMENT '시장 구분',
-    sector VARCHAR(50) NOT NULL COMMENT '업종',
-    stock_type VARCHAR(20) NOT NULL COMMENT '종목 타입',
-    PRIMARY KEY (stock_seq)
-)
-    comment '주식 종목';
+-- 2. 학습 난이도
+CREATE TABLE `LEARNING_LEVEL` (
+                                  `LEVEL_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                  `LEVEL_NAME`	VARCHAR(10)	NOT NULL	COMMENT '초급/중급/고급',
+                                  `IS_DOMESTIC`	CHAR(1)	NOT NULL	COMMENT 'Y/N',
+                                  PRIMARY KEY (`LEVEL_SEQ`)
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE USER_WATCHLIST (
-    favorite_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '관심종목 시퀀스',
-    user_seq INT UNSIGNED NOT NULL COMMENT '유저 시퀀스',
-    stock_seq INT UNSIGNED COMMENT '종목 시퀀스',
-    PRIMARY KEY (favorite_seq),
-    FOREIGN KEY (user_seq) REFERENCES USERS(user_seq),
-    FOREIGN KEY (stock_seq) REFERENCES STOCK_MASTER(stock_seq)
-)
-    comment '관심종목';
+-- 3. 주식 종목 마스터
+CREATE TABLE `STOCK_MASTER` (
+                                `STOCK_SEQ` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                `STOCK_CODE` VARCHAR(10) NOT NULL COMMENT 'EX)005930',
+                                `STOCK_NAME` VARCHAR(100) NOT NULL COMMENT 'EX)에코마켓팅',
+                                `MARKET_TYPE` VARCHAR(20) NOT NULL COMMENT 'KOSPI/KOSDAQ',
+                                `SECTOR` VARCHAR(50) NOT NULL COMMENT 'EX)LED',
+                                PRIMARY KEY (`STOCK_SEQ`),
+                                CONSTRAINT `UK_STOCK_MASTER_CODE`
+                                    UNIQUE (`STOCK_CODE`)
+) ENGINE=INNODB DEFAULT CHARSET=UTF8MB4;
 
-CREATE TABLE USER_ACCOUNT (
-    account_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '계좌 시퀀스',
-    user_id VARCHAR(20) NOT NULL COMMENT '유저 ID',
-    account_no INT UNSIGNED NOT NULL COMMENT '계좌 번호',
-    cash_balance INT UNSIGNED NOT NULL DEFAULT 100000 COMMENT '잔고',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '계좌 생성일',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '계좌 수정일',
-    PRIMARY KEY (account_seq)
-)
-    comment '유저 계좌';
 
-CREATE TABLE MOCK_TRADE (
-    trade_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '거래 시퀀스',
-    user_seq INT UNSIGNED NOT NULL COMMENT '유저 시퀀스',
-    stock_seq INT UNSIGNED COMMENT '종목 시퀀스',
-    trade_type CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '매수/매도',
-    trade_price INT UNSIGNED NOT NULL COMMENT '거래 가격',
-    trade_quantity INT UNSIGNED NOT NULL COMMENT '거래 수량',
-    traded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '거래 일시',
-    PRIMARY KEY (trade_seq),
-    FOREIGN KEY (user_seq) REFERENCES USERS(user_seq),
-    FOREIGN KEY (stock_seq) REFERENCES STOCK_MASTER(stock_seq)
-)
-    comment '거래 내역';
+-- 4. 미션
+CREATE TABLE `MISSION` (
+                           `MISSION_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                           `MISSION_TYPE`	VARCHAR(50)	NOT NULL	COMMENT '레슨/모의체결/챕터테스트/관종추',
+                           `MISSION_TITLE`	VARCHAR(50)	NOT NULL	COMMENT '레슨 5개완료하기 ETC',
+                           `MISSION_REWARD`	INT UNSIGNED	NOT NULL	COMMENT '500',
+                           `TARGET_VALUE`	INT UNSIGNED	NOT NULL	COMMENT '5',
+                           PRIMARY KEY (`MISSION_SEQ`)
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE USER_MISSION (
-    user_mission_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '유저 미션 시퀀스',
-    is_completed CHAR(1) NOT NULL DEFAULT 'N' COMMENT '미션 완료 여부',
-    started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '시작 일시',
-    completed_at DATETIME COMMENT '완료 일시',
-    progress_count INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '진행 횟수',
-    PRIMARY KEY (user_mission_seq)
-)
-    comment '유저 미션';
+-- 5. DART 기업 매핑
+CREATE TABLE `DART_CORP_MAP` (
+                                 `DART_MAP_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                 `CORP_CODE`	VARCHAR(10)	NOT NULL	COMMENT 'EX)00126380',
+                                 `CORP_NAME`	VARCHAR(200)	NOT NULL	COMMENT 'EX)삼성전자',
+                                 `STOCK_CODE`	VARCHAR(10)	NOT NULL	COMMENT 'EX)005930',
+                                 `MODIFY_DATE`	VARCHAR(8)	NOT NULL	COMMENT 'EX)20251201',
+                                 PRIMARY KEY (`DART_MAP_SEQ`)
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE LEARNING_LEVEL (
-    level_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '레벨 시퀀스',
-    level_name VARCHAR(10) NOT NULL COMMENT '레벨명',
-    is_domestic CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '국내 여부',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    PRIMARY KEY (level_seq)
-)
-    comment '학습 레벨';
+-- 6. 학습 챕터
+CREATE TABLE `LEARNING_CHAPTER` (
+                                    `CHAPTER_ID`	VARCHAR(50)	NOT NULL,
+                                    `LEVEL_SEQ`	INT UNSIGNED	NOT NULL,
+                                    `CHAPTER_NAME`	VARCHAR(100)	NOT NULL,
+                                    `REWARD_CASH`	INT UNSIGNED	NOT NULL,
+                                    `TEST_PAY`	INT UNSIGNED	NOT NULL	DEFAULT 0,
+                                    PRIMARY KEY (`CHAPTER_ID`),
+                                    CONSTRAINT `FK_CHAPTER_LEVEL` FOREIGN KEY (`LEVEL_SEQ`) REFERENCES `LEARNING_LEVEL` (`LEVEL_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE LEARNING_CHAPTER (
-    chapter_id VARCHAR(50) NOT NULL COMMENT '챕터ID',
-    level_seq INT UNSIGNED NOT NULL COMMENT '레벨 시퀀스',
-    chapter_name VARCHAR(100) NOT NULL COMMENT '챕터명',
-    test_reward INT UNSIGNED NOT NULL COMMENT '테스트 보상',
-    test_pay INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '테스트 지불',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    PRIMARY KEY (chapter_id),
-    FOREIGN KEY (level_seq) REFERENCES LEARNING_LEVEL(level_seq)
-)
-    comment '학습 챕터';
+-- 7. 학습 레슨
+CREATE TABLE `LEARNING_LESSON` (
+                                   `LESSON_ID`	VARCHAR(50)	NOT NULL,
+                                   `CHAPTER_ID`	VARCHAR(50)	NOT NULL,
+                                   `LESSON_NAME`	VARCHAR(100)	NOT NULL,
+                                   `LESSON_TYPE`	VARCHAR(20)	NOT NULL	COMMENT 'THEORY / PRACTICE / TEST',
+                                   `DESCRIPTION`	VARCHAR(100)	NULL,
+                                   PRIMARY KEY (`LESSON_ID`),
+                                   CONSTRAINT `FK_LESSON_CHAPTER` FOREIGN KEY (`CHAPTER_ID`) REFERENCES `LEARNING_CHAPTER` (`CHAPTER_ID`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE LEARNING_LESSON (
-    lesson_id VARCHAR(50) NOT NULL COMMENT '레슨ID',
-    chapter_id VARCHAR(50) NOT NULL COMMENT '챕터ID',
-    lesson_name VARCHAR(100) NOT NULL COMMENT '레슨명',
-    lesson_type VARCHAR(20) NOT NULL COMMENT '레슨 타입',
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '생성일',
-    PRIMARY KEY (lesson_id),
-    FOREIGN KEY (chapter_id) REFERENCES LEARNING_CHAPTER(chapter_id)
-)
-    comment '학습 레슨';
+-- 8. 학습 문제
+CREATE TABLE `LEARNING_QUESTION` (
+                                     `QUESTION_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                     `LESSON_ID`	VARCHAR(50)	NOT NULL,
+                                     `QUESTION_ID`	VARCHAR(50)	NOT NULL,
+                                     `QUESTION_TYPE`	VARCHAR(20)	NOT NULL	COMMENT '개념형,선택형,드래그형,설명형,실습형',
+                                     `QUESTION_TEXT`	TEXT	NULL,
+                                     `OPTIONS`	JSON	NOT NULL	COMMENT '문항 유형에 따른 JSON DATA(개념형 포함)',
+                                     `ANSWER`	JSON	NULL	COMMENT '정답 JSON + 해설 포함',
+                                     `IMAGE`	TEXT	NULL	COMMENT '실습용 이미지',
+                                     PRIMARY KEY (`QUESTION_SEQ`),
+                                     CONSTRAINT `FK_QUESTION_LESSON` FOREIGN KEY (`LESSON_ID`) REFERENCES `LEARNING_LESSON` (`LESSON_ID`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE LEARNING_QUESTION (
-    question_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '문항 시퀀스',
-    lesson_id VARCHAR(50) NOT NULL COMMENT '레슨ID',
-    question_id VARCHAR(50) NOT NULL COMMENT '문항ID',
-    question_type VARCHAR(20) NOT NULL COMMENT '문항 유형',
-    question_text TEXT NOT NULL COMMENT '문항 내용',
-    options JSON NOT NULL COMMENT '선택지 정보',
-    answer JSON NOT NULL COMMENT '정답 정보',
-    image VARCHAR(100) COMMENT '이미지 경로',
-    PRIMARY KEY (question_seq),
-    FOREIGN KEY (lesson_id) REFERENCES LEARNING_LESSON(lesson_id)
-)
-    comment '학습 문항';
+-- 9. 유저 계좌
+CREATE TABLE `USER_ACCOUNT` (
+                                `ACCOUNT_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                `ACCOUNT_NO`	VARCHAR(30)	NOT NULL	COMMENT '계좌번호',
+                                `CASH_BALANCE`	BIGINT	NOT NULL,
+                                `CREATED_AT`	DATETIME	NOT NULL,
+                                `UPDATED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                                PRIMARY KEY (`ACCOUNT_SEQ`),
+                                CONSTRAINT `FK_ACCOUNT_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE USER_QUESTION_RESULT (
-    result_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '결과 시퀀스',
-    lesson_id VARCHAR(50) NOT NULL COMMENT '레슨ID',
-    user_seq INT UNSIGNED NOT NULL COMMENT '유저시퀀스',
-    started_at DATETIME COMMENT '시작 시간',
-    finished_at DATETIME COMMENT '종료 시간',
-    PRIMARY KEY (result_seq)
-)
-    comment '유저 레슨 결과';
+-- 10. 유저 문제 풀이 결과
+CREATE TABLE `USER_QUESTION_RESULT` (
+                                        `RESULT_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                        `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                        `LESSON_ID`	VARCHAR(50)	NOT NULL,
+                                        `STARTED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                                        `FINISHED_AT`	DATETIME	NULL,
+                                        PRIMARY KEY (`RESULT_SEQ`),
+                                        CONSTRAINT `FK_Q_RESULT_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                                        CONSTRAINT `FK_Q_RESULT_LESSON` FOREIGN KEY (`LESSON_ID`) REFERENCES `LEARNING_LESSON` (`LESSON_ID`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE USER_TEST_RESULT (
-    test_result_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '테스트 결과 번호',
-    user_seq INT UNSIGNED NOT NULL COMMENT '유저 시퀀스',
-    chapter_id VARCHAR(50) NOT NULL COMMENT '챕터ID',
-    score INT NOT NULL COMMENT '점수',
-    attempt_no INT UNSIGNED NOT NULL COMMENT '시도 횟수',
-    is_pass CHAR(1) NOT NULL DEFAULT 'N' COMMENT '통과 여부',
-    tested_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '응시 일시',
-    PRIMARY KEY (test_result_seq),
-    FOREIGN KEY (user_seq) REFERENCES USERS(user_seq)
-)
-    comment '유저 테스트 결과';
+-- 11. 유저 챕터 테스트 결과
+CREATE TABLE `USER_TEST_RESULT` (
+                                    `TEST_RESULT_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                    `CHAPTER_ID`	VARCHAR(50)	NOT NULL,
+                                    `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                    `SCORE`	INT UNSIGNED	NOT NULL	DEFAULT 0,
+                                    `IS_PASS`	CHAR(1)	NOT NULL	DEFAULT 'N'	COMMENT 'Y/N',
+                                    `TESTED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                                    PRIMARY KEY (`TEST_RESULT_SEQ`),
+                                    CONSTRAINT `FK_T_RESULT_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                                    CONSTRAINT `FK_T_RESULT_CHAPTER` FOREIGN KEY (`CHAPTER_ID`) REFERENCES `LEARNING_CHAPTER` (`CHAPTER_ID`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE MISSION (
-    mission_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '미션 시퀀스',
-    mission_type VARCHAR(50) NOT NULL COMMENT '미션 유형',
-    mission_title VARCHAR(50) NOT NULL COMMENT '미션 제목',
-    mission_reward INT UNSIGNED NOT NULL COMMENT '미션 보상',
-    target_value INT UNSIGNED COMMENT '목표 값',
-    PRIMARY KEY (mission_seq)
-)
-    comment '미션';
+-- 12. 모의 주식 거래
+CREATE TABLE `MOCK_TRADE` (
+                              `TRADE_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                              `STOCK_SEQ`	INT UNSIGNED	NOT NULL,
+                              `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                              `TRADE_TYPE`	CHAR(1)	NOT NULL	DEFAULT 'Y'	COMMENT '매수/매도 Y/N',
+                              `TRADE_PRICE`	INT UNSIGNED	NOT NULL	COMMENT '5000',
+                              `TRADE_QUANTITY`	INT UNSIGNED	NOT NULL,
+                              `TRADED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                              PRIMARY KEY (`TRADE_SEQ`),
+                              CONSTRAINT `FK_TRADE_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                              CONSTRAINT `FK_TRADE_STOCK` FOREIGN KEY (`STOCK_SEQ`) REFERENCES `STOCK_MASTER` (`STOCK_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
 
-CREATE TABLE MOCK_PORTFOLIO (
-    portfolio_seq INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '포트폴리오 시퀀스',
-    user_seq INT UNSIGNED NOT NULL COMMENT '유저 시퀀스',
-    stock_seq INT UNSIGNED COMMENT '종목 시퀀스',
-    quantity INT NOT NULL COMMENT '보유 수량',
-    avg_price INT NOT NULL COMMENT '평균 단가',
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정 일시',
-    PRIMARY KEY (portfolio_seq),
-    FOREIGN KEY (user_seq) REFERENCES USERS(user_seq),
-    FOREIGN KEY (stock_seq) REFERENCES STOCK_MASTER(stock_seq)
-)
-    comment '유저 포트폴리오';
+-- 13. 모의 포트폴리오
+CREATE TABLE `MOCK_PORTFOLIO` (
+                                  `PORTFOLIO_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                  `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                  `STOCK_SEQ`	INT UNSIGNED	NOT NULL,
+                                  `QUANTITY`	INT UNSIGNED	NOT NULL	COMMENT '증감',
+                                  `AVG_PRICE`	INT UNSIGNED	NOT NULL	COMMENT '평균단가',
+                                  `UPDATED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                                  PRIMARY KEY (`PORTFOLIO_SEQ`),
+                                  CONSTRAINT `FK_PORTFOLIO_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                                  CONSTRAINT `FK_PORTFOLIO_STOCK` FOREIGN KEY (`STOCK_SEQ`) REFERENCES `STOCK_MASTER` (`STOCK_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
+
+-- 14. 유저 관심 종목
+CREATE TABLE `USER_WATCHLIST` (
+                                  `FAVORITE_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                  `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                  `STOCK_SEQ`	INT UNSIGNED	NOT NULL,
+                                  `CREATED_AT`	DATETIME	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+                                  PRIMARY KEY (`FAVORITE_SEQ`),
+                                  CONSTRAINT `FK_WATCHLIST_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                                  CONSTRAINT `FK_WATCHLIST_STOCK` FOREIGN KEY (`STOCK_SEQ`) REFERENCES `STOCK_MASTER` (`STOCK_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;
+
+-- 15. 유저 미션 현황
+CREATE TABLE `USER_MISSION` (
+                                `USER_MISSION_SEQ`	INT UNSIGNED	NOT NULL AUTO_INCREMENT,
+                                `USER_SEQ`	INT UNSIGNED	NOT NULL,
+                                `MISSION_SEQ`	INT UNSIGNED	NOT NULL,
+                                `STARTED_AT`	DATETIME	NOT NULL	COMMENT '매일 자정 초기화',
+                                `IS_COMPLETED`	CHAR(1)	NOT NULL	DEFAULT 'N'	COMMENT 'Y/N',
+                                `IS_REWARDED`	CHAR(1)	NOT NULL	DEFAULT 'N'	COMMENT 'Y/N',
+                                `PROGRESS`	INT UNSIGNED	NOT NULL	DEFAULT 0,
+                                PRIMARY KEY (`USER_MISSION_SEQ`),
+                                CONSTRAINT `FK_MISSION_USER` FOREIGN KEY (`USER_SEQ`) REFERENCES `USERS` (`USER_SEQ`) ON DELETE CASCADE,
+                                CONSTRAINT `FK_MISSION_MASTER` FOREIGN KEY (`MISSION_SEQ`) REFERENCES `MISSION` (`MISSION_SEQ`) ON DELETE CASCADE
+) ENGINE = INNODB DEFAULT CHARSET = UTF8MB4;

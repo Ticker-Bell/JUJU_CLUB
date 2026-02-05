@@ -1,0 +1,256 @@
+/* Scroll Snap 및 컨테이너 설정 */
+.snap-container {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.snap-container::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+}
+
+/* SVG Styles */
+#roadmapSvg {
+    overflow: visible;
+}
+
+#roadPath {
+    fill: none;
+    stroke: #ffffff;
+    stroke-width: 20px;
+    stroke-linecap: round;
+    stroke-dasharray: 35px 10px;
+    stroke-linejoin: round;
+}
+
+/* 별똥별 기본 스타일 */
+.star-shooting {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 2px;
+    background: #CEC8F6;
+    border-radius: 50%;
+    opacity: 0;
+}
+
+/* 별똥별 꼬리 */
+.star-shooting::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, #d1c9ff, transparent);
+}
+
+/* 떨어지는 애니메이션 */
+@keyframes shooting {
+    0% {
+        transform: rotate(315deg) translateX(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1; /* 나타남 */
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(315deg) translateX(-1500px);
+        opacity: 0;
+    }
+}
+
+
+/* 챕터 깃발 스타일 */
+.flag-div {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 95px;
+    height: auto;
+    z-index: 30;
+    pointer-events: none;
+}
+
+/* 깃발 이미지 */
+.flag-img {
+    display: block;
+    width: 95px;
+    height: auto;
+}
+
+/* 깃발 위에 올라갈 텍스트 */
+.flag-text {
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    color: #191919;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    z-index: 1;
+}
+
+
+/* Orb (노드) 스타일 */
+.orb {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    /*border: 4px solid #E0E7FF;*/
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /*z-index: 30;*/
+    box-shadow: 0 0 10px white;
+    transition: transform .18s ease, box-shadow .18s ease;
+    user-select: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+    /*filter: blur(1px);*/
+}
+
+.orb:hover {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 0 0 20px white;
+}
+
+/* 상태별 스타일 */
+.orb.completed {
+    background: radial-gradient(#dddbff 50%, #4f46e5);
+    box-shadow: 0 0 20px #423bc8;
+    filter: blur(1px);
+}
+
+.orb.current {
+    background: #908bef;
+    color: white;
+    box-shadow: 0 0 0 20px rgba(79, 70, 229);
+    animation: pulse 2s infinite;
+}
+
+.orb.locked {
+    background: rgb(194, 194, 194);
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.chapter-test {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    transition: transform .18s ease, box-shadow .18s ease;
+    user-select: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+    width: 80px;
+    height: 80px;
+}
+
+.chapter-test:hover {
+    transform: scale(1.15) translateY(-5px);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.6);
+    }
+    70% {
+        box-shadow: 0 0 0 14px rgba(79, 70, 229, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    }
+}
+
+
+
+/* 툴팁 스타일 */
+.tip {
+    position: absolute;
+    z-index: 50;
+    width: 300px;
+    background: white;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid #F3F4F6;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+}
+
+.tip::before,
+.tip::after {
+    display: none !important;
+    content: none !important;
+    border: none !important;
+    background: none !important;
+}
+
+.tip.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+
+
+
+/* 챕터 이동 버튼 전용 스타일 */
+.nav-btn-locaton-left {
+    position: absolute;
+    bottom: 24px;
+    left: 32px;
+    z-index: 40;
+}
+
+.nav-btn-locaton-right {
+    position: absolute;
+    bottom: 24px;
+    right: 32px;
+    z-index: 40;
+}
+
+.nav-btn {
+    height: 60px;
+    width: 60px; /* 정사각형 */
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(229, 231, 235, 1);
+    box-shadow: 0 12px 24px rgba(17, 24, 39, 0.08);
+    border-radius: 99px;
+    padding: 10px 10px 10px 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 중앙 정렬 */
+
+    cursor: pointer;
+    user-select: none;
+    backdrop-filter: blur(8px);
+    transition: all .2s ease;
+    outline: none;
+    position: relative;
+}
+
+/* 호버 효과 */
+.nav-btn:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 36px rgba(17, 24, 39, 0.12);
+}

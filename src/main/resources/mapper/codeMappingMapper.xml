@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.CodeMappingMapper">
+
+    <select id="selectCorpCode" parameterType="String" resultType="String">
+        <!-- Dart corp_code <==> KIS stock_code -->
+        select d.corp_code
+        from dart_corp_map d
+        join stock_master s on s.stock_code = d.stock_code
+        where s.stock_code = #{stockCode}
+    </select>
+
+</mapper>

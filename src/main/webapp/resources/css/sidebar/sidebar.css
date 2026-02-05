@@ -1,0 +1,24 @@
+.nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 12px;
+    border-radius: 99px; transition: all .2s ease; color: #9CA3AF; width: 100%; cursor: pointer;
+}
+.nav-icon-box {
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; transition: all .3s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Hover 효과 */
+.nav-item:hover { background-color: rgba(255,255,255,.8); color: #191919; }
+.nav-item:hover .nav-icon-box { background-color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,.05); transform: scale(1.05); }
+
+/* [활성화 상태] Active 효과 */
+.nav-item.active { color: #5E45EB; font-weight: 800; }
+.nav-item.active .nav-icon-box {
+    background-color: #5E45EB; color: #fff;
+    box-shadow: 0 4px 12px rgba(94,69,235,0.4); transform: scale(1.05);
+}
+
+/* 활성화 되었을 때 아이콘(SVG)을 흰색으로 변경하는 필터 */
+.nav-item.active .nav-icon-box img {
+    filter: brightness(0) invert(1);
+}

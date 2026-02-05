@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.AssetDetailMapper">
+
+    <!-- 유저 seq로 모의 체결 테이블 조회 -->
+    <select id="findUserTrades" parameterType="int" resultType="com.tickerbell.jujuclub.invest.dto.MockTradeDTO">
+        SELECT
+            stock_name as stockName,
+            trade_type as tradeType,
+            trade_price as tradePrice,
+            trade_quantity as tradeQuantity,
+            traded_at as tradedAt
+        FROM MOCK_TRADE join STOCK_MASTER
+        ON (MOCK_TRADE.stock_seq = STOCK_MASTER.stock_seq)
+        WHERE user_seq = #{userSeq}
+        ORDER BY TRADED_AT DESC
+    </select>
+</mapper>

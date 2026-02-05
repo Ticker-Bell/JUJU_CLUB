@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.StockMapper">
+
+    <!-- 유저 관심 종목 테이블과 조인해서 유저가 즐겨찾기한 종목들의 코드 조회 -->
+    <select id="findStockListFromUserWatchList" parameterType="integer" resultType="com.tickerbell.jujuclub.invest.dto.StockDTO">
+        SELECT STOCK_MASTER.*
+        FROM USER_WATCHLIST join STOCK_MASTER
+        ON (USER_WATCHLIST.stock_seq = STOCK_MASTER.stock_seq)
+        WHERE user_seq = #{userSeq}
+    </select>
+
+    <!-- 검색창에서 입력한 내용을 포함한 종목들 조회 -->
+    <select id="getSearchList" resultType="com.tickerbell.jujuclub.invest.dto.StockDTO">
+        SELECT stock_code, stock_name
+        FROM STOCK_MASTER
+        WHERE stock_name LIKE CONCAT('%', #{keyword}, '%')
+           OR stock_code LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+</mapper>

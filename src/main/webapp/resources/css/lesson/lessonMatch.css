@@ -1,0 +1,114 @@
+/* Matching Game Styles */
+.match-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 20px 0;
+}
+
+.match-col {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 45%;
+  z-index: 10;
+}
+
+.match-item {
+  position: relative;
+  background: white;
+  border: 2px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  min-height: 80px;
+}
+
+.match-item:hover {
+  border-color: #5E45EB;
+  box-shadow: 0 4px 12px rgba(94, 69, 235, 0.1);
+  transform: translateY(-2px);
+}
+
+.match-item.selected {
+  border-color: #5E45EB;
+  background-color: #F5F3FF;
+  ring: 2px solid #5E45EB;
+}
+
+.match-item.matched {
+  border-color: #10B981;
+  background-color: #ECFDF5;
+  color: #047857;
+  pointer-events: none;
+}
+
+/* Connection Points */
+.dot-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #D1D5DB;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #D1D5DB;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.2s;
+}
+
+.match-item:hover .dot-handle {
+  background: #5E45EB;
+  box-shadow: 0 0 0 1px #5E45EB;
+}
+
+.match-item.selected .dot-handle {
+  background: #5E45EB;
+  box-shadow: 0 0 0 1px #5E45EB;
+  transform: translateY(-50%) scale(1.2);
+}
+
+.match-item.matched .dot-handle {
+  background: #10B981;
+  box-shadow: 0 0 0 1px #10B981;
+}
+
+.left-item .dot-handle {
+  right: -6px;
+}
+
+.right-item .dot-handle {
+  left: -6px;
+}
+
+/* SVG Overlay */
+#svg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+}
+
+.connection-line {
+  stroke: #5E45EB;
+  stroke-width: 3;
+  stroke-linecap: round;
+  fill: none;
+  transition: stroke 0.3s;
+}
+
+.connection-line.correct {
+  stroke: #10B981;
+  stroke-width: 4;
+}

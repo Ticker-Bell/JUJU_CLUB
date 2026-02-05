@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tickerbell.jujuclub.invest.mapper.TradeMapper">
+<!--유저 계좌 잔고 select -->
+    <select id="selectBalance" resultType="int" parameterType="int">
+        SELECT cash_balance
+        FROM user_account
+        WHERE user_seq = #{userSeq}
+    </select>
+
+
+    <!--유저 계좌 잔고 업데이트-->
+    <update id="updateBalance">
+        UPDATE user_account
+        Set cash_balance = cash_balance + #{amount}
+        WHERE user_seq = #{userSeq}
+    </update>
+
+    <!--보유주식의 수량 select-->
+    <select id="selectHoldings" resultType="Integer"  parameterType="com.tickerbell.jujuclub.invest.dto.TradeDTO">
+        SELECT quantity
+        FROM  mock_portfolio JOIN stock_master ON mock_portfolio.stock_seq =stock_master.stock_seq
+        WHERE user_seq = #{userSeq} AND stock_code= #{stockCode}
+    </select>
+
+    <!--보유주식 insert and update-->
+    <insert id="upsertHoldings" parameterType="com.tickerbell.jujuclub.invest.dto.TradeDTO">
+        INSERT INTO mock_portfolio(user_seq, stock_seq, quantity, avg_price)
+        VALUES (#{userSeq}, #{stockSeq}, #{tradeQuantity}, #{tradePrice}) ON DUPLICATE KEY
+        UPDATE
+        <choose>
+            <when test='tradeType == "Y"'>
+                avg_price = (avg_price * quantity + #{tradePrice} * #{tradeQuantity}) / (quantity + #{tradeQuantity}),
+                quantity = quantity + #{tradeQuantity}
+            </when>
+            <when test='tradeType == "N"'>
+                avg_price = avg_price,
+                quantity = quantity - #{tradeQuantity}
+            </when>
+            <otherwise>
+               avg_price = 0,
+                quantity = quantity
+            </otherwise>
+        </choose>
+    </insert>
+
+    <!--보유주식 delete-->
+    <delete id="deleteHoldings">
+    DELETE
+    FROM mock_portfolio
+    WHERE quantity = 0
+    </delete>
+
+    <!--거래 내역 insert-->
+    <insert id="insertTradeHistory" parameterType="com.tickerbell.jujuclub.invest.dto.TradeDTO">
+        INSERT INTO mock_trade(user_seq, stock_seq, trade_type, trade_price, trade_quantity)
+        VALUES (#{userSeq}, #{stockSeq}, #{tradeType}, #{tradePrice}, #{tradeQuantity})
+    </insert>
+
+    <select id="selectStockSeq" resultType="int" parameterType="string">
+        SELECT stock_seq FROM stock_master WHERE stock_code = #{stockCode}
+    </select>
+</mapper>

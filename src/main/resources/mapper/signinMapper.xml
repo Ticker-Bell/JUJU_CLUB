@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.tickerbell.jujuclub.auth.mapper.SigninMapper">
+
+  <select id="selectUserById" parameterType="string" resultType="com.tickerbell.jujuclub.auth.dto.MemberDTO">
+    SELECT
+      user_seq as userSeq,
+      user_id as userId,
+      user_pw as userPw,
+      user_name as userName,
+      user_level as userLevel,
+      created_at as createdAt
+    FROM USERS
+    WHERE user_id = #{userId}
+  </select>
+
+  <update id="updateUserLevel">
+    UPDATE USERS
+    SET user_level = #{level}
+    WHERE user_seq = #{userSeq}
+  </update>
+
+</mapper>

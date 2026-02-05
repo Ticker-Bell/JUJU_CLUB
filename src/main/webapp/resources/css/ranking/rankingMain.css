@@ -1,0 +1,93 @@
+/* TOP 3 하이라이트 */
+.rank-top-1 { background: rgba(255, 193, 7, 0.14) !important; }   /* gold */
+.rank-top-2 { background: rgba(156, 163, 175, 0.16) !important; } /* silver */
+.rank-top-3 { background: rgba(205, 127, 50, 0.16) !important; }  /* bronze */
+.rank-top-1:hover, .rank-top-2:hover, .rank-top-3:hover { filter: brightness(0.98); }
+
+/* 랭킹 리스트 - 프로필 아바타 */
+.rank-user { display: flex; align-items: center; gap: 10px; padding-left: 50px; }
+.rank-avatar {
+  width: 30px; height: 30px; border-radius: 9999px; object-fit: cover;
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  flex: 0 0 auto;
+}
+.rank-avatar-fallback {
+  width: 30px; height: 30px; border-radius: 9999px;
+  display: flex; align-items: center; justify-content: center;
+  background: #EEF2FF; color: #4F46E5; font-weight: 900; font-size: 12px;
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  flex: 0 0 auto;
+}
+
+/* ✅ 전체 랭킹 테이블: 탭마다 컬럼폭 고정 */
+.rank-table { table-layout: fixed; }
+
+/* 기본 설정 및 레이아웃 */
+#rankingMainContent { font-family: 'Pretendard', sans-serif; display: flex; height: 100vh; width: 100%; background: #fff; overflow: hidden; }
+
+/* [왼쪽] 스테이지 영역 */
+#leftAnimZone {
+  flex: 1; height: 100%;
+  background: radial-gradient(circle at 50% 50%, #fcfcfd 0%, #f3f4f6 100%);
+  border-right: 1px solid #f1f5f9;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding-top: 50px; position: relative;
+}
+
+/* 트로피 섹션 */
+.trophy-wrap {
+  display: flex; justify-content: center; align-items: flex-end;
+  gap: 50px; margin-top:16vh; margin-bottom: 18px;
+}
+.trophy {
+  position: relative; width: clamp(110px, 12vw, 170px);
+  display: flex; flex-direction: column; align-items: center;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: grayscale(1) opacity(0.5);
+}
+
+/* 트로피 색상 및 활성화 효과 */
+.trophy.gold .text-color { color: #FFC107; }
+.trophy.silver .text-color { color: #9CA3AF; }
+.trophy.bronze .text-color { color: #CD7F32; }
+.trophy.active { filter: grayscale(0) opacity(1); transform: scale(1.15) translateY(-15px); }
+.trophy.gold.active { transform: scale(1.4) translateY(-25px); animation: activeGlowGold 2s ease-in-out infinite; }
+.trophy.silver.active { animation: activeGlowSilver 2s ease-in-out infinite; }
+.trophy.bronze.active { animation: activeGlowBronze 2s ease-in-out infinite; }
+
+@keyframes activeGlowGold {
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.4)); }
+  50% { filter: drop-shadow(0 0 35px rgba(255, 193, 7, 0.7)); }
+}
+@keyframes activeGlowSilver {
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(156, 163, 175, 0.4)); }
+  50% { filter: drop-shadow(0 0 35px rgba(156, 163, 175, 0.7)); }
+}
+@keyframes activeGlowBronze {
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(205, 127, 50, 0.4)); }
+  50% { filter: drop-shadow(0 0 35px rgba(205, 127, 50, 0.7)); }
+}
+
+/* 슬라이더 및 카드 */
+.portfolio-slider {
+  width: 100%; max-width: 600px;
+  position: relative; display: flex; align-items: center; justify-content: center;
+  margin-top: 4px;
+}
+.portfolio-container { width: 100%; overflow: hidden; border-radius: 24px; touch-action: none; z-index: 10; }
+.portfolio-inner { display: flex; width: 100%; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+.winner-card { flex: 0 0 100%; width: 100%; padding: 10px; box-sizing: border-box; }
+.card-content { background: #fff; border: 1px solid #f1f5f9; border-radius: 24px; padding: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); }
+
+/* 버튼 및 탭 */
+.nav-btn { position: absolute; z-index: 20; opacity: 0.3; transition: all 0.3s ease; color: #111827; }
+.nav-btn:hover { opacity: 1; transform: scale(1.2); color: #5E45EB; }
+.nav-btn.prev { left: -50px; }
+.nav-btn.next { right: -50px; }
+
+#rightDataZone { flex: 1; height: 100%; overflow-y: auto; padding: 40px; background: #fff; display: flex; flex-direction: column; gap: 20px; }
+.rank-tab-btn { position: relative; padding-bottom: 10px; font-weight: 900; font-size: 13px; color: #9CA3AF; }
+.rank-tab-btn.active { color: #111827; }
+#tab-slider { position: absolute; bottom: 0; left: 0; height: 2px; background-color: #5E45EB; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
